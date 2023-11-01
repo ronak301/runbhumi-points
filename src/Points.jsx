@@ -56,7 +56,15 @@ const Points = () => {
   const onUpdateEntry = async () => {
     try {
       const userRef = doc(db, "points", input?.id);
-      setDoc(userRef, input);
+      setDoc(
+        userRef,
+        {
+          name: input?.name,
+          number: input?.number,
+          points: input.points,
+        },
+        { merge: true }
+      );
       await fetchUsers();
       setLoading(false);
       setInput({});
