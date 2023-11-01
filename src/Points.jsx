@@ -27,7 +27,7 @@ import { shareOnMobile } from "react-mobile-share";
 import { collection, addDoc, getDocs, setDoc, doc } from "firebase/firestore";
 import React from "react";
 import { db } from "./firebase";
-import { filter, includes, lowerCase, map } from "lodash";
+import { filter, includes, isEmpty, lowerCase, map } from "lodash";
 
 const Points = () => {
   const [users, setUsers] = React.useState();
@@ -222,48 +222,55 @@ const Points = () => {
           placeholder="Search Phone Number / Name"
         />
       </Flex>
-      <TableContainer>
-        <Table variant="striped" colorScheme="teal">
-          <Thead>
-            <Tr>
-              <Th>Action</Th>
-              <Th>Name</Th>
-              <Th>Points</Th>
-              <Th isNumeric>Number</Th>
-              <Th isNumeric>Share</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {map(updatedUsers, (user) => {
-              return (
-                <Tr>
-                  <Button
-                    onClick={() => {
-                      setInput(user);
-                      onOpen();
-                    }}
-                    mt={2}>
-                    Edit
-                  </Button>
-                  <Td>{user?.name}</Td>
-                  <Td>{user?.points}</Td>
-                  <Td isNumeric>{user?.number}</Td>
-                  <Button
-                    onClick={() => {
-                      shareOnMobile({
-                        title: "Runbhumi Points",
-                        text: `Hello! You have ${user?.points} Runbhumi Points available to be redeemed.`,
-                      });
-                    }}
-                    mt={2}>
-                    Share
-                  </Button>
-                </Tr>
-              );
-            })}
-          </Tbody>
-        </Table>
-      </TableContainer>
+      {isEmpty(updatedUsers) ? (
+        <Box textAlign={"center"} mt={12} mb={8}>
+          No Data
+        </Box>
+      ) : (
+        <TableContainer>
+          <Table variant="striped" colorScheme="teal">
+            <Thead>
+              <Tr>
+                <Th>Action</Th>
+                <Th>Name</Th>
+                <Th>Points</Th>
+                <Th isNumeric>Number</Th>
+                <Th isNumeric>Share</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {map(updatedUsers, (user) => {
+                return (
+                  <Tr>
+                    <Button
+                      onClick={() => {
+                        setInput(user);
+                        onOpen();
+                      }}
+                      mt={2}>
+                      Edit
+                    </Button>
+                    <Td>{user?.name}</Td>
+                    <Td>{user?.points}</Td>
+                    <Td isNumeric>{user?.number}</Td>
+                    <Button
+                      onClick={() => {
+                        shareOnMobile({
+                          title: "Runbhumi Points",
+                          text: `Hello! You have ${user?.points} Runbhumi Points available to be redeemed.`,
+                        });
+                      }}
+                      mt={2}>
+                      Share
+                    </Button>
+                  </Tr>
+                );
+              })}
+            </Tbody>
+          </Table>
+        </TableContainer>
+      )}
+
       <Button mb={32} onClick={onOpen} colorScheme="blue" mt={8}>
         Add New Entry
       </Button>
