@@ -25,10 +25,10 @@ import {
   ModalCloseButton,
 } from "@chakra-ui/react";
 
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import { collection, addDoc, getDocs, setDoc, doc } from "firebase/firestore";
 import React from "react";
 import { db } from "./firebase";
-import { filter, includes, map } from "lodash";
+import { filter, includes, lowerCase, map } from "lodash";
 
 const Points = () => {
   const [users, setUsers] = React.useState();
@@ -55,7 +55,30 @@ const Points = () => {
     });
   };
 
+  const onUpdateEntry = async () => {
+    try {
+      const userRef = doc(db, "points", input?.id);
+      setDoc(userRef, input);
+      await fetchUsers();
+      setLoading(false);
+      setInput({});
+      onClose();
+      return;
+    } catch (e) {
+      setLoading(false);
+      console.error(e);
+      return;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const onAddEntry = async () => {
+    setLoading(true);
+    if (input?.id) {
+      await onUpdateEntry();
+      return;
+    }
     const doesUserExist =
       filter(users, (u) => u?.number === input?.number)?.length > 0;
     if (doesUserExist) {
@@ -64,7 +87,7 @@ const Points = () => {
       );
       return;
     }
-    setLoading(true);
+
     try {
       await addDoc(collection(db, "points"), {
         ...input,
@@ -76,6 +99,8 @@ const Points = () => {
     } catch (e) {
       setLoading(false);
       console.error("Error adding document: ", e);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -85,7 +110,9 @@ const Points = () => {
     } else {
       const updatedUsers = filter(
         users,
-        (u) => includes(u?.number, query) || u?.name === query
+        (u) =>
+          includes(u?.number, query) ||
+          includes(lowerCase(u?.name), lowerCase(query))
       );
       setUpdatedUsers(updatedUsers);
     }
@@ -105,6 +132,7 @@ const Points = () => {
           <ModalCloseButton />
           <ModalBody>
             <Input
+              value={input?.number}
               width={"100%"}
               onChange={(e) => {
                 setInput({
@@ -112,10 +140,11 @@ const Points = () => {
                   number: e?.target?.value,
                 });
               }}
-              placeholder="Enter Phone Name"
+              placeholder="Phone Number"
             />
             <Input
               width={"100%"}
+              value={input?.name}
               mt={2}
               onChange={(e) => {
                 setInput({
@@ -123,18 +152,19 @@ const Points = () => {
                   name: e?.target?.value,
                 });
               }}
-              placeholder="Enter Name"
+              placeholder="Name"
             />
             <Input
               mt={2}
               width={"100%"}
+              value={input?.points}
               onChange={(e) => {
                 setInput({
                   ...input,
                   points: e?.target?.value,
                 });
               }}
-              placeholder="Enter Points"
+              placeholder="Points"
             />
           </ModalBody>
 
@@ -145,7 +175,7 @@ const Points = () => {
               colorScheme="blue"
               ml={3}
               onClick={onAddEntry}>
-              Add
+              {input?.id ? "Update" : "Add"}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -158,12 +188,22 @@ const Points = () => {
       </Box>
 
       <Flex mt={4} flexDirection={"column"}>
-        <Box fontSize={14} mt={4} mb={1}>
-          Search By Name or Phone Number
-        </Box>
-        <Box fontSize={14} mt={4} mb={1}>
-          {`Total ${users?.length}`}
-        </Box>
+        <Flex
+          flexDirection={"row"}
+          justifyContent={"space-between"}
+          mt={4}
+          mb={2}>
+          <Box>
+            <Box fontSize={14}>Search</Box>
+            <Box fontSize={14} mt={1} mb={1}>
+              {`Total ${users?.length}`}
+            </Box>
+          </Box>
+          <Box>
+            <Button colorScheme="blue">Add</Button>
+          </Box>
+        </Flex>
+
         <Input
           width={"100%"}
           value={query}
@@ -186,7 +226,14 @@ const Points = () => {
             {map(updatedUsers, (user) => {
               return (
                 <Tr>
-                  <Button mt={2}>Edit</Button>
+                  <Button
+                    onClick={() => {
+                      setInput(user);
+                      onOpen();
+                    }}
+                    mt={2}>
+                    Edit
+                  </Button>
                   <Td>{user?.name}</Td>
                   <Td>{user?.points}</Td>
                   <Td isNumeric>{user?.number}</Td>
