@@ -223,6 +223,7 @@ const Points = () => {
         <Table variant="striped" colorScheme="teal">
           <Thead>
             <Tr>
+              <Th>Action</Th>
               <Th>Name</Th>
               <Th>Points</Th>
               <Th isNumeric>Number</Th>
