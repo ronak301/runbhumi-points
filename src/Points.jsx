@@ -12,7 +12,19 @@ import {
   Th,
   Thead,
   Tr,
+  useDisclosure,
 } from "@chakra-ui/react";
+
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+} from "@chakra-ui/react";
+
 import { collection, addDoc, getDocs } from "firebase/firestore";
 import React from "react";
 import { db } from "./firebase";
@@ -22,6 +34,9 @@ const Points = () => {
   const [users, setUsers] = React.useState();
   const [updatedUsers, setUpdatedUsers] = React.useState();
   const [query, setQuery] = React.useState("");
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [input, setInput] = React.useState({});
+  const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
     fetchUsers();
@@ -35,19 +50,31 @@ const Points = () => {
       }));
       setUsers(newData);
       setUpdatedUsers(newData);
+      setQuery("");
       console.log(newData);
     });
   };
 
-  const onAddEntry = async (values) => {
+  const onAddEntry = async () => {
+    const doesUserExist =
+      filter(users, (u) => u?.number === input?.number)?.length > 0;
+    if (doesUserExist) {
+      alert(
+        "User with this number already exist, please edit that user instead"
+      );
+      return;
+    }
+    setLoading(true);
     try {
-      const docRef = await addDoc(collection(db, "points"), {
-        name: "Abhay",
-        points: 600,
-        number: "9649354356",
+      await addDoc(collection(db, "points"), {
+        ...input,
       });
-      console.log("Document written with ID: ", docRef.id);
+      await fetchUsers();
+      setLoading(false);
+      setInput({});
+      onClose();
     } catch (e) {
+      setLoading(false);
       console.error("Error adding document: ", e);
     }
   };
@@ -66,10 +93,63 @@ const Points = () => {
 
   return (
     <Flex
+      scrollBehavior="auto"
       paddingTop={"10%"}
       paddingLeft={"10%"}
       paddingRight={"10%"}
       flexDirection={"column"}>
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent width="90%">
+          <ModalHeader>Add New Member</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Input
+              width={"100%"}
+              onChange={(e) => {
+                setInput({
+                  ...input,
+                  number: e?.target?.value,
+                });
+              }}
+              placeholder="Enter Phone Name"
+            />
+            <Input
+              width={"100%"}
+              mt={2}
+              onChange={(e) => {
+                setInput({
+                  ...input,
+                  name: e?.target?.value,
+                });
+              }}
+              placeholder="Enter Name"
+            />
+            <Input
+              mt={2}
+              width={"100%"}
+              onChange={(e) => {
+                setInput({
+                  ...input,
+                  points: e?.target?.value,
+                });
+              }}
+              placeholder="Enter Points"
+            />
+          </ModalBody>
+
+          <ModalFooter>
+            <Button onClick={onClose}>Cancel</Button>
+            <Button
+              isLoading={loading}
+              colorScheme="blue"
+              ml={3}
+              onClick={onAddEntry}>
+              Add
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
       <Box textAlign={"center"} fontSize={18}>
         Welcome To Runbhumi Mewar
       </Box>
@@ -80,6 +160,9 @@ const Points = () => {
       <Flex mt={4} flexDirection={"column"}>
         <Box fontSize={14} mt={4} mb={1}>
           Search By Name or Phone Number
+        </Box>
+        <Box fontSize={14} mt={4} mb={1}>
+          {`Total ${users?.length}`}
         </Box>
         <Input
           width={"100%"}
@@ -103,7 +186,7 @@ const Points = () => {
             {map(updatedUsers, (user) => {
               return (
                 <Tr>
-                  <Button mt={2}>Edit</Button>  
+                  <Button mt={2}>Edit</Button>
                   <Td>{user?.name}</Td>
                   <Td>{user?.points}</Td>
                   <Td isNumeric>{user?.number}</Td>
@@ -113,7 +196,7 @@ const Points = () => {
           </Tbody>
         </Table>
       </TableContainer>
-      <Button onClick={onAddEntry} colorScheme="blue" mt={8}>
+      <Button mb={32} onClick={onOpen} colorScheme="blue" mt={8}>
         Add New Entry
       </Button>
     </Flex>
