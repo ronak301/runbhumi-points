@@ -22,6 +22,7 @@ import {
   ModalBody,
   ModalCloseButton,
 } from "@chakra-ui/react";
+import { shareOnMobile } from "react-mobile-share";
 
 import { collection, addDoc, getDocs, setDoc, doc } from "firebase/firestore";
 import React from "react";
@@ -56,7 +57,7 @@ const Points = () => {
   const onUpdateEntry = async () => {
     try {
       const userRef = doc(db, "points", input?.id);
-      setDoc(
+      await setDoc(
         userRef,
         {
           name: input?.name,
@@ -206,7 +207,9 @@ const Points = () => {
             </Box>
           </Box>
           <Box>
-            <Button colorScheme="blue">Add</Button>
+            <Button onClick={onOpen} colorScheme="blue">
+              Add
+            </Button>
           </Box>
         </Flex>
 
@@ -216,7 +219,7 @@ const Points = () => {
           onChange={(e) => {
             setQuery(e.target.value);
           }}
-          placeholder="Enter Phone Number / Name"
+          placeholder="Search Phone Number / Name"
         />
       </Flex>
       <TableContainer>
@@ -227,6 +230,7 @@ const Points = () => {
               <Th>Name</Th>
               <Th>Points</Th>
               <Th isNumeric>Number</Th>
+              <Th isNumeric>Share</Th>
             </Tr>
           </Thead>
           <Tbody>
@@ -244,6 +248,16 @@ const Points = () => {
                   <Td>{user?.name}</Td>
                   <Td>{user?.points}</Td>
                   <Td isNumeric>{user?.number}</Td>
+                  <Button
+                    onClick={() => {
+                      shareOnMobile({
+                        title: "Runbhumi Points",
+                        text: `Hello! You have ${user?.points} Runbhumi Points available to be redeemed.`,
+                      });
+                    }}
+                    mt={2}>
+                    Share
+                  </Button>
                 </Tr>
               );
             })}

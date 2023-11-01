@@ -9382,6 +9382,11 @@ react-is@^18.0.0:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-18.2.0.tgz#199431eeaaa2e09f86427efbb4f1473edb47609b"
   integrity sha512-xWGDIW6x921xtzPkhiULtthJHoJvBbF3q26fzloPCK0hsvxtPVelvftw3zjbHWSkR2km9Z+4uxbDDK/6Zw9B8w==
 
+react-mobile-share@^1.0.30:
+  version "1.0.30"
+  resolved "https://registry.yarnpkg.com/react-mobile-share/-/react-mobile-share-1.0.30.tgz#d57a0a8130c36ce88cd73b82fd186214ce835724"
+  integrity sha512-mP5UxJ1m3cRSbmidR0sB/y470sBSeX9Wuf9uL6cFrFypWQt+zca00IT6j1s9UQ9FzPqCTZSkYGVS3EsOwrGTCQ==
+
 react-refresh@^0.11.0:
   version "0.11.0"
   resolved "https://registry.yarnpkg.com/react-refresh/-/react-refresh-0.11.0.tgz#77198b944733f0f1f1a90e791de4541f9f074046"
