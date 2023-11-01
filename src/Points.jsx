@@ -256,7 +256,7 @@ const Points = () => {
                     <Button
                       onClick={() => {
                         shareOnMobile({
-                          title: `Hello! You have ${user?.points} Runbhumi Points available to be redeemed.`,
+                          title: `Hello!! You have ${user?.points} Runbhumi Points associated with mobile number -  ${user?.number}`,
                         });
                       }}
                       mt={2}>
