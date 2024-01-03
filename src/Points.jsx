@@ -29,8 +29,27 @@ import { shareOnMobile } from "react-mobile-share";
 import { collection, addDoc, getDocs, setDoc, doc } from "firebase/firestore";
 import React from "react";
 import { db } from "./firebase";
-import { filter, includes, isEmpty, lowerCase, map, reduce } from "lodash";
+import {
+  filter,
+  forEach,
+  includes,
+  isEmpty,
+  lowerCase,
+  map,
+  reduce,
+} from "lodash";
 import { DeleteIcon, EditIcon, ExternalLinkIcon } from "@chakra-ui/icons";
+import { getDateFormat } from "./utils/date";
+import * as moment from "moment";
+
+export const VALID_TILL_DURATION = 20;
+
+// type User = {
+//   name: string;
+//   points: string;
+//   number: string;
+//   validTill: string;
+// };
 
 const Points = () => {
   const [users, setUsers] = React.useState();
@@ -44,6 +63,12 @@ const Points = () => {
     fetchUsers();
   }, []);
 
+  const getValidTill = () => {
+    return moment(new Date())
+      .add(VALID_TILL_DURATION, "days")
+      .format("YYYY-MM-DD");
+  };
+
   const fetchUsers = async () => {
     await getDocs(collection(db, "points")).then((querySnapshot) => {
       const newData = querySnapshot.docs.map((doc) => ({
@@ -53,7 +78,6 @@ const Points = () => {
       setUsers(newData);
       setUpdatedUsers(newData);
       setQuery("");
-      console.log(newData);
     });
   };
 
@@ -66,6 +90,7 @@ const Points = () => {
           name: input?.name,
           number: input?.number,
           points: input.points,
+          validTill: getValidTill(),
         },
         { merge: true }
       );
@@ -101,6 +126,7 @@ const Points = () => {
     try {
       await addDoc(collection(db, "points"), {
         ...input,
+        validTill: getValidTill(),
       });
       await fetchUsers();
       setLoading(false);
@@ -145,6 +171,7 @@ const Points = () => {
           Points Table
         </Box>
       </Box>
+
       <Flex
         backgroundColor={"rgb(247,245,238)"}
         scrollBehavior="auto"
@@ -220,6 +247,9 @@ const Points = () => {
               <Box fontSize={14} mt={1} mb={1}>
                 {`Total Points -  ${totalPoints}`}
               </Box>
+              <Box fontSize={14} mt={1} mb={1}>
+                {`Valid Till Duration (in days) - ${VALID_TILL_DURATION}`}
+              </Box>
             </Box>
             <Box>
               <Button onClick={onOpen} colorScheme="blue">
@@ -269,11 +299,14 @@ const Points = () => {
                       <Text fontSize={18} fontWeight={"700"}>
                         {user?.name}
                       </Text>
-                      <Text fontWeight={"700"} fontSize={20}>
+                      <Text fontWeight={"700"} fontSize={22}>
                         {`${user?.points}`}
                       </Text>
                     </Flex>
                     <Text>{user?.number}</Text>
+                    <Text color="gray.700">{`Valid Till ${getDateFormat(
+                      user?.validTill
+                    )}`}</Text>
                     <Flex justifyContent={"space-between"} mt={4}>
                       <Box>
                         <IconButton
@@ -314,47 +347,6 @@ const Points = () => {
                 );
               })}
             </Box>
-            <TableContainer>
-              <Table variant="striped" colorScheme="teal">
-                <Thead>
-                  <Tr>
-                    <Th>Action</Th>
-                    <Th>Name</Th>
-                    <Th>Points</Th>
-                    <Th isNumeric>Number</Th>
-                    <Th isNumeric>Share</Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {map(updatedUsers, (user) => {
-                    return (
-                      <Tr>
-                        <Button
-                          onClick={() => {
-                            setInput(user);
-                            onOpen();
-                          }}
-                          mt={2}>
-                          Edit
-                        </Button>
-                        <Td>{user?.name}</Td>
-                        <Td>{user?.points}</Td>
-                        <Td isNumeric>{user?.number}</Td>
-                        <Button
-                          onClick={() => {
-                            shareOnMobile({
-                              title: `Hello ${user?.name}!! You have ${user?.points} Runbhumi Points associated with mobile number -  ${user?.number}`,
-                            });
-                          }}
-                          mt={2}>
-                          Share
-                        </Button>
-                      </Tr>
-                    );
-                  })}
-                </Tbody>
-              </Table>
-            </TableContainer>
           </>
         )}
 
