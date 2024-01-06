@@ -4,6 +4,10 @@ import {
   Flex,
   IconButton,
   Input,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
@@ -22,11 +26,10 @@ import { collection, addDoc, getDocs, setDoc, doc } from "firebase/firestore";
 import React from "react";
 import { db } from "./firebase";
 import { filter, includes, isEmpty, lowerCase, map, reduce } from "lodash";
-import { EditIcon, ExternalLinkIcon, UpDownIcon } from "@chakra-ui/icons";
+import { ChevronDownIcon, EditIcon, ExternalLinkIcon } from "@chakra-ui/icons";
 import { getDateFormat } from "./utils/date";
 import * as moment from "moment";
 import { DeleteEntry } from "./components/DeleteEntry";
-import { Test } from "./components/Test";
 
 export const VALID_TILL_DURATION = 20;
 
@@ -43,6 +46,7 @@ const Points = () => {
   const [query, setQuery] = React.useState("");
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [input, setInput] = React.useState({});
+  const [points, setPoints] = React.useState("");
   const [loading, setLoading] = React.useState(false);
 
   const getPoints = (points) => {
@@ -83,7 +87,7 @@ const Points = () => {
         {
           name: input?.name,
           number: input?.number,
-          points: [...userStored?.points, input?.points],
+          points: [...userStored?.points, points],
           validTill: getValidTill(),
           updatedAt: Date.now(),
         },
@@ -121,7 +125,9 @@ const Points = () => {
 
     try {
       await addDoc(collection(db, "points"), {
-        ...input,
+        name: input?.name,
+        number: input?.number,
+        points: [points],
         updatedAt: Date.now(),
         validTill: getValidTill(),
       });
@@ -164,10 +170,26 @@ const Points = () => {
     });
   };
 
-  const sortUsersByDaysRemaining = (data) => {
+  const sortUsersByDaysRemaining = (data, order = "asc") => {
+    const isAscending = order === "asc";
+    const firstVal = isAscending ? -1 : 1;
+    const secondVal = isAscending ? 1 : -1;
     setUpdatedUsers(
       [...data]?.sort((a, b) => {
-        return a?.validTill < b?.validTill ? -1 : 1;
+        return a?.validTill < b?.validTill ? firstVal : secondVal;
+      })
+    );
+  };
+
+  const sortByPoints = (data, order = "asc") => {
+    const isAscending = order === "asc";
+    const firstVal = isAscending ? -1 : 1;
+    const secondVal = isAscending ? 1 : -1;
+    setUpdatedUsers(
+      [...data]?.sort((a, b) => {
+        return Number(getPoints(a?.points)) < Number(getPoints(b?.points))
+          ? firstVal
+          : secondVal;
       })
     );
   };
@@ -232,12 +254,9 @@ const Points = () => {
               <Input
                 mt={2}
                 width={"100%"}
-                value={getPoints(input?.points)}
+                defaultValue={getPoints(input?.points)}
                 onChange={(e) => {
-                  setInput({
-                    ...input,
-                    points: e?.target?.value,
-                  });
+                  setPoints(e?.target?.value);
                 }}
                 placeholder="Points"
               />
@@ -287,28 +306,51 @@ const Points = () => {
           <Box fontSize={14} mb={2}>
             Search
           </Box>
-          <Input
-            autoFocus
-            borderColor={"black"}
-            height={12}
-            mb={4}
-            width={"100%"}
-            value={query}
-            onChange={(e) => {
-              setQuery(e.target.value);
-            }}
-            placeholder="Search Phone Number / Name"
-          />
+          <Flex>
+            <Input
+              h={"48px"}
+              autoFocus
+              borderColor={"black"}
+              height={12}
+              mb={4}
+              width={"100%"}
+              value={query}
+              onChange={(e) => {
+                setQuery(e.target.value);
+              }}
+              placeholder="Search Phone Number / Name"
+            />
+            <Menu maxW={300}>
+              <MenuButton
+                h={"48px"}
+                ml={2}
+                w={120}
+                as={Button}
+                rightIcon={<ChevronDownIcon />}>
+                Sort
+              </MenuButton>
+              <MenuList>
+                <MenuItem
+                  onClick={() =>
+                    sortUsersByDaysRemaining(updatedUsers, "desc")
+                  }>
+                  Sort By Days Remaining (High to Low)
+                </MenuItem>
+                <MenuItem
+                  onClick={() => sortUsersByDaysRemaining(updatedUsers, "asc")}>
+                  Sort By Days Remaining (Low to High)
+                </MenuItem>
+                <MenuItem onClick={() => sortByPoints(updatedUsers, "desc")}>
+                  Sort By Points (High to low)
+                </MenuItem>
+                <MenuItem onClick={() => sortByPoints(updatedUsers, "asc")}>
+                  Sort By Points (Low to High)
+                </MenuItem>
+              </MenuList>
+            </Menu>
+          </Flex>
         </Flex>
-        <Button
-          onClick={() => sortUsersByDaysRemaining(updatedUsers)}
-          colorScheme={"blue"}
-          rightIcon={<UpDownIcon />}
-          variant="outline"
-          w={240}
-          alignSelf="flex-end">
-          Sort by Days Remaining
-        </Button>
+
         {isEmpty(updatedUsers) ? (
           <Box textAlign={"center"} mt={12} mb={8}>
             No Data
@@ -317,6 +359,8 @@ const Points = () => {
           <>
             <Box>
               {map(updatedUsers, (user) => {
+                if (user?.name === "Prachi")
+                  console.log("user?.pointsuser?.points", user?.points);
                 const remainingDays = moment(new Date(user?.validTill))?.diff(
                   moment(),
                   "days"
@@ -365,13 +409,13 @@ const Points = () => {
                           onClick={() => {
                             const message = `Hello ${
                               user?.name
-                            }!! You have ${getPoints(
+                            }!! You have *${getPoints(
                               user?.points
-                            )} Runbhumi Points associated with mobile number -  ${
+                            )} Runbhumi Points* associated with mobile number -  ${
                               user?.number
-                            } .\nValid till - ${moment(user?.validTill).format(
+                            } .\n*Valid till - ${moment(user?.validTill).format(
                               "DD/MM/YYYY"
-                            )}`;
+                            )}*`;
                             window.open(
                               `https://wa.me/${user?.number}?text=${message}`,
                               "_blank"
