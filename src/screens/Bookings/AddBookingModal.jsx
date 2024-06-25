@@ -1,6 +1,7 @@
 import React from "react";
 import {
   Button,
+  Flex,
   Input,
   Modal,
   ModalBody,
@@ -9,11 +10,12 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  useDisclosure,
 } from "@chakra-ui/react";
+import SlotSelector from "./SlotSelector";
+import moment from "moment";
+import ContactPicker from "./ContactPicker";
 
-export default function AddBookingModal() {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+export default function AddBookingModal({ isOpen, onClose, input, setInput }) {
   // update this later
   const isUpdating = false;
 
@@ -22,11 +24,43 @@ export default function AddBookingModal() {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
-      <ModalContent width="90%">
-        <ModalHeader>{isUpdating ? "Update" : "Add New Member"}</ModalHeader>
+      <ModalContent width="96%">
+        <ModalHeader>{isUpdating ? "Update" : "Add Booking"}</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Input />
+          <Flex gap={4} direction={"column"}>
+            <Input
+              value={input?.name}
+              width={"100%"}
+              onChange={(e) => {
+                setInput({
+                  ...input,
+                  name: e?.target?.value,
+                });
+              }}
+              placeholder="Name"
+            />
+            <Input
+              value={input?.number}
+              width={"100%"}
+              onChange={(e) => {
+                setInput({
+                  ...input,
+                  number: e?.target?.value,
+                });
+              }}
+              placeholder="Phone Number"
+            />
+            <Input
+              placeholder="Select Date"
+              size="md"
+              type="date"
+              defaultValue={moment().format("YYYY-MM-DD")}
+              min={moment().format("YYYY-MM-DD")}
+            />
+            <ContactPicker />
+            <SlotSelector input={input} setInput={setInput} />
+          </Flex>
         </ModalBody>
 
         <ModalFooter>

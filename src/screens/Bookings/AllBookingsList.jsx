@@ -1,4 +1,11 @@
-import { Button, Flex, Box, Text, IconButton } from "@chakra-ui/react";
+import {
+  Button,
+  Flex,
+  Box,
+  Text,
+  IconButton,
+  useDisclosure,
+} from "@chakra-ui/react";
 import React from "react";
 import AddBookingModal from "./AddBookingModal";
 import { map } from "lodash";
@@ -8,6 +15,8 @@ import moment from "moment";
 
 export default function AllBookingsList() {
   const [bookings, setBookings] = React.useState([]);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [input, setInput] = React.useState({});
   const [shouldFetchAllBookings, setShouldFetchAllBookings] =
     React.useState(false);
 
@@ -44,7 +53,12 @@ export default function AllBookingsList() {
         paddingLeft={"4%"}
         paddingRight={"4%"}
         flexDirection={"column"}>
-        <AddBookingModal />
+        <AddBookingModal
+          input={input}
+          setInput={setInput}
+          isOpen={isOpen}
+          onClose={onClose}
+        />
         <Flex mt={4} flexDirection={"column"}>
           <Flex
             flexDirection={"row"}
@@ -53,7 +67,9 @@ export default function AllBookingsList() {
             mb={2}>
             <Box />
             <Button
-              onClick={() => {}}
+              onClick={() => {
+                onOpen();
+              }}
               colorScheme="blue"
               alignSelf={"flex-end"}>
               Add Booking
