@@ -219,10 +219,11 @@ const Points = () => {
         <Flex mt={4} flexDirection={"column"}>
           <Flex
             flexDirection={"row"}
+            alignItems={"center"}
             justifyContent={"space-between"}
             mt={1}
             mb={2}>
-            <Box>
+            <Box backgroundColor={"white"} px={2} py={2} borderRadius={8}>
               <Box fontSize={10}>{`Total Users - ${users?.length}`}</Box>
               <Box fontSize={10}>{`Total Points -  ${totalPoints}`}</Box>
               <Box fontSize={10}>
@@ -255,6 +256,7 @@ const Points = () => {
               onChange={(e) => {
                 setQuery(e.target.value);
               }}
+              backgroundColor={"white"}
               placeholder="Search Phone Number / Name"
             />
             <Menu maxW={300}>
@@ -262,6 +264,7 @@ const Points = () => {
                 h={"48px"}
                 ml={2}
                 w={120}
+                border={"1px solid black"}
                 as={Button}
                 rightIcon={<ChevronDownIcon />}>
                 Sort
