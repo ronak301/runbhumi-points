@@ -1,11 +1,11 @@
 import "./App.css";
 import { ChakraProvider } from "@chakra-ui/react";
-import Points from "./Points";
+import HomeTab from "./screens/HomeTab/HomeTab";
 
 function App() {
   return (
     <ChakraProvider>
-      <Points />
+      <HomeTab />
     </ChakraProvider>
   );
 }

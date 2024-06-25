@@ -13,34 +13,33 @@ import {
 } from "@chakra-ui/react";
 
 import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-} from "@chakra-ui/react";
-
-import { collection, addDoc, getDocs, setDoc, doc } from "firebase/firestore";
+  collection,
+  addDoc,
+  getDocs,
+  setDoc,
+  doc,
+  query as q,
+  orderBy,
+  limit,
+} from "firebase/firestore";
 import React from "react";
-import { db } from "./firebase";
+import { db } from "../../firebase";
 import { filter, includes, isEmpty, lowerCase, map, reduce } from "lodash";
 import { ChevronDownIcon, EditIcon, ExternalLinkIcon } from "@chakra-ui/icons";
-import { getDateFormat } from "./utils/date";
+import { getDateFormat } from "../../utils/date";
 import * as moment from "moment";
-import { DeleteEntry } from "./components/DeleteEntry";
+import { DeleteEntry } from "../../components/DeleteEntry";
+import AddPointsModal from "./AddPointsModal";
 
-export const VALID_TILL_DURATION = 20;
-
-// type User = {
-//   name: string;
-//   points: string;
-//   number: string;
-//   validTill: string;
-// };
+export const VALID_TILL_DURATION = 30;
 
 const Points = () => {
+  const initialDocs = q(
+    collection(db, "points"),
+    orderBy("updatedAt", "desc"),
+    limit(10)
+  );
+
   const [users, setUsers] = React.useState();
   const [updatedUsers, setUpdatedUsers] = React.useState();
   const [query, setQuery] = React.useState("");
@@ -48,6 +47,7 @@ const Points = () => {
   const [input, setInput] = React.useState({});
   const [points, setPoints] = React.useState("");
   const [loading, setLoading] = React.useState(false);
+  const [docs, setDocs] = React.useState(initialDocs);
 
   const getPoints = (points) => {
     if (isEmpty(points)) return "";
@@ -57,7 +57,7 @@ const Points = () => {
 
   React.useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [docs]);
 
   const getValidTill = () => {
     return moment(new Date())
@@ -66,7 +66,7 @@ const Points = () => {
   };
 
   const fetchUsers = async () => {
-    await getDocs(collection(db, "points")).then((querySnapshot) => {
+    await getDocs(docs).then((querySnapshot) => {
       const newData = querySnapshot.docs.map((doc) => ({
         ...doc.data(),
         id: doc.id,
@@ -198,97 +198,34 @@ const Points = () => {
 
   return (
     <>
-      <Box
-        backgroundColor={"rgb(20,20,20)"}
-        paddingTop={"10%"}
-        paddingBottom={"6%"}
-        borderRadius={8}
-        overflow={"visible"}>
-        <Box textAlign={"center"} fontSize={24} color={"white"}>
-          Welcome To Runbhumi Mewar
-        </Box>
-        <Box textAlign={"center"} fontSize={20} mt={4} color={"white"}>
-          Points Table
-        </Box>
-      </Box>
-
       <Flex
         backgroundColor={"rgb(247,245,238)"}
         scrollBehavior="auto"
         paddingLeft={"4%"}
         paddingRight={"4%"}
         flexDirection={"column"}>
-        <Modal isOpen={isOpen} onClose={onClose}>
-          <ModalOverlay />
-          <ModalContent width="90%">
-            <ModalHeader>
-              {isUpdating ? "Update" : "Add New Member"}
-            </ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Input
-                disabled={!!isUpdating}
-                value={input?.number}
-                width={"100%"}
-                onChange={(e) => {
-                  setInput({
-                    ...input,
-                    number: e?.target?.value,
-                  });
-                }}
-                placeholder="Phone Number"
-              />
-              <Input
-                disabled={!!isUpdating}
-                width={"100%"}
-                value={input?.name}
-                mt={2}
-                onChange={(e) => {
-                  setInput({
-                    ...input,
-                    name: e?.target?.value,
-                  });
-                }}
-                placeholder="Name"
-              />
-              <Input
-                mt={2}
-                width={"100%"}
-                defaultValue={getPoints(input?.points)}
-                onChange={(e) => {
-                  setPoints(e?.target?.value);
-                }}
-                placeholder="Points"
-              />
-            </ModalBody>
-
-            <ModalFooter>
-              <Button onClick={onClose}>Cancel</Button>
-              <Button
-                isLoading={loading}
-                colorScheme="blue"
-                ml={3}
-                onClick={onAddEntry}>
-                {input?.id ? "Update" : "Add"}
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+        <AddPointsModal
+          isOpen={isOpen}
+          onClose={onClose}
+          input={input}
+          setInput={setInput}
+          loading={loading}
+          onAddEntry={onAddEntry}
+          setPoints={setPoints}
+          getPoints={getPoints}
+          isUpdating={isUpdating}
+        />
 
         <Flex mt={4} flexDirection={"column"}>
           <Flex
             flexDirection={"row"}
             justifyContent={"space-between"}
-            mt={4}
+            mt={1}
             mb={2}>
             <Box>
-              <Box fontSize={14} mt={1} mb={1}>
-                {`Total Users - ${users?.length}`}
-              </Box>
-              <Box fontSize={14} mt={1} mb={1}>
-                {`Total Points -  ${totalPoints}`}
-              </Box>
-              <Box fontSize={14} mt={1} mb={1}>
+              <Box fontSize={10}>{`Total Users - ${users?.length}`}</Box>
+              <Box fontSize={10}>{`Total Points -  ${totalPoints}`}</Box>
+              <Box fontSize={10}>
                 {`Valid Till Duration (in days) - ${VALID_TILL_DURATION}`}
               </Box>
             </Box>
@@ -359,8 +296,11 @@ const Points = () => {
           <>
             <Box>
               {map(updatedUsers, (user) => {
-                if (user?.name === "Prachi")
-                  console.log("user?.pointsuser?.points", user?.points);
+                // append user's mobile number with 91 if its not already there.
+                const updatedNumber = user?.number?.startsWith("91")
+                  ? user?.number
+                  : `91${user?.number}`;
+
                 const remainingDays = moment(new Date(user?.validTill))?.diff(
                   moment(),
                   "days"
@@ -417,7 +357,7 @@ const Points = () => {
                               "DD/MM/YYYY"
                             )}*`;
                             window.open(
-                              `https://wa.me/${user?.number}?text=${message}`,
+                              `https://wa.me/${updatedNumber}?text=${message}`,
                               "_blank"
                             );
                           }}
@@ -449,12 +389,15 @@ const Points = () => {
         <Button
           mb={32}
           onClick={() => {
-            setInput({});
-            onOpen();
+            const all = q(
+              collection(db, "points"),
+              orderBy("updatedAt", "desc")
+            );
+            setDocs(all);
           }}
           colorScheme="blue"
           mt={8}>
-          Add New Entry
+          Load All
         </Button>
       </Flex>
     </>
