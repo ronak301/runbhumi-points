@@ -5,6 +5,7 @@ import {
   Text,
   IconButton,
   useDisclosure,
+  Spinner,
 } from "@chakra-ui/react";
 import React from "react";
 import AddBookingModal from "./AddBookingModal";
@@ -12,18 +13,29 @@ import { map } from "lodash";
 import { EditIcon, ExternalLinkIcon } from "@chakra-ui/icons";
 import { getAllBookings } from "../../api/bookings";
 import moment from "moment";
+import { DeleteBooking } from "../../components/DeleteBooking";
 
 export default function AllBookingsList() {
+  const [isLoaing, setIsLoading] = React.useState(true);
   const [bookings, setBookings] = React.useState([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [input, setInput] = React.useState({});
+
   const [shouldFetchAllBookings, setShouldFetchAllBookings] =
     React.useState(false);
 
-  React.useEffect(() => {
-    // use await here
+  const fetchBookings = () => {
+    setIsLoading(true);
     getAllBookings(shouldFetchAllBookings).then((data) => {
       setBookings(data);
+      setIsLoading(false);
+    });
+  };
+
+  React.useEffect(() => {
+    setIsLoading(true);
+    getAllBookings(shouldFetchAllBookings).then((data) => {
+      setBookings(data);
+      setIsLoading(false);
     });
   }, [shouldFetchAllBookings]);
 
@@ -45,7 +57,15 @@ export default function AllBookingsList() {
     }
   };
 
-  return (
+  return isLoaing ? (
+    <Spinner
+      thickness="4px"
+      speed="0.65s"
+      emptyColor="gray.200"
+      color="blue.500"
+      size="xl"
+    />
+  ) : (
     <>
       <Flex
         backgroundColor={"rgb(247,245,238)"}
@@ -54,10 +74,9 @@ export default function AllBookingsList() {
         paddingRight={"4%"}
         flexDirection={"column"}>
         <AddBookingModal
-          input={input}
-          setInput={setInput}
           isOpen={isOpen}
           onClose={onClose}
+          fetchBookings={fetchBookings}
         />
         <Flex mt={4} flexDirection={"column"}>
           <Flex
@@ -79,8 +98,6 @@ export default function AllBookingsList() {
         <>
           <Box>
             {map(bookings, (singleBooking) => {
-              console.log("singleBooking", singleBooking);
-
               // append user's mobile number with 91 if its not already there.
               const num = String(singleBooking?.customer?.number);
               const updatedNumber = num?.startsWith("91") ? num : `91${num}`;
@@ -88,6 +105,7 @@ export default function AllBookingsList() {
 
               return (
                 <Box
+                  key={singleBooking.id}
                   boxShadow="md"
                   backgroundColor={"white"}
                   mt={2}
@@ -114,6 +132,10 @@ export default function AllBookingsList() {
                   <Text>{num}</Text>
 
                   <Flex justifyContent={"space-between"} mt={4}>
+                    <DeleteBooking
+                      booking={singleBooking}
+                      fetchBookings={fetchBookings}
+                    />
                     <Box>
                       <IconButton
                         onClick={() => {

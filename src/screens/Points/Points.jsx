@@ -310,6 +310,7 @@ const Points = () => {
                 );
                 return (
                   <Box
+                    key={user?.id}
                     boxShadow="md"
                     backgroundColor={"white"}
                     mt={2}

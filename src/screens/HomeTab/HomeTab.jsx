@@ -20,7 +20,7 @@ export default function HomeTab() {
         </Box> */}
       </Box>
       <Tabs>
-        <TabList isLazy>
+        <TabList>
           <Tab>Bookings</Tab>
           <Tab>Points</Tab>
         </TabList>

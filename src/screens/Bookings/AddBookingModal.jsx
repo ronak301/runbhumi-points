@@ -2,6 +2,7 @@ import React from "react";
 import {
   Button,
   Flex,
+  FormLabel,
   Input,
   Modal,
   ModalBody,
@@ -13,16 +14,74 @@ import {
 } from "@chakra-ui/react";
 import SlotSelector from "./SlotSelector";
 import moment from "moment";
-import ContactPicker from "./ContactPicker";
+import { addSlotBooking } from "../../api/bookings";
+import { isEmpty, map } from "lodash";
 
-export default function AddBookingModal({ isOpen, onClose, input, setInput }) {
-  // update this later
+export default function AddBookingModal({ isOpen, onClose, fetchBookings }) {
+  const [input, setInput] = React.useState({
+    date: moment().format("YYYY-MM-DD"),
+  });
+  const [selectedSlots, setSelectedSlots] = React.useState([]); // [slot1, slot2, slot3]
   const isUpdating = false;
+  const [isAddBookingDisabled, setIsAddBookingDisabled] = React.useState(true);
+  const [additionOrUpdationInProgress, setAdditionOrUpdationInProgress] =
+    React.useState(false);
 
-  const onAddBooking = () => {};
+  React.useEffect(() => {
+    const { name, number, date } = input;
+    if (name && number && date && selectedSlots.length > 0) {
+      setIsAddBookingDisabled(false);
+    } else {
+      setIsAddBookingDisabled(true);
+    }
+  }, [input, selectedSlots]);
+
+  const onCloseModal = () => {
+    onClose();
+    setInput({});
+    setSelectedSlots([]);
+  };
+
+  const totalAmount = isEmpty(selectedSlots)
+    ? 0
+    : map(selectedSlots, (slot) => slot?.price).reduce(
+        (acc, cur) => acc + cur,
+        0
+      );
+
+  const payable = totalAmount - (input?.discount || 0) - (input?.advanced || 0);
+
+  const onAddBooking = async () => {
+    setAdditionOrUpdationInProgress(true);
+    const bookingDate = input?.date;
+    const booking = {
+      bookingDate,
+      amountSumary: {
+        total: totalAmount,
+        discount: input?.discount || 0,
+        advanced: input?.advanced || 0,
+        payable: payable,
+      },
+      customer: {
+        name: input?.name,
+        number: input?.number,
+      },
+      property: {
+        // todo fix this
+        id: "iNANAwfMb6EXNtp7MRwJ",
+        title: "RunBhumi Mewar",
+      },
+      slots: selectedSlots,
+      timestamp: moment().format(),
+    };
+    await addSlotBooking(booking, selectedSlots);
+    fetchBookings();
+    setAdditionOrUpdationInProgress(false);
+    onCloseModal();
+  };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={onCloseModal}>
       <ModalOverlay />
       <ModalContent width="96%">
         <ModalHeader>{isUpdating ? "Update" : "Add Booking"}</ModalHeader>
@@ -55,17 +114,81 @@ export default function AddBookingModal({ isOpen, onClose, input, setInput }) {
               placeholder="Select Date"
               size="md"
               type="date"
+              onChange={(e) => {
+                setInput({
+                  ...input,
+                  date: e?.target?.value,
+                });
+              }}
               defaultValue={moment().format("YYYY-MM-DD")}
-              min={moment().format("YYYY-MM-DD")}
+              // min={moment().format("YYYY-MM-DD")}
             />
-            <ContactPicker />
-            <SlotSelector input={input} setInput={setInput} />
+            <SlotSelector
+              input={input}
+              selectedSlots={selectedSlots}
+              setSelectedSlots={setSelectedSlots}
+            />
+            <FormLabel mb={-2} mt={3}>
+              Total Amount
+            </FormLabel>
+            <Input
+              value={input?.totalAmount || totalAmount}
+              width={"100%"}
+              onChange={(e) => {
+                setInput({
+                  ...input,
+                  totalAmount: e?.target?.value,
+                });
+              }}
+              placeholder="Total Amount"
+            />
+            <FormLabel mb={-2}>Discount</FormLabel>
+            <Input
+              value={input?.discount}
+              width={"100%"}
+              onChange={(e) => {
+                setInput({
+                  ...input,
+                  discount: e?.target?.value,
+                });
+              }}
+              placeholder="Total Discount"
+            />
+            <FormLabel mb={-2}>Advanced</FormLabel>
+            <Input
+              value={input?.advanced}
+              width={"100%"}
+              onChange={(e) => {
+                setInput({
+                  ...input,
+                  advanced: e?.target?.value,
+                });
+              }}
+              placeholder="Advanced"
+            />
+            <FormLabel mb={-2}>Total Payable Amount</FormLabel>
+            <Input
+              value={payable || input?.payable}
+              width={"100%"}
+              onChange={(e) => {
+                setInput({
+                  ...input,
+                  payable: e?.target?.value,
+                });
+              }}
+              placeholder="Total Payable Amount"
+            />
           </Flex>
         </ModalBody>
 
         <ModalFooter>
           <Button onClick={onClose}>Cancel</Button>
-          <Button colorScheme="blue" ml={3} onClick={onAddBooking}>
+          <Button
+            isLoading={additionOrUpdationInProgress}
+            isDisabled={isAddBookingDisabled}
+            colorScheme="blue"
+            ml={3}
+            onClick={onAddBooking}>
             Add Booking
           </Button>
         </ModalFooter>
