@@ -58,8 +58,8 @@ export default function AddBookingModal({ isOpen, onClose, fetchBookings }) {
       bookingDate,
       amountSumary: {
         total: totalAmount,
-        discount: input?.discount || 0,
-        advanced: input?.advanced || 0,
+        discount: Number(input?.discount) || 0,
+        advanced: Number(input?.advanced) || 0,
         payable: payable,
       },
       customer: {

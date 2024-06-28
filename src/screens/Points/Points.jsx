@@ -20,7 +20,6 @@ import {
   doc,
   query as q,
   orderBy,
-  limit,
 } from "firebase/firestore";
 import React from "react";
 import { db } from "../../firebase";
@@ -30,17 +29,20 @@ import { getDateFormat } from "../../utils/date";
 import * as moment from "moment";
 import { DeleteEntry } from "../../components/DeleteEntry";
 import AddPointsModal from "./AddPointsModal";
+import useStore from "../../zustand/useStore";
 
 export const VALID_TILL_DURATION = 30;
 
-const Points = () => {
-  const initialDocs = q(
-    collection(db, "points"),
-    orderBy("updatedAt", "desc"),
-    limit(10)
-  );
+export const getPoints = (points) => {
+  if (isEmpty(points)) return "";
+  const length = points?.length;
+  return points[length - 1];
+};
 
-  const [users, setUsers] = React.useState();
+const Points = () => {
+  const initialDocs = q(collection(db, "points"), orderBy("updatedAt", "desc"));
+
+  const [users, setUsers] = React.useState([]);
   const [updatedUsers, setUpdatedUsers] = React.useState();
   const [query, setQuery] = React.useState("");
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -48,16 +50,21 @@ const Points = () => {
   const [points, setPoints] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [docs, setDocs] = React.useState(initialDocs);
-
-  const getPoints = (points) => {
-    if (isEmpty(points)) return "";
-    const length = points?.length;
-    return points[length - 1];
-  };
+  const { addUsers } = useStore();
 
   React.useEffect(() => {
-    fetchUsers();
-  }, [docs]);
+    console.log("users", users);
+    if (isEmpty(users) && !loading) {
+      fetchUsers();
+    } else {
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  React.useEffect(() => {
+    addUsers(users);
+  }, [users, addUsers]);
 
   const getValidTill = () => {
     return moment(new Date())
@@ -66,6 +73,7 @@ const Points = () => {
   };
 
   const fetchUsers = async () => {
+    if (!isEmpty(users)) return;
     await getDocs(docs).then((querySnapshot) => {
       const newData = querySnapshot.docs.map((doc) => ({
         ...doc.data(),
@@ -389,20 +397,6 @@ const Points = () => {
             </Box>
           </>
         )}
-
-        <Button
-          mb={32}
-          onClick={() => {
-            const all = q(
-              collection(db, "points"),
-              orderBy("updatedAt", "desc")
-            );
-            setDocs(all);
-          }}
-          colorScheme="blue"
-          mt={8}>
-          Load All
-        </Button>
       </Flex>
     </>
   );

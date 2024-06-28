@@ -14,11 +14,14 @@ import { EditIcon, ExternalLinkIcon } from "@chakra-ui/icons";
 import { getAllBookings } from "../../api/bookings";
 import moment from "moment";
 import { DeleteBooking } from "../../components/DeleteBooking";
+import useStore from "../../zustand/useStore";
+import { getPoints } from "../Points/Points";
 
 export default function AllBookingsList() {
   const [isLoaing, setIsLoading] = React.useState(true);
   const [bookings, setBookings] = React.useState([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { usersWithPoints } = useStore();
 
   const [shouldFetchAllBookings, setShouldFetchAllBookings] =
     React.useState(false);
@@ -26,6 +29,7 @@ export default function AllBookingsList() {
   const fetchBookings = () => {
     setIsLoading(true);
     getAllBookings(shouldFetchAllBookings).then((data) => {
+      console.log("dataaaa", data);
       setBookings(data);
       setIsLoading(false);
     });
@@ -56,6 +60,8 @@ export default function AllBookingsList() {
       return info.slice(0, start) + info.slice(end);
     }
   };
+
+  console.log("bookings", bookings);
 
   return isLoaing ? (
     <Spinner
@@ -102,6 +108,14 @@ export default function AllBookingsList() {
               const num = String(singleBooking?.customer?.number);
               const updatedNumber = num?.startsWith("91") ? num : `91${num}`;
               const name = singleBooking?.customer?.name;
+              const linkedUser = usersWithPoints.find(
+                // last 10 digits of both numbers should be same after removing any spaces
+                (user) =>
+                  user?.number?.replace(/\s/g, "").slice(-10) ===
+                  num?.replace(/\s/g, "").slice(-10)
+              );
+
+              const pointsAvailable = getPoints(linkedUser?.points) || 0;
 
               return (
                 <Box
@@ -139,19 +153,33 @@ export default function AllBookingsList() {
                     <Box>
                       <IconButton
                         onClick={() => {
-                          const message = `Hello !! You have *xx Runbhumi Points* associated with mobile number -`;
+                          const message = `
+*🏏Runbhumi Mewar Booking Confirmation🏏*
+Name: ${name}
+Mobile: ${num}
+Location - F-266, Road No. 12, Near Airtel Office, Madri Industrial Area
+Map: https://maps.app.goo.gl/QAs3A9APjdqRZfmS9
+Date of Booking: ${moment(singleBooking?.bookingDate).format("DD-MMM")}
+Time Slots: ${getSlotsInfo(singleBooking)}
+Total Amount: ${singleBooking?.amountSumary?.total}
+Advanced Recieved: ${singleBooking?.amountSumary?.advanced}
+Total Due: ${singleBooking?.amountSumary?.payable}
+Points Available: ${pointsAvailable}
+                          `;
                           window.open(
-                            `https://wa.me/${updatedNumber}?text=${message}`,
+                            `https://api.whatsapp.com/send/?phone=${updatedNumber}&text=${encodeURIComponent(
+                              message
+                            )}`,
                             "_blank"
                           );
                         }}
                         isRound
-                        mr={2}
+                        // mr={2}
                         colorScheme="green"
                         aria-label="Share"
                         icon={<ExternalLinkIcon />}
                       />
-                      <IconButton
+                      {/* <IconButton
                         isRound
                         onClick={() => {
                           //   setInput(user);
@@ -160,7 +188,7 @@ export default function AllBookingsList() {
                         colorScheme="blue"
                         aria-label="Edit"
                         icon={<EditIcon />}
-                      />
+                      /> */}
                     </Box>
                   </Flex>
                 </Box>

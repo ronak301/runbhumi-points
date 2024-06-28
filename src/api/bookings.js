@@ -10,7 +10,6 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import { db } from "../firebase";
-import { useContext } from "react";
 import { showAlert } from "../context/AlertContext";
 
 export const getAllBookings = async (fetchAll = false) => {
