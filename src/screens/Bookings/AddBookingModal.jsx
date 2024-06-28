@@ -26,6 +26,7 @@ export default function AddBookingModal({ isOpen, onClose, fetchBookings }) {
   const [isAddBookingDisabled, setIsAddBookingDisabled] = React.useState(true);
   const [additionOrUpdationInProgress, setAdditionOrUpdationInProgress] =
     React.useState(false);
+  const [totalAmount, setTotalAmount] = React.useState(0);
 
   React.useEffect(() => {
     const { name, number, date } = input;
@@ -42,14 +43,22 @@ export default function AddBookingModal({ isOpen, onClose, fetchBookings }) {
     setSelectedSlots([]);
   };
 
-  const totalAmount = isEmpty(selectedSlots)
-    ? 0
-    : map(selectedSlots, (slot) => slot?.price).reduce(
-        (acc, cur) => acc + cur,
-        0
+  React.useEffect(() => {
+    if (input?.totalAmount !== undefined) {
+      setTotalAmount(input?.totalAmount);
+    } else {
+      setTotalAmount(
+        isEmpty(selectedSlots)
+          ? 0
+          : map(selectedSlots, (slot) => slot?.price).reduce(
+              (acc, cur) => acc + cur,
+              0
+            )
       );
+    }
+  }, [selectedSlots, input?.totalAmount]);
 
-  const payable = totalAmount - (input?.discount || 0) - (input?.advanced || 0);
+  const payable = totalAmount - (input?.advanced || 0);
 
   const onAddBooking = async () => {
     setAdditionOrUpdationInProgress(true);
@@ -58,7 +67,6 @@ export default function AddBookingModal({ isOpen, onClose, fetchBookings }) {
       bookingDate,
       amountSumary: {
         total: totalAmount,
-        discount: Number(input?.discount) || 0,
         advanced: Number(input?.advanced) || 0,
         payable: payable,
       },
@@ -132,7 +140,7 @@ export default function AddBookingModal({ isOpen, onClose, fetchBookings }) {
               Total Amount
             </FormLabel>
             <Input
-              value={input?.totalAmount || totalAmount}
+              value={totalAmount}
               width={"100%"}
               onChange={(e) => {
                 setInput({
@@ -140,20 +148,10 @@ export default function AddBookingModal({ isOpen, onClose, fetchBookings }) {
                   totalAmount: e?.target?.value,
                 });
               }}
+              defaultValue={totalAmount}
               placeholder="Total Amount"
             />
-            <FormLabel mb={-2}>Discount</FormLabel>
-            <Input
-              value={input?.discount}
-              width={"100%"}
-              onChange={(e) => {
-                setInput({
-                  ...input,
-                  discount: e?.target?.value,
-                });
-              }}
-              placeholder="Total Discount"
-            />
+
             <FormLabel mb={-2}>Advanced</FormLabel>
             <Input
               value={input?.advanced}
@@ -168,7 +166,7 @@ export default function AddBookingModal({ isOpen, onClose, fetchBookings }) {
             />
             <FormLabel mb={-2}>Total Payable Amount</FormLabel>
             <Input
-              value={payable || input?.payable}
+              value={input?.payable || payable}
               width={"100%"}
               onChange={(e) => {
                 setInput({

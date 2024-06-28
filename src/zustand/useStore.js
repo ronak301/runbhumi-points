@@ -2,8 +2,7 @@ import { create } from "zustand";
 
 const useStore = create((set) => ({
   usersWithPoints: [],
-  addUsers: (users) =>
-    set((state) => ({ usersWithPoints: [...state.usersWithPoints, ...users] })),
+  setUsersWithPoints: (users) => set(() => ({ usersWithPoints: users })),
 }));
 
 export default useStore;

@@ -10,12 +10,20 @@ import {
 import React from "react";
 import AddBookingModal from "./AddBookingModal";
 import { map } from "lodash";
-import { EditIcon, ExternalLinkIcon } from "@chakra-ui/icons";
+import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { getAllBookings } from "../../api/bookings";
 import moment from "moment";
 import { DeleteBooking } from "../../components/DeleteBooking";
 import useStore from "../../zustand/useStore";
-import { getPoints } from "../Points/Points";
+import { getPoints, isValidPoints } from "../Points/Points";
+
+const sortDataBySlots = (data) => {
+  return data.sort((a, b) => {
+    const slotA = a?.slots?.[0];
+    const slotB = b?.slots?.[0];
+    return slotA.sort - slotB?.sort;
+  });
+};
 
 export default function AllBookingsList() {
   const [isLoaing, setIsLoading] = React.useState(true);
@@ -30,7 +38,7 @@ export default function AllBookingsList() {
     setIsLoading(true);
     getAllBookings(shouldFetchAllBookings).then((data) => {
       console.log("dataaaa", data);
-      setBookings(data);
+      setBookings(sortDataBySlots(data));
       setIsLoading(false);
     });
   };
@@ -38,7 +46,7 @@ export default function AllBookingsList() {
   React.useEffect(() => {
     setIsLoading(true);
     getAllBookings(shouldFetchAllBookings).then((data) => {
-      setBookings(data);
+      setBookings(sortDataBySlots(data));
       setIsLoading(false);
     });
   }, [shouldFetchAllBookings]);
@@ -108,6 +116,9 @@ export default function AllBookingsList() {
               const num = String(singleBooking?.customer?.number);
               const updatedNumber = num?.startsWith("91") ? num : `91${num}`;
               const name = singleBooking?.customer?.name;
+              const advancedAmountString = singleBooking?.amountSumary?.advanced
+                ? `Advance Recieved: Rs. ${singleBooking?.amountSumary?.advanced}`
+                : "";
               const linkedUser = usersWithPoints.find(
                 // last 10 digits of both numbers should be same after removing any spaces
                 (user) =>
@@ -115,7 +126,9 @@ export default function AllBookingsList() {
                   num?.replace(/\s/g, "").slice(-10)
               );
 
-              const pointsAvailable = getPoints(linkedUser?.points) || 0;
+              const pointsAvailable = isValidPoints(linkedUser)
+                ? getPoints(linkedUser?.points)
+                : 0;
 
               return (
                 <Box
@@ -136,12 +149,16 @@ export default function AllBookingsList() {
                     <Text fontSize={16} fontWeight={"700"}>
                       {name}
                     </Text>
-                    <Text fontWeight={"500"} fontSize={16} px={1}>
-                      {getSlotsInfo(singleBooking)}
-                    </Text>
-                    <Text fontWeight={"500"} fontSize={16} px={1}>
-                      {moment(singleBooking?.bookingDate).format("DD-MMM")}
-                    </Text>
+                    <Flex>
+                      <Text fontWeight={"500"} fontSize={16} px={1}>
+                        {getSlotsInfo(singleBooking)}
+                      </Text>
+                      <Text fontWeight={"500"} ml={2} fontSize={16} px={1}>
+                        {moment(singleBooking?.bookingDate).format(
+                          "DD-MM-YYYY"
+                        )}
+                      </Text>
+                    </Flex>
                   </Flex>
                   <Text>{num}</Text>
 
@@ -159,12 +176,12 @@ Name: ${name}
 Mobile: ${num}
 Location - F-266, Road No. 12, Near Airtel Office, Madri Industrial Area
 Map: https://maps.app.goo.gl/QAs3A9APjdqRZfmS9
-Date of Booking: ${moment(singleBooking?.bookingDate).format("DD-MMM")}
+Date of Booking: ${moment(singleBooking?.bookingDate).format("DD-MM-YYYY")}
 Time Slots: ${getSlotsInfo(singleBooking)}
-Total Amount: ${singleBooking?.amountSumary?.total}
-Advanced Recieved: ${singleBooking?.amountSumary?.advanced}
-Total Due: ${singleBooking?.amountSumary?.payable}
+*Total Amount: Rs. ${singleBooking?.amountSumary?.total}*
+${advancedAmountString}
 Points Available: ${pointsAvailable}
+
                           `;
                           window.open(
                             `https://api.whatsapp.com/send/?phone=${updatedNumber}&text=${encodeURIComponent(

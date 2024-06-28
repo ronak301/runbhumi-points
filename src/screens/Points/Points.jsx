@@ -36,7 +36,13 @@ export const VALID_TILL_DURATION = 30;
 export const getPoints = (points) => {
   if (isEmpty(points)) return "";
   const length = points?.length;
-  return points[length - 1];
+  return points[length - 1] || 0;
+};
+
+export const isValidPoints = (user) => {
+  const validTill = moment(user?.validTill);
+  const currentDate = moment(new Date());
+  return validTill.diff(currentDate, "days") > 0;
 };
 
 const Points = () => {
@@ -50,7 +56,7 @@ const Points = () => {
   const [points, setPoints] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [docs, setDocs] = React.useState(initialDocs);
-  const { addUsers } = useStore();
+  const { setUsersWithPoints } = useStore();
 
   React.useEffect(() => {
     console.log("users", users);
@@ -63,8 +69,8 @@ const Points = () => {
   }, []);
 
   React.useEffect(() => {
-    addUsers(users);
-  }, [users, addUsers]);
+    setUsersWithPoints(users);
+  }, [setUsersWithPoints, users]);
 
   const getValidTill = () => {
     return moment(new Date())
@@ -73,7 +79,6 @@ const Points = () => {
   };
 
   const fetchUsers = async () => {
-    if (!isEmpty(users)) return;
     await getDocs(docs).then((querySnapshot) => {
       const newData = querySnapshot.docs.map((doc) => ({
         ...doc.data(),
