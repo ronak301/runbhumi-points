@@ -57,13 +57,13 @@ function SlotSelector({ input, setSelectedSlots, selectedSlots }) {
           filter(selectedSlots, (s) => s.title === slot.title)?.length > 0;
         const isBooked = bookedByArray?.length > 0;
         const backgroundColor = isBooked
-          ? "#8D99Ae"
+          ? "#000"
           : isSelected
           ? "#3182CE"
           : "#fff";
-        const borderColor = isBooked ? "#8D99Ae" : "#000";
+        const borderColor = isBooked ? "#000" : "#000";
         const bookedBy = isBooked ? bookedByArray?.[0]?.customer?.name : "";
-
+        const color = isBooked ? "#fff" : "#212121";
         return (
           <Button
             _hover={{}}
@@ -79,11 +79,11 @@ function SlotSelector({ input, setSelectedSlots, selectedSlots }) {
             backgroundColor={backgroundColor}
             borderColor={borderColor}
             border="1px solid">
-            <Text fontSize={"12"} color="#212121">
+            <Text fontSize={"12"} color={color}>
               {slot.title}
             </Text>
             {isBooked ? (
-              <Text fontSize={"8"} color="#212121">
+              <Text fontSize={"8"} color={color}>
                 {`Booked - ${bookedBy}`}
               </Text>
             ) : null}
