@@ -177,6 +177,12 @@ const Points = () => {
     0
   );
 
+  const totalExpiredPoints = reduce(
+    users,
+    (acc, u) => (acc += isValidPoints(u) ? 0 : Number(getPoints(u?.points))),
+    0
+  );
+
   const sortUsersByUpdateDate = (data) => {
     return data?.sort((a, b) => {
       return a?.updatedAt < b?.updatedAt ? 1 : -1;
@@ -238,7 +244,10 @@ const Points = () => {
             mb={2}>
             <Box backgroundColor={"white"} px={2} py={2} borderRadius={8}>
               <Box fontSize={10}>{`Total Users - ${users?.length}`}</Box>
-              <Box fontSize={10}>{`Total Points -  ${totalPoints}`}</Box>
+              <Box
+                fontSize={
+                  10
+                }>{`Total Points -  ${totalPoints} (Expired - ${totalExpiredPoints})`}</Box>
               <Box fontSize={10}>
                 {`Valid Till Duration (in days) - ${VALID_TILL_DURATION}`}
               </Box>
