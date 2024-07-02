@@ -18,10 +18,15 @@ import useStore from "../../zustand/useStore";
 import { getPoints, isValidPoints } from "../Points/Points";
 
 const sortDataBySlots = (data) => {
-  return data.sort((a, b) => {
-    const slotA = a?.slots?.[0];
-    const slotB = b?.slots?.[0];
-    return slotA.sort - slotB?.sort;
+  console.log("datadata", data);
+  return data?.sort((a, b) => {
+    if (a?.bookingDate === b?.bookingDate) {
+      const slotA = a?.slots?.[0];
+      const slotB = b?.slots?.[0];
+      return slotA.sort - slotB?.sort;
+    } else {
+      return new Date(b?.bookingDate) - new Date(a?.bookingDate);
+    }
   });
 };
 
@@ -71,15 +76,7 @@ export default function AllBookingsList() {
 
   console.log("bookings", bookings);
 
-  return isLoaing ? (
-    <Spinner
-      thickness="4px"
-      speed="0.65s"
-      emptyColor="gray.200"
-      color="blue.500"
-      size="xl"
-    />
-  ) : (
+  return (
     <>
       <Flex
         backgroundColor={"rgb(247,245,238)"}
@@ -109,68 +106,78 @@ export default function AllBookingsList() {
             </Button>
           </Flex>
         </Flex>
-        <>
-          <Box>
-            {map(bookings, (singleBooking) => {
-              // append user's mobile number with 91 if its not already there.
-              const num = String(singleBooking?.customer?.number);
-              const updatedNumber = num?.startsWith("91") ? num : `91${num}`;
-              const name = singleBooking?.customer?.name;
-              const advancedAmountString = singleBooking?.amountSumary?.advanced
-                ? `Advance Recieved: Rs. ${singleBooking?.amountSumary?.advanced}`
-                : "";
-              const linkedUser = usersWithPoints.find(
-                // last 10 digits of both numbers should be same after removing any spaces
-                (user) =>
-                  user?.number?.replace(/\s/g, "").slice(-10) ===
-                  num?.replace(/\s/g, "").slice(-10)
-              );
+        {isLoaing ? (
+          <Spinner
+            thickness="4px"
+            speed="0.65s"
+            emptyColor="gray.200"
+            color="blue.500"
+            size="xl"
+          />
+        ) : (
+          <>
+            <Box>
+              {map(bookings, (singleBooking) => {
+                // append user's mobile number with 91 if its not already there.
+                const num = String(singleBooking?.customer?.number);
+                const updatedNumber = num?.startsWith("91") ? num : `91${num}`;
+                const name = singleBooking?.customer?.name;
+                const advancedAmountString = singleBooking?.amountSumary
+                  ?.advanced
+                  ? `Advance Recieved: Rs. ${singleBooking?.amountSumary?.advanced}`
+                  : "";
+                const linkedUser = usersWithPoints.find(
+                  // last 10 digits of both numbers should be same after removing any spaces
+                  (user) =>
+                    user?.number?.replace(/\s/g, "").slice(-10) ===
+                    num?.replace(/\s/g, "").slice(-10)
+                );
 
-              const pointsAvailable = isValidPoints(linkedUser)
-                ? getPoints(linkedUser?.points)
-                : 0;
+                const pointsAvailable = isValidPoints(linkedUser)
+                  ? getPoints(linkedUser?.points)
+                  : 0;
 
-              return (
-                <Box
-                  key={singleBooking.id}
-                  boxShadow="md"
-                  backgroundColor={"white"}
-                  mt={2}
-                  mb={2}
-                  pb={4}
-                  pl={4}
-                  pr={4}
-                  borderRadius={8}
-                  pt={4}>
-                  <Flex
-                    d="flex"
-                    justifyContent={"space-between"}
-                    flexDirection={"row"}>
-                    <Text fontSize={16} fontWeight={"700"}>
-                      {name}
-                    </Text>
-                    <Flex>
-                      <Text fontWeight={"500"} fontSize={16} px={1}>
-                        {getSlotsInfo(singleBooking)}
+                return (
+                  <Box
+                    key={singleBooking.id}
+                    boxShadow="md"
+                    backgroundColor={"white"}
+                    mt={2}
+                    mb={2}
+                    pb={4}
+                    pl={4}
+                    pr={4}
+                    borderRadius={8}
+                    pt={4}>
+                    <Flex
+                      d="flex"
+                      justifyContent={"space-between"}
+                      flexDirection={"row"}>
+                      <Text fontSize={16} fontWeight={"700"}>
+                        {name}
                       </Text>
-                      <Text fontWeight={"500"} ml={2} fontSize={16} px={1}>
-                        {moment(singleBooking?.bookingDate).format(
-                          "DD-MM-YYYY"
-                        )}
-                      </Text>
+                      <Flex>
+                        <Text fontWeight={"500"} fontSize={16} px={1}>
+                          {getSlotsInfo(singleBooking)}
+                        </Text>
+                        <Text fontWeight={"500"} ml={2} fontSize={16} px={1}>
+                          {moment(singleBooking?.bookingDate).format(
+                            "DD-MM-YYYY"
+                          )}
+                        </Text>
+                      </Flex>
                     </Flex>
-                  </Flex>
-                  <Text>{num}</Text>
+                    <Text>{num}</Text>
 
-                  <Flex justifyContent={"space-between"} mt={4}>
-                    <DeleteBooking
-                      booking={singleBooking}
-                      fetchBookings={fetchBookings}
-                    />
-                    <Box>
-                      <IconButton
-                        onClick={() => {
-                          const message = `
+                    <Flex justifyContent={"space-between"} mt={4}>
+                      <DeleteBooking
+                        booking={singleBooking}
+                        fetchBookings={fetchBookings}
+                      />
+                      <Box>
+                        <IconButton
+                          onClick={() => {
+                            const message = `
 *🏏Runbhumi Mewar Booking Confirmation🏏*
 Name: ${name}
 Mobile: ${num}
@@ -183,20 +190,20 @@ ${advancedAmountString}
 Points Available: ${pointsAvailable}
 
                           `;
-                          window.open(
-                            `https://api.whatsapp.com/send/?phone=${updatedNumber}&text=${encodeURIComponent(
-                              message
-                            )}`,
-                            "_blank"
-                          );
-                        }}
-                        isRound
-                        // mr={2}
-                        colorScheme="green"
-                        aria-label="Share"
-                        icon={<ExternalLinkIcon />}
-                      />
-                      {/* <IconButton
+                            window.open(
+                              `https://api.whatsapp.com/send/?phone=${updatedNumber}&text=${encodeURIComponent(
+                                message
+                              )}`,
+                              "_blank"
+                            );
+                          }}
+                          isRound
+                          // mr={2}
+                          colorScheme="green"
+                          aria-label="Share"
+                          icon={<ExternalLinkIcon />}
+                        />
+                        {/* <IconButton
                         isRound
                         onClick={() => {
                           //   setInput(user);
@@ -206,22 +213,23 @@ Points Available: ${pointsAvailable}
                         aria-label="Edit"
                         icon={<EditIcon />}
                       /> */}
-                    </Box>
-                  </Flex>
-                </Box>
-              );
-            })}
-          </Box>
-          <Button
-            mb={32}
-            onClick={() => {
-              setShouldFetchAllBookings(true);
-            }}
-            colorScheme="blue"
-            mt={8}>
-            Load All
-          </Button>
-        </>
+                      </Box>
+                    </Flex>
+                  </Box>
+                );
+              })}
+            </Box>
+            <Button
+              mb={32}
+              onClick={() => {
+                setShouldFetchAllBookings(true);
+              }}
+              colorScheme="blue"
+              mt={8}>
+              Load All
+            </Button>
+          </>
+        )}
       </Flex>
     </>
   );

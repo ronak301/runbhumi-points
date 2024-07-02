@@ -20,10 +20,20 @@ import {
   doc,
   query as q,
   orderBy,
+  limit,
 } from "firebase/firestore";
 import React from "react";
 import { db } from "../../firebase";
-import { filter, includes, isEmpty, lowerCase, map, reduce } from "lodash";
+import {
+  compact,
+  filter,
+  includes,
+  isEmpty,
+  lowerCase,
+  map,
+  reduce,
+  trim,
+} from "lodash";
 import { ChevronDownIcon, EditIcon, ExternalLinkIcon } from "@chakra-ui/icons";
 import { getDateFormat } from "../../utils/date";
 import * as moment from "moment";
@@ -59,7 +69,6 @@ const Points = () => {
   const { setUsersWithPoints } = useStore();
 
   React.useEffect(() => {
-    console.log("users", users);
     if (isEmpty(users) && !loading) {
       fetchUsers();
     } else {
@@ -322,9 +331,10 @@ const Points = () => {
             <Box>
               {map(updatedUsers, (user) => {
                 // append user's mobile number with 91 if its not already there.
-                const updatedNumber = user?.number?.startsWith("91")
-                  ? user?.number
-                  : `91${user?.number}`;
+                const len = user?.number?.length;
+                let updatedNumber = user?.number?.substring(len - 1 - 10, len);
+
+                updatedNumber = `91${trim(updatedNumber)}`;
 
                 const remainingDays = moment(new Date(user?.validTill))?.diff(
                   moment(),
