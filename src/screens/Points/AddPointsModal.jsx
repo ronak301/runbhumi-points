@@ -34,11 +34,14 @@ export default function AddPointsModal({
             value={input?.number}
             width={"100%"}
             onChange={(e) => {
+              if (input?.number?.length >= 10) return;
               setInput({
                 ...input,
                 number: e?.target?.value,
               });
             }}
+            maxLength={10}
+            type="number"
             placeholder="Phone Number"
           />
           <Input

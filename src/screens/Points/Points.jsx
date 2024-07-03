@@ -68,6 +68,12 @@ const Points = () => {
   const [docs, setDocs] = React.useState(initialDocs);
   const { setUsersWithPoints } = useStore();
 
+  const getLastTenDigits = React.useCallback((number) => {
+    const len = number?.length;
+    const val = trim(number)?.substring(len - 10, len);
+    return val;
+  }, []);
+
   React.useEffect(() => {
     if (isEmpty(users) && !loading) {
       fetchUsers();
@@ -136,7 +142,9 @@ const Points = () => {
       return;
     }
     const doesUserExist =
-      filter(users, (u) => u?.number === input?.number)?.length > 0;
+      filter(users, (u) => getLastTenDigits(u?.number) === input?.number)
+        ?.length > 0;
+    console.log("doesUserExist", doesUserExist);
     if (doesUserExist) {
       alert(
         `User with this number already exist, please edit that user instead with name - ${input?.name}`
@@ -330,9 +338,7 @@ const Points = () => {
           <>
             <Box>
               {map(updatedUsers, (user) => {
-                // append user's mobile number with 91 if its not already there.
-                const len = user?.number?.length;
-                let updatedNumber = user?.number?.substring(len - 1 - 10, len);
+                let updatedNumber = getLastTenDigits(user?.number);
 
                 updatedNumber = `91${trim(updatedNumber)}`;
 
