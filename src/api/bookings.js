@@ -25,6 +25,7 @@ export const getAllBookings = async (fetchAll = false) => {
 
   const bookingsToFetch = fetchAll ? allBookings : limitedBookings;
   const bookings = [];
+  console.log("rkkfetching", bookingsToFetch);
   const querySnapshot = await getDocs(bookingsToFetch);
   querySnapshot.forEach((doc) => {
     bookings.push({ ...doc.data(), id: doc.id });

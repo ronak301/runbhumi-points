@@ -14,21 +14,20 @@ import Login from "./screens/Login"; // Assuming Login component is in "screens/
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const user = localStorage.getItem("user");
 
-  // Check if the user is already authenticated in localStorage
+  // Check if the user is authenticated based on localStorage
   useEffect(() => {
+    const user = localStorage.getItem("user");
     if (user) {
       setIsAuthenticated(true);
     }
-  }, [user]);
+  }, []);
 
-  const handleLogin = () => {
+  const onLogin = () => {
     setIsAuthenticated(true);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("user");
+  const onLogout = () => {
     setIsAuthenticated(false);
   };
 
@@ -37,7 +36,6 @@ function App() {
       <AlertProvider>
         <Router>
           <Routes>
-            {/* Redirect user to login if not authenticated */}
             <Route path="/" element={<Website />} />
             <Route
               path="/login"
@@ -45,24 +43,19 @@ function App() {
                 isAuthenticated ? (
                   <Navigate to="/home" />
                 ) : (
-                  <Login onLogin={handleLogin} />
+                  <Login onLogin={onLogin} />
                 )
               }
             />
-            <Route
-              path="/*"
-              element={
-                isAuthenticated ? (
-                  <Navigate to="/home" />
-                ) : (
-                  <Login onLogin={handleLogin} />
-                )
-              }
-            />
-            {/* Redirect user to login if not authenticated */}
             <Route
               path="/home"
-              element={isAuthenticated ? <HomeTab /> : <Navigate to="/login" />}
+              element={
+                isAuthenticated ? (
+                  <HomeTab onLogout={onLogout} />
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
             />
           </Routes>
         </Router>

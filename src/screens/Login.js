@@ -26,10 +26,8 @@ const Login = ({ onLogin }) => {
         JSON.stringify({ mobileNo, propertyId: user.propertyId })
       );
 
-      // Call the onLogin prop to update authentication state in App.js
       onLogin();
 
-      // Redirect to Home Tab with the property ID
       navigate("/home", { state: { propertyId: user.propertyId } });
     } else {
       toast({
@@ -49,7 +47,7 @@ const Login = ({ onLogin }) => {
       mt="100px"
       p={6}
       borderRadius="md"
-      boxShadow="lg">
+      boxShadow="sm">
       <Text fontSize="2xl" fontWeight="bold" mb={4}>
         Login
       </Text>
