@@ -360,6 +360,7 @@ const Points = () => {
                     pt={4}>
                     <Flex
                       d="flex"
+                      flex={1}
                       justifyContent={"space-between"}
                       flexDirection={"row"}>
                       <Text fontSize={18} fontWeight={"700"}>
@@ -378,7 +379,9 @@ const Points = () => {
                     </Flex>
                     <Flex>
                       <Text
+                        flexWrap={"wrap"}
                         fontSize={10}
+                        width={"80%"}
                         color="gray.700">{`History of points - [${user?.points?.join(
                         ","
                       )}]`}</Text>
