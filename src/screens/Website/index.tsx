@@ -63,18 +63,22 @@ const Website = () => {
 
     const formData = new FormData(event.target);
 
+    formData.forEach((value, key) => {
+      console.log(`${key}: ${value}`);
+    });
+
     try {
       const response = await fetch("https://formspree.io/f/mzzzlydl", {
         method: "POST",
         body: formData,
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "application/json", // Make sure to set the content-type
+        },
       });
 
-      if (response.ok) {
-        setFormStatus("Thank you! Your message has been submitted.");
-        event.target.reset(); // Clear form fields after successful submission
-      } else {
-        setFormStatus("Oops! Something went wrong. Please try again.");
-      }
+      setFormStatus("Thank you! Your message has been submitted.");
+      event.target.reset();
     } catch (error) {
       setFormStatus("Network error. Please try again later.");
     } finally {
