@@ -22,6 +22,8 @@ import {
   DrawerBody,
   useDisclosure,
 } from "@chakra-ui/react";
+import { Link } from "react-scroll";
+
 import { motion } from "framer-motion";
 import { Link as ScrollLink, animateScroll as scroll } from "react-scroll";
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
@@ -30,7 +32,7 @@ import { FiHome, FiInfo, FiPhone, FiImage, FiStar } from "react-icons/fi";
 const MotionBox = motion(Box);
 const MotionImage = motion(Image);
 
-const Website = () => {
+const Website = ({ onLoginClick }: any) => {
   const scrollToTop = () => scroll.scrollToTop();
   const [formStatus, setFormStatus] = useState(""); // To track form submission status
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -53,13 +55,12 @@ const Website = () => {
       image:
         "https://cdni.iconscout.com/illustration/premium/thumb/man-illustration-download-in-svg-png-gif-file-formats--portrait-beard-glasses-portraits-pack-people-illustrations-2790260.png",
     },
-    // Add more testimonials here
   ];
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
     setIsSubmitting(true);
-    setFormStatus(""); // Reset status message
+    setFormStatus("");
 
     const formData = new FormData(event.target);
 
@@ -101,7 +102,7 @@ const Website = () => {
           zIndex={10}
           bg="white"
           shadow="sm"
-          justifyContent="space-between"
+          justifyContent="center" // Center align the items
           alignItems="center"
           px={8}
           py={4}>
@@ -110,10 +111,13 @@ const Website = () => {
             fontWeight="bold"
             color="green.600"
             cursor="pointer"
-            onClick={scrollToTop}>
+            onClick={scrollToTop}
+            mr="auto">
+            {" "}
+            {/* Pushes this to the left */}
             Turfwale
           </Text>
-          <Flex gap={6}>
+          <Flex gap={6} alignItems="center">
             {["About", "Features", "Gallery", "Testimonials", "Contact"].map(
               (section, idx) => (
                 <ScrollLink
@@ -219,27 +223,30 @@ const Website = () => {
               display="flex"
               flexDirection={{ base: "column", sm: "row" }}
               gap={4}>
-              <Button
-                size="lg"
-                colorScheme="green"
-                bg="green.500"
-                _hover={{ bg: "green.600" }}
-                mb={{ base: 4, sm: 0 }} // Margin bottom for mobile view
-                as="a"
-                href="#contact-form" // Link to the Contact section
-              >
-                Get a Free Consultation
-              </Button>
-              <Button
-                size="lg"
-                colorScheme="whiteAlpha"
-                variant="outline"
-                _hover={{ bg: "whiteAlpha.300" }}
-                as="a"
-                href="#contact-form" // Link to the Contact section
-              >
-                Learn More
-              </Button>
+              <Link to="contact-form" smooth={true} duration={800} offset={-70}>
+                {" "}
+                {/* Added smooth scrolling */}
+                <Button
+                  size="lg"
+                  colorScheme="green"
+                  bg="green.500"
+                  _hover={{ bg: "green.600" }}
+                  mb={{ base: 4, sm: 0 }} // Margin bottom for mobile view
+                >
+                  Get a Free Consultation
+                </Button>
+              </Link>
+              <Link to="about" smooth={true} duration={800} offset={-70}>
+                {" "}
+                {/* Added smooth scrolling */}
+                <Button
+                  size="lg"
+                  colorScheme="whiteAlpha"
+                  variant="outline"
+                  _hover={{ bg: "whiteAlpha.300" }}>
+                  Learn More
+                </Button>
+              </Link>
             </Box>
           </Box>
         </MotionBox>
@@ -479,8 +486,8 @@ const Website = () => {
           transition={{ duration: 1 }}>
           <Text fontSize="md" mb={2}>
             Contact us today at{" "}
-            <a href="tel:7042770304" style={{ fontWeight: "bold" }}>
-              7042770304
+            <a href="tel:6377478355" style={{ fontWeight: "bold" }}>
+              6377478355
             </a>{" "}
             for more details!
           </Text>
