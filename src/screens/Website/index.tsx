@@ -26,8 +26,9 @@ import { Link } from "react-scroll";
 
 import { motion } from "framer-motion";
 import { Link as ScrollLink, animateScroll as scroll } from "react-scroll";
-import { MoonIcon, SunIcon } from "@chakra-ui/icons";
+import { HamburgerIcon, MoonIcon, SunIcon } from "@chakra-ui/icons";
 import { FiHome, FiInfo, FiPhone, FiImage, FiStar } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 
 const MotionBox = motion(Box);
 const MotionImage = motion(Image);
@@ -37,6 +38,7 @@ const Website = ({ onLoginClick }: any) => {
   const [formStatus, setFormStatus] = useState(""); // To track form submission status
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure(); // Correctly use useDisclosure hook
+  const navigate = useNavigate();
 
   const testimonials = [
     {
@@ -90,6 +92,23 @@ const Website = ({ onLoginClick }: any) => {
     }
   };
 
+  const handleNavigation = (section: any) => {
+    onClose(); // Close the Drawer
+
+    // Scroll to the respective section
+    scrollToSection(section);
+  };
+
+  const scrollToSection = (section: any) => {
+    const element = document.getElementById(section); // Get the section by id
+    if (element) {
+      window.scrollTo({
+        top: element.offsetTop - 70, // Adjust for the fixed navbar height
+        behavior: "smooth",
+      });
+    }
+  };
+
   return (
     <ChakraProvider>
       <Box>
@@ -102,10 +121,12 @@ const Website = ({ onLoginClick }: any) => {
           zIndex={10}
           bg="white"
           shadow="sm"
-          justifyContent="center" // Center align the items
+          justifyContent="center"
           alignItems="center"
           px={8}
-          py={4}>
+          py={4}
+          display={{ base: "none", md: "flex" }} // Hide on mobile
+        >
           <Text
             fontSize="xl"
             fontWeight="bold"
@@ -113,8 +134,6 @@ const Website = ({ onLoginClick }: any) => {
             cursor="pointer"
             onClick={scrollToTop}
             mr="auto">
-            {" "}
-            {/* Pushes this to the left */}
             Turfwale
           </Text>
           <Flex gap={6} alignItems="center">
@@ -139,6 +158,18 @@ const Website = ({ onLoginClick }: any) => {
           </Flex>
         </Flex>
 
+        {/* Hamburger Icon for Mobile */}
+        <IconButton
+          aria-label="Open Menu"
+          icon={<HamburgerIcon />}
+          onClick={onOpen}
+          display={{ base: "flex", md: "none" }} // Show only on mobile
+          position="fixed"
+          top={4}
+          right={4}
+          zIndex={20}
+        />
+
         <Drawer isOpen={isOpen} onClose={onClose} placement="left">
           <DrawerOverlay />
           <DrawerContent bg="green.50">
@@ -150,30 +181,26 @@ const Website = ({ onLoginClick }: any) => {
               <VStack spacing={6} align="start" p={4}>
                 <Button
                   variant="link"
-                  leftIcon={<FiHome />}
-                  fontSize="lg"
-                  color="green.600">
-                  Home
-                </Button>
-                <Button
-                  variant="link"
                   leftIcon={<FiInfo />}
                   fontSize="lg"
-                  color="green.600">
+                  color="green.600"
+                  onClick={() => handleNavigation("about")}>
                   About
                 </Button>
                 <Button
                   variant="link"
                   leftIcon={<FiInfo />}
                   fontSize="lg"
-                  color="green.600">
+                  color="green.600"
+                  onClick={() => handleNavigation("features")}>
                   Features
                 </Button>
                 <Button
                   variant="link"
                   leftIcon={<FiPhone />}
                   fontSize="lg"
-                  color="green.600">
+                  color="green.600"
+                  onClick={() => handleNavigation("contact")}>
                   Contact
                 </Button>
               </VStack>
