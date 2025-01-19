@@ -33,6 +33,7 @@ export const getAllBookings = async (fetchAll = false) => {
 };
 
 export const addSlotBooking = async (booking, slotsToBook) => {
+  console.log("addSlotBooking", booking, slotsToBook);
   // eslint-disable-next-line react-hooks/rules-of-hooks
 
   try {
