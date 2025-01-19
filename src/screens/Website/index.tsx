@@ -172,10 +172,10 @@ const Website = ({ onLoginClick }: any) => {
 
         <Drawer isOpen={isOpen} onClose={onClose} placement="left">
           <DrawerOverlay />
-          <DrawerContent bg="green.50">
+          <DrawerContent bg="white">
             <DrawerCloseButton />
             <DrawerHeader bg="green.600" color="white" textAlign="center">
-              Turfwale Menu
+              Menu
             </DrawerHeader>
             <DrawerBody>
               <VStack spacing={6} align="start" p={4}>
