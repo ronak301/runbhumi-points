@@ -29,6 +29,8 @@ import { Link as ScrollLink, animateScroll as scroll } from "react-scroll";
 import { HamburgerIcon, MoonIcon, SunIcon } from "@chakra-ui/icons";
 import { FiHome, FiInfo, FiPhone, FiImage, FiStar } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import FloatingButtons from "../FloatingButtons";
+import NavBar from "./Navbar";
 
 const MotionBox = motion(Box);
 const MotionImage = motion(Image);
@@ -113,53 +115,10 @@ const Website = ({ onLoginClick }: any) => {
     <ChakraProvider>
       <Box>
         {/* Top Navigation */}
-        <Flex
-          as="nav"
-          position="fixed"
-          top={0}
-          width="100%"
-          zIndex={10}
-          bg="white"
-          shadow="sm"
-          justifyContent="center"
-          alignItems="center"
-          px={8}
-          py={4}
-          display={{ base: "none", md: "flex" }} // Hide on mobile
-        >
-          <Text
-            fontSize="xl"
-            fontWeight="bold"
-            color="green.600"
-            cursor="pointer"
-            onClick={scrollToTop}
-            mr="auto">
-            Turfwale
-          </Text>
-          <Flex gap={6} alignItems="center">
-            {["About", "Features", "Gallery", "Testimonials", "Contact"].map(
-              (section, idx) => (
-                <ScrollLink
-                  key={idx}
-                  to={section.toLowerCase()}
-                  smooth
-                  duration={800}
-                  offset={-70}
-                  style={{
-                    fontSize: "16px",
-                    fontWeight: "500",
-                    color: "green.600",
-                    cursor: "pointer",
-                  }}>
-                  {section}
-                </ScrollLink>
-              )
-            )}
-          </Flex>
-        </Flex>
+        <NavBar />
 
         {/* Hamburger Icon for Mobile */}
-        <IconButton
+        {/* <IconButton
           aria-label="Open Menu"
           icon={<HamburgerIcon />}
           onClick={onOpen}
@@ -168,9 +127,9 @@ const Website = ({ onLoginClick }: any) => {
           top={4}
           right={4}
           zIndex={20}
-        />
+        /> */}
 
-        <Drawer isOpen={isOpen} onClose={onClose} placement="left">
+        {/* <Drawer isOpen={isOpen} onClose={onClose} placement="left">
           <DrawerOverlay />
           <DrawerContent bg="white">
             <DrawerCloseButton />
@@ -206,12 +165,12 @@ const Website = ({ onLoginClick }: any) => {
               </VStack>
             </DrawerBody>
           </DrawerContent>
-        </Drawer>
+        </Drawer> */}
 
         {/* Hero Section */}
         <MotionBox
           id="hero"
-          bgImage={`url(https://justurf.club//assets/upload/1732193786.jpg)`}
+          bgImage={`url(https://images.pexels.com/photos/9420724/pexels-photo-9420724.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2)`}
           bgSize="cover"
           bgPosition="center"
           bgRepeat="no-repeat"
@@ -238,7 +197,12 @@ const Website = ({ onLoginClick }: any) => {
           />
           {/* Content */}
           <Box position="relative" zIndex={2} textAlign="center" px={4}>
-            <Heading as="h1" size="2xl" mb={4} textShadow="2px 2px #000000">
+            <Heading
+              as="h1"
+              size="2xl"
+              mb={4}
+              textShadow="2px 2px #000000"
+              style={{ fontFamily: "Neulis Alt, sans-serif" }}>
               Turfwale
             </Heading>
             <Text fontSize="lg" mb={6} textShadow="1px 1px #000000">
@@ -268,7 +232,7 @@ const Website = ({ onLoginClick }: any) => {
                 {/* Added smooth scrolling */}
                 <Button
                   size="lg"
-                  colorScheme="whiteAlpha"
+                  colorScheme="white"
                   variant="outline"
                   _hover={{ bg: "whiteAlpha.300" }}>
                   Learn More
@@ -285,7 +249,11 @@ const Website = ({ onLoginClick }: any) => {
           textAlign="center"
           bg="gray.50"
           py={16}>
-          <Heading size="lg" color="green.600" textDecoration="underline">
+          <Heading
+            style={{ fontFamily: "Neulis Alt, sans-serif" }}
+            size="lg"
+            color="green.600"
+            textDecoration="underline">
             About Us
           </Heading>
           <Text maxW="800px" fontSize="lg" lineHeight="1.8">
@@ -470,12 +438,6 @@ const Website = ({ onLoginClick }: any) => {
                   pattern="[0-9]{10}"
                   required
                 />
-                <Textarea
-                  placeholder="Your Message"
-                  name="message"
-                  rows={5}
-                  required
-                />
                 <Button
                   type="submit"
                   colorScheme="green"
@@ -521,6 +483,7 @@ const Website = ({ onLoginClick }: any) => {
           <Text fontSize="sm">&copy; 2025 Turfwale. All rights reserved.</Text>
         </MotionBox>
       </Box>
+      <FloatingButtons />
     </ChakraProvider>
   );
 };
