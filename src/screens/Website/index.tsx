@@ -199,13 +199,22 @@ const Website = ({ onLoginClick }: any) => {
           <Box position="relative" zIndex={2} textAlign="center" px={4}>
             <Heading
               as="h1"
-              size="2xl"
-              mb={4}
-              textShadow="2px 2px #000000"
-              style={{ fontFamily: "Neulis Alt, sans-serif" }}>
+              fontSize={{ base: "4xl", md: "6xl", lg: "7xl" }}
+              fontWeight="extrabold"
+              mb={6}
+              textShadow="3px 3px rgba(0, 0, 0, 0.5)"
+              lineHeight="1.1"
+              letterSpacing="wide"
+              style={{ fontFamily: "Neulis Alt, sans-serif" }}
+              textAlign="center">
               Turfwale
             </Heading>
-            <Text fontSize="lg" mb={6} textShadow="1px 1px #000000">
+            <Text
+              fontSize={{ base: "2xl", md: "4xl", lg: "5xl" }}
+              fontWeight="bold"
+              mb={8}
+              textShadow="2px 2px #000000"
+              lineHeight="1.2">
               India&apos;s Leading Sports Infra Manufacturer
             </Text>
             {/* CTA Buttons */}
