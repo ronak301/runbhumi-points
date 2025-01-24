@@ -1,6 +1,6 @@
 import { ChakraProvider } from "@chakra-ui/react";
-import theme from "./theme"; // Assuming you've defined your theme
-import HomeTab from "./screens/HomeTab/HomeTab";
+import theme from "./theme";
+import HomeTab from "./modules/app/HomeTab/HomeTab";
 import { AlertProvider } from "./context/AlertContext";
 import {
   BrowserRouter as Router,
@@ -8,9 +8,10 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import Website from "./screens/Website/index";
+import Website from "./modules/website/index";
 import { useState, useEffect } from "react";
-import Login from "./screens/Login"; // Assuming Login component is in "screens/Login"
+import Login from "./modules/auth/Login";
+import AdminPanel from "./modules/admin/AdminPanel"; // Import AdminPanel
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -29,6 +30,7 @@ function App() {
 
   const onLogout = () => {
     setIsAuthenticated(false);
+    localStorage.removeItem("user"); // Remove user from localStorage on logout
   };
 
   return (
@@ -41,9 +43,20 @@ function App() {
               path="/login"
               element={
                 isAuthenticated ? (
-                  <Navigate to="/home" />
+                  <Navigate to="/admin" />
                 ) : (
                   <Login onLogin={onLogin} />
+                )
+              }
+            />
+            {/* Protected admin route */}
+            <Route
+              path="/admin/*"
+              element={
+                isAuthenticated ? (
+                  <AdminPanel onLogout={onLogout} />
+                ) : (
+                  <Navigate to="/login" />
                 )
               }
             />
@@ -52,6 +65,18 @@ function App() {
               element={
                 isAuthenticated ? (
                   <HomeTab onLogout={onLogout} />
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
+            />
+            <Route path="/admin" element={<Navigate to="/admin/home" />} />
+            {/* Protected admin route */}
+            <Route
+              path="/admin/*"
+              element={
+                isAuthenticated ? (
+                  <AdminPanel onLogout={onLogout} />
                 ) : (
                   <Navigate to="/login" />
                 )

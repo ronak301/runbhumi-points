@@ -23,7 +23,7 @@ import {
   limit,
 } from "firebase/firestore";
 import React from "react";
-import { db } from "../../firebase";
+import { db } from "../../../firebase";
 import {
   compact,
   filter,
@@ -35,11 +35,11 @@ import {
   trim,
 } from "lodash";
 import { ChevronDownIcon, EditIcon, ExternalLinkIcon } from "@chakra-ui/icons";
-import { getDateFormat } from "../../utils/date";
+import { getDateFormat } from "../../../utils/date";
 import * as moment from "moment";
-import { DeleteEntry } from "../../components/DeleteEntry";
+import { DeleteEntry } from "../../../components/DeleteEntry";
 import AddPointsModal from "./AddPointsModal";
-import useStore from "../../zustand/useStore";
+import useStore from "../../../zustand/useStore";
 
 export const VALID_TILL_DURATION = 30;
 

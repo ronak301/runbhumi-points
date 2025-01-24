@@ -11,10 +11,10 @@ import React from "react";
 import AddBookingModal from "./AddBookingModal";
 import { map } from "lodash";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
-import { getAllBookings } from "../../api/bookings";
+import { getAllBookings } from "../../../api/bookings";
 import moment from "moment";
-import { DeleteBooking } from "../../components/DeleteBooking";
-import useStore from "../../zustand/useStore";
+import { DeleteBooking } from "../../../components/DeleteBooking";
+import useStore from "../../../zustand/useStore";
 import { getPoints, isValidPoints } from "../Points/Points";
 
 const sortDataBySlots = (data) => {

@@ -14,7 +14,7 @@ import {
 } from "@chakra-ui/react";
 import SlotSelector from "./SlotSelector";
 import moment from "moment";
-import { addSlotBooking } from "../../api/bookings";
+import { addSlotBooking } from "../../../api/bookings";
 import { isEmpty, map } from "lodash";
 
 export default function AddBookingModal({ isOpen, onClose, fetchBookings }) {

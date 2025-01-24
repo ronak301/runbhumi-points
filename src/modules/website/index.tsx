@@ -29,7 +29,7 @@ import { Link as ScrollLink, animateScroll as scroll } from "react-scroll";
 import { HamburgerIcon, MoonIcon, SunIcon } from "@chakra-ui/icons";
 import { FiHome, FiInfo, FiPhone, FiImage, FiStar } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import FloatingButtons from "../FloatingButtons";
+import FloatingButtons from "../../components/FloatingButtons";
 import NavBar from "./Navbar";
 
 const MotionBox = motion(Box);
