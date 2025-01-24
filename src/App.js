@@ -38,28 +38,20 @@ function App() {
       <AlertProvider>
         <Router>
           <Routes>
+            {/* Public Routes */}
             <Route path="/" element={<Website />} />
             <Route
               path="/login"
               element={
                 isAuthenticated ? (
-                  <Navigate to="/admin" />
+                  <Navigate to="/home" />
                 ) : (
                   <Login onLogin={onLogin} />
                 )
               }
             />
-            {/* Protected admin route */}
-            <Route
-              path="/admin/*"
-              element={
-                isAuthenticated ? (
-                  <AdminPanel onLogout={onLogout} />
-                ) : (
-                  <Navigate to="/login" />
-                )
-              }
-            />
+
+            {/* /home route for authenticated users */}
             <Route
               path="/home"
               element={
@@ -70,8 +62,12 @@ function App() {
                 )
               }
             />
-            <Route path="/admin" element={<Navigate to="/admin/home" />} />
-            {/* Protected admin route */}
+
+            {/* Admin Routes */}
+            <Route
+              path="/admin"
+              element={<Navigate to="/admin/home" />} // Redirect /admin to /admin/home
+            />
             <Route
               path="/admin/*"
               element={
