@@ -40,11 +40,17 @@ function App() {
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Website />} />
+
             <Route
               path="/login"
               element={
                 isAuthenticated ? (
-                  <Navigate to="/home" />
+                  // If authenticated, redirect to home with dynamic propertyId
+                  <Navigate
+                    to={`/home/property/${
+                      JSON.parse(localStorage.getItem("user")).propertyId
+                    }`}
+                  />
                 ) : (
                   <Login onLogin={onLogin} />
                 )
@@ -54,6 +60,22 @@ function App() {
             {/* /home route for authenticated users */}
             <Route
               path="/home"
+              element={
+                isAuthenticated ? (
+                  <Navigate
+                    to={`/home/property/${
+                      JSON.parse(localStorage.getItem("user")).propertyId
+                    }`}
+                  />
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
+            />
+
+            {/* Dynamic Route for Property Home */}
+            <Route
+              path="/home/property/:id"
               element={
                 isAuthenticated ? (
                   <HomeTab onLogout={onLogout} />

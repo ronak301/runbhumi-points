@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
   Box,
-  Button,
   Text,
   Tabs,
   TabList,
@@ -9,21 +8,23 @@ import {
   TabPanels,
   TabPanel,
   Icon,
-} from "@chakra-ui/react";
-import Points from "../Points/Points";
-import Bookings from "../Bookings";
-import Profile from "../Profile";
-import { useLocation, useNavigate } from "react-router-dom";
+} from "@chakra-ui/react"; // Full import from Chakra UI
+import { useNavigate, useParams } from "react-router-dom";
 import { FaCalendarAlt, FaStar, FaUser } from "react-icons/fa";
+import Bookings from "../Bookings"; // Assuming Bookings component fetches bookings for the property
+import Profile from "../Profile"; // Assuming Profile component exists
+import featureConfig from "../../../featureConfig"; // Import the feature config
+import Points from "../Points/Points";
 
 export default function HomeTab({ onLogout }) {
-  const location = useLocation();
-  const { propertyId } = location.state || {}; // Fallback to empty if not passed via state
+  const { id: propertyIdFromUrl } = useParams(); // Get propertyId from URL params
   const storedUser = JSON.parse(localStorage.getItem("user"));
-  const userPropertyId = storedUser?.propertyId || propertyId;
-  const navigate = useNavigate();
-  const [activeTabIndex, setActiveTabIndex] = useState(0); // State for active tab
+  const userPropertyId = propertyIdFromUrl || storedUser?.propertyId; // PropertyId from URL or user data
+  const user = storedUser;
 
+  const navigate = useNavigate();
+
+  // Redirect to login if no user is authenticated
   useEffect(() => {
     if (!storedUser) {
       navigate("/login");
@@ -31,13 +32,19 @@ export default function HomeTab({ onLogout }) {
   }, [storedUser, navigate]);
 
   const handleLogout = () => {
-    localStorage.removeItem("user"); // Clear user data
+    localStorage.removeItem("user");
     onLogout();
-    navigate("/login", { replace: true }); // Navigate to login after clearing
+    navigate("/login", { replace: true });
   };
 
+  // Get feature flags for the current property
+  const features = featureConfig[userPropertyId] || {}; // Default to an empty object if the property ID is not found
+
+  // State to manage the active tab
+  const [activeTabIndex, setActiveTabIndex] = useState(0);
+
   const handleTabChange = (index) => {
-    setActiveTabIndex(index);
+    setActiveTabIndex(index); // Update active tab index when a tab is clicked
   };
 
   return (
@@ -52,7 +59,7 @@ export default function HomeTab({ onLogout }) {
         px={6}
         boxShadow="sm">
         <Text fontSize="lg" color="white" fontWeight="bold">
-          Runbhumi Mewar
+          {user?.title || "User"} {/* Safely access user title */}
         </Text>
       </Box>
 
@@ -64,13 +71,19 @@ export default function HomeTab({ onLogout }) {
           variant="unstyled">
           <TabPanels p={0}>
             <TabPanel>
-              <Bookings />
+              <Bookings /> {/* Render Bookings component */}
             </TabPanel>
+
+            {/* Conditionally Render the Points Tab and Panel */}
+            {features.points ? (
+              <TabPanel>
+                <Points />
+              </TabPanel>
+            ) : null}
+
             <TabPanel>
-              <Points />
-            </TabPanel>
-            <TabPanel>
-              <Profile onLogout={handleLogout} />
+              <Profile onLogout={handleLogout} />{" "}
+              {/* Render Profile component */}
             </TabPanel>
           </TabPanels>
         </Tabs>
@@ -98,14 +111,18 @@ export default function HomeTab({ onLogout }) {
               <Icon as={FaCalendarAlt} boxSize={5} />
               <Text fontSize="sm">Bookings</Text>
             </Tab>
-            <Tab
-              _selected={{ color: "green.500" }}
-              color="white"
-              flexDirection="column"
-              alignItems="center">
-              <Icon as={FaStar} boxSize={5} />
-              <Text fontSize="sm">Points</Text>
-            </Tab>
+            {/* Conditionally Render the Points Tab */}
+            {features.points ? (
+              <Tab
+                _selected={{ color: "green.500" }}
+                color="white"
+                flexDirection="column"
+                alignItems="center">
+                <Icon as={FaStar} boxSize={5} />
+                <Text fontSize="sm">Points</Text>
+              </Tab>
+            ) : null}{" "}
+            {/* Don't render Points tab if feature is disabled */}
             <Tab
               _selected={{ color: "green.500" }}
               color="white"

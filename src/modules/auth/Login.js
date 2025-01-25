@@ -10,10 +10,16 @@ const Login = ({ onLogin }) => {
 
   // Mapping of mobile numbers to passwords and property IDs
   const userMap = {
-    7042770304: { password: "1234", propertyId: "iNANAwfMb6EXNtp7MRwJ" },
-    7042770304: { password: "1234", propertyId: "iNANAwfMb6EXNtp7MRwJ" },
-    9999999999: { password: "5678", propertyId: "xyz" },
-    8888888888: { password: "0000", propertyId: "abc" },
+    7042770304: {
+      password: "1234",
+      propertyId: "iNANAwfMb6EXNtp7MRwJ",
+      title: "Runbhumi Mewar",
+    },
+    9649354356: {
+      password: "1234",
+      propertyId: "JNznXP3zKHF6PL08RwVv",
+      title: "Velocity Turf",
+    },
   };
 
   const handleLogin = () => {
@@ -23,12 +29,16 @@ const Login = ({ onLogin }) => {
       // Store user info and property ID in localStorage
       localStorage.setItem(
         "user",
-        JSON.stringify({ mobileNo, propertyId: user.propertyId })
+        JSON.stringify({
+          mobileNo,
+          propertyId: user.propertyId,
+          title: user.title,
+        })
       );
 
       onLogin();
 
-      navigate("/home", { state: { propertyId: user.propertyId } });
+      navigate(`/home/property/${user.propertyId}`);
     } else {
       toast({
         title: "Invalid credentials",
