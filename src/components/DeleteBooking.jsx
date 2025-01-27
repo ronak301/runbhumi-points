@@ -14,16 +14,16 @@ import * as React from "react";
 import { doc, deleteDoc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { DeleteIcon } from "@chakra-ui/icons";
-import { deleteSlotBooking } from "../api/bookings";
+import useBookingsManager from "../modules/app/hooks/useBookingsManager";
 
-export function DeleteBooking({ booking, fetchBookings }) {
+export function DeleteBooking({ booking }) {
   const id = booking?.id;
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = React.useRef();
+  const { deleteSlotBooking, fetchBookings } = useBookingsManager();
 
   const onDeleteEntry = () => {
     deleteSlotBooking(id, booking?.bookingDate);
-    fetchBookings();
     onClose();
   };
 

@@ -15,21 +15,19 @@ import Bookings from "../Bookings"; // Assuming Bookings component fetches booki
 import Profile from "../Profile"; // Assuming Profile component exists
 import featureConfig from "../../../featureConfig"; // Import the feature config
 import Points from "../Points/Points";
+import useCurrentProperty from "../hooks/useCurrentProperty";
 
 export default function HomeTab({ onLogout }) {
-  const { id: propertyIdFromUrl } = useParams(); // Get propertyId from URL params
-  const storedUser = JSON.parse(localStorage.getItem("user"));
-  const userPropertyId = propertyIdFromUrl || storedUser?.propertyId; // PropertyId from URL or user data
-  const user = storedUser;
+  const { propertyId, property } = useCurrentProperty();
 
   const navigate = useNavigate();
 
   // Redirect to login if no user is authenticated
   useEffect(() => {
-    if (!storedUser) {
+    if (!propertyId) {
       navigate("/login");
     }
-  }, [storedUser, navigate]);
+  }, [propertyId, navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem("user");
@@ -38,7 +36,7 @@ export default function HomeTab({ onLogout }) {
   };
 
   // Get feature flags for the current property
-  const features = featureConfig[userPropertyId] || {}; // Default to an empty object if the property ID is not found
+  const features = featureConfig[propertyId] || {}; // Default to an empty object if the property ID is not found
 
   // State to manage the active tab
   const [activeTabIndex, setActiveTabIndex] = useState(0);
@@ -59,7 +57,7 @@ export default function HomeTab({ onLogout }) {
         px={6}
         boxShadow="sm">
         <Text fontSize="lg" color="white" fontWeight="bold">
-          {user?.title || "User"} {/* Safely access user title */}
+          {property?.title || "User"} {/* Safely access user title */}
         </Text>
       </Box>
 
@@ -71,7 +69,7 @@ export default function HomeTab({ onLogout }) {
           variant="unstyled">
           <TabPanels p={0}>
             <TabPanel>
-              <Bookings /> {/* Render Bookings component */}
+              <Bookings />
             </TabPanel>
 
             {/* Conditionally Render the Points Tab and Panel */}
@@ -83,7 +81,6 @@ export default function HomeTab({ onLogout }) {
 
             <TabPanel>
               <Profile onLogout={handleLogout} />{" "}
-              {/* Render Profile component */}
             </TabPanel>
           </TabPanels>
         </Tabs>

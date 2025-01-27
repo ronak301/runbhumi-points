@@ -3,7 +3,7 @@ import {
   getAllProperties,
   getAllSlots,
   getBookedSlotsForDateAndPlayground,
-} from "../../../api/slots";
+} from "../api/slots";
 import { filter, map } from "lodash";
 import { Button, Grid, Spinner, Text } from "@chakra-ui/react";
 import moment from "moment";

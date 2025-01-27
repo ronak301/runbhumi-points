@@ -1,6 +1,5 @@
 import { collection, getDocs, query } from "firebase/firestore";
-import { db } from "../firebase";
-import moment from "moment/moment";
+import { db } from "../../../firebase";
 
 export const getAllProperties = async () => {
   let prop = [];

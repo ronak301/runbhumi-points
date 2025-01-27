@@ -9,52 +9,23 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 import AddBookingModal from "./AddBookingModal";
-import { map } from "lodash";
+import { isEmpty, map } from "lodash";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
-import { getAllBookings } from "../../../api/bookings";
 import moment from "moment";
 import { DeleteBooking } from "../../../components/DeleteBooking";
 import useStore from "../../../zustand/useStore";
 import { getPoints, isValidPoints } from "../Points/Points";
-
-const sortDataBySlots = (data) => {
-  console.log("datadata", data);
-  return data?.sort((a, b) => {
-    if (a?.bookingDate === b?.bookingDate) {
-      const slotA = a?.slots?.[0];
-      const slotB = b?.slots?.[0];
-      return slotA.sort - slotB?.sort;
-    } else {
-      return new Date(b?.bookingDate) - new Date(a?.bookingDate);
-    }
-  });
-};
+import useBookingsManager from "../hooks/useBookingsManager";
+import NoBookings from "./NoBookings";
 
 export default function AllBookingsList() {
-  const [isLoaing, setIsLoading] = React.useState(true);
-  const [bookings, setBookings] = React.useState([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { usersWithPoints } = useStore();
-
-  const [shouldFetchAllBookings, setShouldFetchAllBookings] =
-    React.useState(false);
-
-  const fetchBookings = () => {
-    setIsLoading(true);
-    getAllBookings(shouldFetchAllBookings).then((data) => {
-      console.log("dataaaa", data);
-      setBookings(sortDataBySlots(data));
-      setIsLoading(false);
-    });
-  };
+  const { fetchBookings, loading, loadMore, bookings } = useBookingsManager();
 
   React.useEffect(() => {
-    setIsLoading(true);
-    getAllBookings(shouldFetchAllBookings).then((data) => {
-      setBookings(sortDataBySlots(data));
-      setIsLoading(false);
-    });
-  }, [shouldFetchAllBookings]);
+    if (!loading) fetchBookings();
+  }, [loading]);
 
   const getSlotsInfo = (booking) => {
     const slots = booking?.slots;
@@ -73,16 +44,15 @@ export default function AllBookingsList() {
       return info.slice(0, start) + info.slice(end);
     }
   };
-
-  console.log("bookings", bookings);
+  const noBookings = !loading && isEmpty(bookings);
 
   return (
     <>
       <Flex
-        backgroundColor={"rgb(247,245,238)"}
         scrollBehavior="auto"
         paddingLeft={"4%"}
         paddingRight={"4%"}
+        minH={"70vh"}
         flexDirection={"column"}>
         <AddBookingModal
           isOpen={isOpen}
@@ -106,14 +76,23 @@ export default function AllBookingsList() {
             </Button>
           </Flex>
         </Flex>
-        {isLoaing ? (
-          <Spinner
-            thickness="4px"
-            speed="0.65s"
-            emptyColor="gray.200"
-            color="blue.500"
-            size="xl"
-          />
+        {loading ? (
+          <Flex
+            minH="100vh"
+            justify="center"
+            align="center"
+            direction="column"
+            p={4}>
+            <Spinner
+              thickness="4px"
+              speed="0.65s"
+              emptyColor="gray.200"
+              color="blue.500"
+              size="xl"
+            />
+          </Flex>
+        ) : noBookings ? (
+          <NoBookings />
         ) : (
           <>
             <Box>
@@ -219,14 +198,8 @@ Points Available: ${pointsAvailable}
                 );
               })}
             </Box>
-            <Button
-              mb={32}
-              onClick={() => {
-                setShouldFetchAllBookings(true);
-              }}
-              colorScheme="blue"
-              mt={8}>
-              Load All
+            <Button mb={32} onClick={loadMore} colorScheme="blue" mt={8}>
+              Load More
             </Button>
           </>
         )}

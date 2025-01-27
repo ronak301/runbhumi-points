@@ -14,10 +14,13 @@ import {
 } from "@chakra-ui/react";
 import SlotSelector from "./SlotSelector";
 import moment from "moment";
-import { addSlotBooking } from "../../../api/bookings";
 import { isEmpty, map } from "lodash";
+import { getTitleFromId } from "../../../utils/utils";
+import useBookingsManager from "../hooks/useBookingsManager";
+import useCurrentProperty from "../hooks/useCurrentProperty";
 
-export default function AddBookingModal({ isOpen, onClose, fetchBookings }) {
+export default function AddBookingModal({ isOpen, onClose }) {
+  const { propertyId } = useCurrentProperty();
   const [input, setInput] = React.useState({
     date: moment().format("YYYY-MM-DD"),
   });
@@ -27,6 +30,7 @@ export default function AddBookingModal({ isOpen, onClose, fetchBookings }) {
   const [additionOrUpdationInProgress, setAdditionOrUpdationInProgress] =
     React.useState(false);
   const [totalAmount, setTotalAmount] = React.useState(0);
+  const { addSlotBooking } = useBookingsManager();
 
   React.useEffect(() => {
     const { name, number, date } = input;
@@ -74,16 +78,15 @@ export default function AddBookingModal({ isOpen, onClose, fetchBookings }) {
         name: input?.name,
         number: input?.number,
       },
+      propertyId: propertyId,
       property: {
-        // todo fix this
-        id: "iNANAwfMb6EXNtp7MRwJ",
-        title: "RunBhumi Mewar",
+        id: propertyId,
+        title: getTitleFromId(propertyId),
       },
       slots: selectedSlots,
       timestamp: moment().format(),
     };
     await addSlotBooking(booking, selectedSlots);
-    fetchBookings();
     setAdditionOrUpdationInProgress(false);
     onCloseModal();
   };
@@ -186,7 +189,7 @@ export default function AddBookingModal({ isOpen, onClose, fetchBookings }) {
             isDisabled={isAddBookingDisabled}
             colorScheme="blue"
             ml={3}
-            onClick={onAddBooking}>
+            onClick={() => onAddBooking()}>
             Add Booking
           </Button>
         </ModalFooter>

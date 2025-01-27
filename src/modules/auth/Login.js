@@ -14,11 +14,28 @@ const Login = ({ onLogin }) => {
       password: "1234",
       propertyId: "iNANAwfMb6EXNtp7MRwJ",
       title: "Runbhumi Mewar",
+      owner: {
+        firstName: "Ronak",
+        lastName: "Kothari",
+      },
     },
     9649354356: {
       password: "1234",
+      propertyId: "iNANAwfMb6EXNtp7MRwJ",
+      title: "Runbhumi Mewar",
+      owner: {
+        firstName: "Abhay",
+        lastName: "Kothari",
+      },
+    },
+    9664317924: {
+      password: "1234",
       propertyId: "JNznXP3zKHF6PL08RwVv",
       title: "Velocity Turf",
+      owner: {
+        firstName: "Abhay",
+        lastName: "Kothari",
+      },
     },
   };
 
@@ -33,6 +50,7 @@ const Login = ({ onLogin }) => {
           mobileNo,
           propertyId: user.propertyId,
           title: user.title,
+          owner: user.owner,
         })
       );
 
