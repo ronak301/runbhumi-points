@@ -20,7 +20,7 @@ export function DeleteBooking({ booking }) {
   const id = booking?.id;
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = React.useRef();
-  const { deleteSlotBooking, fetchBookings } = useBookingsManager();
+  const { deleteSlotBooking } = useBookingsManager();
 
   const onDeleteEntry = () => {
     deleteSlotBooking(id, booking?.bookingDate);

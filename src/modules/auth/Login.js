@@ -1,5 +1,13 @@
 import { useState } from "react";
-import { Input, Button, Box, Text, useToast } from "@chakra-ui/react";
+import {
+  Input,
+  Button,
+  Box,
+  Text,
+  useToast,
+  VStack,
+  Heading,
+} from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 
 const Login = ({ onLogin }) => {
@@ -33,8 +41,8 @@ const Login = ({ onLogin }) => {
       propertyId: "JNznXP3zKHF6PL08RwVv",
       title: "Velocity Turf",
       owner: {
-        firstName: "Abhay",
-        lastName: "Kothari",
+        firstName: "The Velocity Turf",
+        lastName: "",
       },
     },
   };
@@ -55,7 +63,6 @@ const Login = ({ onLogin }) => {
       );
 
       onLogin();
-
       navigate(`/home/property/${user.propertyId}`);
     } else {
       toast({
@@ -69,32 +76,59 @@ const Login = ({ onLogin }) => {
   };
 
   return (
-    <Box
-      maxWidth="400px"
-      mx="auto"
-      mt="100px"
-      p={6}
-      borderRadius="md"
-      boxShadow="sm">
-      <Text fontSize="2xl" fontWeight="bold" mb={4}>
-        Login
-      </Text>
-      <Input
-        placeholder="Mobile Number"
-        value={mobileNo}
-        onChange={(e) => setMobileNo(e.target.value)}
-        mb={4}
-      />
-      <Input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        mb={4}
-      />
-      <Button width="full" colorScheme="green" onClick={handleLogin}>
-        Login
-      </Button>
+    <Box minHeight="100vh" display="flex" flexDirection="column">
+      {/* Top Bar */}
+      <Box bg="teal.500" p={4} color="white">
+        <Heading size="md" textAlign="center">
+          Turfwale
+        </Heading>
+      </Box>
+
+      {/* Centered Login Form */}
+      <VStack
+        spacing={6}
+        maxWidth="400px"
+        mx="auto"
+        mt="100px"
+        p={6}
+        borderRadius="md"
+        boxShadow="lg"
+        bg="white"
+        border="1px solid #e2e8f0">
+        <Text fontSize="2xl" fontWeight="bold" color="teal.600">
+          Login to Your Account
+        </Text>
+
+        <Input
+          placeholder="Mobile Number"
+          value={mobileNo}
+          onChange={(e) => setMobileNo(e.target.value)}
+          mb={4}
+          isFullWidth
+          focusBorderColor="teal.500"
+          borderColor="gray.300"
+        />
+
+        <Input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          mb={4}
+          isFullWidth
+          focusBorderColor="teal.500"
+          borderColor="gray.300"
+        />
+
+        <Button
+          width="full"
+          colorScheme="teal"
+          onClick={handleLogin}
+          isLoading={false} // Can add loading state if needed
+        >
+          Login
+        </Button>
+      </VStack>
     </Box>
   );
 };

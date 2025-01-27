@@ -21,7 +21,7 @@ import NoBookings from "./NoBookings";
 export default function AllBookingsList() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { usersWithPoints } = useStore();
-  const { fetchBookings, loading, loadMore, bookings } = useBookingsManager();
+  const { loading, loadMore, bookings } = useBookingsManager();
 
   const getSlotsInfo = (booking) => {
     const slots = booking?.slots;
@@ -50,11 +50,7 @@ export default function AllBookingsList() {
         paddingRight={"4%"}
         minH={"70vh"}
         flexDirection={"column"}>
-        <AddBookingModal
-          isOpen={isOpen}
-          onClose={onClose}
-          fetchBookings={fetchBookings}
-        />
+        <AddBookingModal isOpen={isOpen} onClose={onClose} />
         <Flex mt={4} flexDirection={"column"}>
           <Flex
             flexDirection={"row"}
@@ -145,10 +141,7 @@ export default function AllBookingsList() {
                     <Text>{num}</Text>
 
                     <Flex justifyContent={"space-between"} mt={4}>
-                      <DeleteBooking
-                        booking={singleBooking}
-                        fetchBookings={fetchBookings}
-                      />
+                      <DeleteBooking booking={singleBooking} />
                       <Box>
                         <IconButton
                           onClick={() => {

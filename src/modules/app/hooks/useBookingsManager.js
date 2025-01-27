@@ -51,11 +51,13 @@ const useBookingsManager = () => {
       const twentyFourHours = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
       if (cacheAge < twentyFourHours) {
+        console.log("Loaded bookings from cache");
         setBookings(JSON.parse(cachedData)); // Load cached bookings if within 24 hours
         return true; // Cache is valid, skip fetching from Firestore
       }
     }
 
+    console.log("Cache expired or not found, fetching from network...");
     return false; // Cache expired or not available, need to fetch from Firestore
   };
 
@@ -99,7 +101,7 @@ const useBookingsManager = () => {
 
       if (isCacheValid && !nextPage) {
         // If cache is valid and it's not a pagination request, use the cache
-        console.log("Serving from cache");
+        console.log("Serving bookings from cache");
         setBookings(cachedBookings); // Set the state from cached data
         setLoading(false); // Hide page loader
         setBusy(false);
@@ -130,6 +132,8 @@ const useBookingsManager = () => {
       querySnapshot.forEach((doc) => {
         fetchedBookings.push({ ...doc.data(), id: doc.id });
       });
+
+      console.log(`Fetched ${fetchedBookings.length} bookings from network`);
 
       // If pagination, append the new bookings to the existing bookings
       if (nextPage) {
@@ -193,6 +197,7 @@ const useBookingsManager = () => {
         })
       );
 
+      console.log("Booking added successfully!");
       showAlert("Booking added successfully!!", "success");
       fetchBookings(); // Refetch bookings after adding
     } catch (e) {
@@ -225,6 +230,7 @@ const useBookingsManager = () => {
         }
       });
 
+      console.log("Booking deleted successfully!");
       showAlert("Booking deleted successfully!!", "success");
       fetchBookings(); // Refetch bookings after deletion
     } catch (e) {
@@ -243,6 +249,7 @@ const useBookingsManager = () => {
     setLoading(true);
     try {
       await setDoc(doc(db, "bookings", booking.id), booking);
+      console.log("Booking updated successfully!");
       showAlert("Booking updated successfully!!", "success");
       fetchBookings(); // Refetch bookings after update
     } catch (e) {
