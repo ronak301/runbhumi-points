@@ -30,7 +30,7 @@ function App() {
 
   const onLogout = () => {
     setIsAuthenticated(false);
-    localStorage.removeItem("user"); // Remove user from localStorage on logout
+    localStorage.clear();
   };
 
   return (

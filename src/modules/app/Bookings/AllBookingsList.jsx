@@ -23,10 +23,6 @@ export default function AllBookingsList() {
   const { usersWithPoints } = useStore();
   const { fetchBookings, loading, loadMore, bookings } = useBookingsManager();
 
-  React.useEffect(() => {
-    if (!loading) fetchBookings();
-  }, [loading]);
-
   const getSlotsInfo = (booking) => {
     const slots = booking?.slots;
     const slotsInfo = slots.map((slot) => {

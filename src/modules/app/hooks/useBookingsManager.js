@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useEffect } from "react";
 import {
   collection,
   addDoc,
@@ -16,10 +16,13 @@ import { db } from "../../../firebase";
 import { showAlert } from "../../../context/AlertContext";
 import useCurrentProperty from "./useCurrentProperty";
 
+const LIMIT = 10;
+
 const useBookingsManager = () => {
   const { propertyId } = useCurrentProperty();
   const [bookings, setBookings] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // Initial loading
+  const [paginationLoading, setPaginationLoading] = useState(false); // Pagination loading
   const [error, setError] = useState(null);
   const [lastVisible, setLastVisible] = useState(null);
   const [busy, setBusy] = useState(false); // State to track if an API call is in progress
@@ -36,67 +39,132 @@ const useBookingsManager = () => {
     });
   };
 
-  const fetchBookings = async (fetchAll = false, nextPage = false) => {
+  // Function to load bookings from cache
+  const loadBookingsFromCache = () => {
+    const cachedData = localStorage.getItem("bookings");
+    const cachedTimestamp = localStorage.getItem("bookingsTimestamp");
+    const currentTime = new Date().getTime();
+
+    // Check if cache is available and is not older than 24 hours
+    if (cachedData && cachedTimestamp) {
+      const cacheAge = currentTime - cachedTimestamp;
+      const twentyFourHours = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+
+      if (cacheAge < twentyFourHours) {
+        setBookings(JSON.parse(cachedData)); // Load cached bookings if within 24 hours
+        return true; // Cache is valid, skip fetching from Firestore
+      }
+    }
+
+    return false; // Cache expired or not available, need to fetch from Firestore
+  };
+
+  // Load initial bookings from cache or Firestore
+  useEffect(() => {
+    // Try loading from cache first
+    const cacheLoaded = loadBookingsFromCache();
+
+    if (!cacheLoaded) {
+      fetchBookings(); // If cache expired or not present, fetch from Firestore
+    }
+  }, []);
+
+  const fetchBookings = async (nextPage = false) => {
     if (busy) return; // Prevent any further calls if an API call is in progress
     setBusy(true); // Set to true to indicate that a request is ongoing
-    setLoading(true);
+
+    // Differentiate between initial load and pagination
+    if (!nextPage) {
+      setLoading(true); // Show page loader for the initial load
+    } else {
+      setPaginationLoading(true); // Show pagination loader for additional data
+    }
+
     setError(null);
-    console.log("rkk2");
 
-    // try {
-    //   if (!propertyId) {
-    //     throw new Error("Property ID is required");
-    //   }
+    const CACHE_EXPIRY_TIME = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
-    //   // Define the query to filter bookings by property id in the nested property object
-    //   let bookingsQuery = query(
-    //     collection(db, "bookings"),
-    //     where("property.id", "==", propertyId), // Updated to query by nested property.id
-    //     orderBy("bookingDate", "desc"),
-    //     limit(1)
-    //   );
+    try {
+      if (!propertyId) {
+        throw new Error("Property ID is required");
+      }
 
-    //   // Handle pagination with nextPage and lastVisible
-    //   if (nextPage && lastVisible) {
-    //     bookingsQuery = query(
-    //       bookingsQuery,
-    //       startAfter(lastVisible),
-    //       limit(1)
-    //     );
-    //   }
+      // Check if cached data is available and if it's still valid (within 24 hours)
+      const cachedBookings = JSON.parse(localStorage.getItem("bookings"));
+      const cachedTimestamp = localStorage.getItem("bookingsTimestamp");
+      const isCacheValid =
+        cachedBookings &&
+        cachedTimestamp &&
+        Date.now() - cachedTimestamp < CACHE_EXPIRY_TIME;
 
-    //   // Fetch the bookings
-    //   const querySnapshot = await getDocs(bookingsQuery);
-    //   const bookings = [];
+      if (isCacheValid && !nextPage) {
+        // If cache is valid and it's not a pagination request, use the cache
+        console.log("Serving from cache");
+        setBookings(cachedBookings); // Set the state from cached data
+        setLoading(false); // Hide page loader
+        setBusy(false);
+        return;
+      }
 
-    //   // Iterate through querySnapshot to collect booking data
-    //   querySnapshot.forEach((doc) => {
-    //     bookings.push({ ...doc.data(), id: doc.id });
-    //   });
+      // Define the query to filter bookings by property id in the nested property object
+      let bookingsQuery = query(
+        collection(db, "bookings"),
+        where("property.id", "==", propertyId),
+        orderBy("bookingDate", "desc"),
+        limit(LIMIT)
+      );
 
-    //   // Update the bookings state (considering whether we are loading more or not)
-    //   setBookings((prevBookings) => {
-    //     console.log("rkk", bookings);
-    //     const data = nextPage ? [...prevBookings, ...bookings] : bookings;
-    //     const sortedData = sortDataBySlots(data);
-    //     return sortedData;
-    //   });
+      // Handle pagination with nextPage and lastVisible
+      if (nextPage && lastVisible) {
+        bookingsQuery = query(
+          bookingsQuery,
+          startAfter(lastVisible),
+          limit(LIMIT)
+        );
+      }
 
-    //   // Update the last visible document for pagination
-    //   setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
-    // } catch (err) {
-    //   console.log("err", err.message);
-    //   setError(err.message);
-    // } finally {
-    //   setLoading(false);
-    //   setBusy(false); // Reset busy flag after API call is completed
-    // }
+      // Fetch the bookings
+      const querySnapshot = await getDocs(bookingsQuery);
+      const fetchedBookings = [];
+
+      querySnapshot.forEach((doc) => {
+        fetchedBookings.push({ ...doc.data(), id: doc.id });
+      });
+
+      // If pagination, append the new bookings to the existing bookings
+      if (nextPage) {
+        setBookings((prevBookings) => {
+          const updatedBookings = [...prevBookings, ...fetchedBookings];
+          return sortDataBySlots(updatedBookings); // Sort the updated list
+        });
+      } else {
+        // If it's the initial load, replace the bookings with the new data
+        setBookings(fetchedBookings); // Set new bookings
+      }
+
+      // Update the timestamp for cache expiry
+      localStorage.setItem("bookings", JSON.stringify(fetchedBookings)); // Cache the new data
+      localStorage.setItem("bookingsTimestamp", new Date().getTime());
+
+      // Update the lastVisible document for pagination
+      setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
+    } catch (err) {
+      console.log("Error fetching bookings:", err.message);
+      setError(err.message);
+    } finally {
+      if (!nextPage) {
+        setLoading(false); // Hide page loader after initial load
+      } else {
+        setPaginationLoading(false); // Hide pagination loader
+      }
+      setBusy(false); // Reset busy flag after API call is completed
+    }
   };
 
   // Add a new booking with slots
   const addSlotBooking = async (booking, slotsToBook) => {
-    if (busy) return; // Prevent further calls if an API call is in progress
-    setBusy(true); // Set to true to indicate that a request is ongoing
+    if (busy) return;
+    setBusy(true);
     setLoading(true);
     try {
       const res = await addDoc(collection(db, "bookings"), booking);
@@ -132,14 +200,14 @@ const useBookingsManager = () => {
       showAlert("Something went wrong while adding booking!!", "error");
     } finally {
       setLoading(false);
-      setBusy(false); // Reset busy flag after API call is completed
+      setBusy(false);
     }
   };
 
   // Delete a slot booking
   const deleteSlotBooking = async (id, date) => {
-    if (busy) return; // Prevent further calls if an API call is in progress
-    setBusy(true); // Set to true to indicate that a request is ongoing
+    if (busy) return;
+    setBusy(true);
     setLoading(true);
     try {
       await deleteDoc(doc(db, "bookings", id));
@@ -164,14 +232,14 @@ const useBookingsManager = () => {
       showAlert("Something went wrong while deleting booking!!", "error");
     } finally {
       setLoading(false);
-      setBusy(false); // Reset busy flag after API call is completed
+      setBusy(false);
     }
   };
 
   // Update a booking
   const updateBooking = async (booking) => {
-    if (busy) return; // Prevent further calls if an API call is in progress
-    setBusy(true); // Set to true to indicate that a request is ongoing
+    if (busy) return;
+    setBusy(true);
     setLoading(true);
     try {
       await setDoc(doc(db, "bookings", booking.id), booking);
@@ -182,19 +250,20 @@ const useBookingsManager = () => {
       showAlert("Something went wrong while updating booking!!", "error");
     } finally {
       setLoading(false);
-      setBusy(false); // Reset busy flag after API call is completed
+      setBusy(false);
     }
   };
 
   // Load more bookings (pagination)
   const loadMore = () => {
-    if (busy) return; // Prevent further calls if an API call is in progress
-    fetchBookings(false, true);
+    if (busy) return;
+    fetchBookings(true);
   };
 
   return {
     bookings,
     loading,
+    paginationLoading,
     error,
     addSlotBooking,
     deleteSlotBooking,

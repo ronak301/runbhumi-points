@@ -3,52 +3,81 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../../firebase";
 
 const useCurrentProperty = () => {
-  // State to hold the property and owner data
   const [property, setProperty] = useState(null);
   const [owner, setOwner] = useState(null);
   const [loading, setLoading] = useState(true);
   const storedUser = JSON.parse(localStorage.getItem("user") ?? "{}");
 
+  const CACHE_EXPIRY_TIME = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+
   useEffect(() => {
-    // Get propertyId from localStorage
-
     const propertyId = storedUser?.propertyId;
-
     if (!propertyId) {
+      setLoading(false); // No propertyId available, stop loading
       return;
     }
 
-    // Define the function to fetch property and owner data
+    // Function to check if cached data is still valid
+    const isCacheValid = () => {
+      const cachedData = JSON.parse(
+        localStorage.getItem(`property-${propertyId}`) || "{}"
+      );
+      if (cachedData) {
+        const { timestamp } = cachedData;
+        // Check if the cached data is older than 24 hours
+        return Date.now() - timestamp < CACHE_EXPIRY_TIME;
+      }
+      return false;
+    };
+
     const fetchPropertyData = async () => {
       try {
-        // Set loading to true while fetching
         setLoading(true);
 
-        // Fetch property info
+        // Check cache first
+        if (isCacheValid()) {
+          const cachedData = JSON.parse(
+            localStorage.getItem(`property-${propertyId}`) || "{}"
+          );
+          setProperty(cachedData.property);
+          setOwner(cachedData.owner);
+          setLoading(false);
+          return; // Skip fetching from Firestore if cache is valid
+        }
+
+        // Fetch from Firestore if no valid cache
+        console.log("fetching prop info");
         const propertyRef = doc(db, "properties", propertyId);
         const propertyDoc = await getDoc(propertyRef);
 
-        if (!propertyDoc.exists()) {
-          return;
+        if (propertyDoc.exists()) {
+          // Save the data in cache with a timestamp
+          localStorage.setItem(
+            `property-${propertyId}`,
+            JSON.stringify({
+              property: propertyDoc.data(),
+              owner: storedUser.owner, // Assuming owner is stored in the user data
+              timestamp: Date.now(),
+            })
+          );
+
+          // Set the property and owner state
+          setProperty(propertyDoc.data() as any);
+          setOwner(storedUser.owner);
+        } else {
+          console.log("Property not found");
         }
-
-        // Set property data
-        setProperty(propertyDoc?.data() as any);
-
-        // Fetch owner info (assuming the owner info is stored in a sub-collection or another document)
-
-        // Set owner data
-        setOwner(storedUser.owner);
-
-        // Set loading to false after data has been fetched
+      } catch (err) {
+        console.error("Error fetching property data", err);
+      } finally {
         setLoading(false);
-      } catch (err) {}
+      }
     };
 
     fetchPropertyData();
-  }, []); // Empty dependency array to only run once on mount
+  }, [storedUser?.propertyId]); // Re-run when the propertyId changes
 
-  return { property, owner, loading, propertyId: storedUser.propertyId };
+  return { property, owner, loading, propertyId: storedUser?.propertyId };
 };
 
 export default useCurrentProperty;
