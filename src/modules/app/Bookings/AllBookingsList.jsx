@@ -20,8 +20,8 @@ export default function AllBookingsList() {
     <>
       <Flex
         scrollBehavior="auto"
-        paddingLeft={"4%"}
-        paddingRight={"4%"}
+        paddingLeft={"1%"}
+        paddingRight={"1%"}
         minH={"70vh"}
         flexDirection={"column"}>
         <AddBookingModal isOpen={isOpen} onClose={onClose} />

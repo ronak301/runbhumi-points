@@ -54,13 +54,13 @@ const BookingCard = ({ booking, title, usersWithPoints }) => {
     <Box
       boxShadow="lg"
       backgroundColor={"white"}
-      mt={4}
-      mb={4}
-      pb={6}
-      pl={6}
-      pr={6}
-      borderRadius={12}
-      pt={6}
+      mt={2}
+      mb={2}
+      pb={3}
+      pl={3}
+      pr={3}
+      borderRadius={8}
+      pt={3}
       _hover={{
         boxShadow: "2xl",
         transform: "scale(1.02)",
