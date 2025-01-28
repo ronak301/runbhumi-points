@@ -71,7 +71,7 @@ const useBookingsManager = () => {
     }
   }, []);
 
-  const fetchBookings = async (nextPage = false) => {
+  const fetchBookings = async (nextPage = false, forceFetch = false) => {
     if (busy) return; // Prevent any further calls if an API call is in progress
     setBusy(true); // Set to true to indicate that a request is ongoing
 
@@ -91,21 +91,24 @@ const useBookingsManager = () => {
         throw new Error("Property ID is required");
       }
 
-      // Check if cached data is available and if it's still valid (within 24 hours)
-      const cachedBookings = JSON.parse(localStorage.getItem("bookings"));
-      const cachedTimestamp = localStorage.getItem("bookingsTimestamp");
-      const isCacheValid =
-        cachedBookings &&
-        cachedTimestamp &&
-        Date.now() - cachedTimestamp < CACHE_EXPIRY_TIME;
+      // Skip cache and force data fetch if forceFetch is true
+      if (!forceFetch) {
+        // Check if cached data is available and if it's still valid (within 24 hours)
+        const cachedBookings = JSON.parse(localStorage.getItem("bookings"));
+        const cachedTimestamp = localStorage.getItem("bookingsTimestamp");
+        const isCacheValid =
+          cachedBookings &&
+          cachedTimestamp &&
+          Date.now() - cachedTimestamp < CACHE_EXPIRY_TIME;
 
-      if (isCacheValid && !nextPage) {
-        // If cache is valid and it's not a pagination request, use the cache
-        console.log("Serving bookings from cache");
-        setBookings(cachedBookings); // Set the state from cached data
-        setLoading(false); // Hide page loader
-        setBusy(false);
-        return;
+        if (isCacheValid && !nextPage) {
+          // If cache is valid and it's not a pagination request, use the cache
+          console.log("Serving bookings from cache");
+          setBookings(cachedBookings); // Set the state from cached data
+          setLoading(false); // Hide page loader
+          setBusy(false);
+          return;
+        }
       }
 
       // Define the query to filter bookings by property id in the nested property object
@@ -199,7 +202,9 @@ const useBookingsManager = () => {
 
       console.log("Booking added successfully!");
       showAlert("Booking added successfully!!", "success");
-      fetchBookings(); // Refetch bookings after adding
+
+      // Force fetching of bookings (no cache)
+      fetchBookings(false, true); // Force fresh data (no cache)
     } catch (e) {
       console.error("Error adding slot booking:", e);
       showAlert("Something went wrong while adding booking!!", "error");
@@ -232,7 +237,7 @@ const useBookingsManager = () => {
 
       console.log("Booking deleted successfully!");
       showAlert("Booking deleted successfully!!", "success");
-      fetchBookings(); // Refetch bookings after deletion
+      fetchBookings(false, true); // Force fresh data (no cache)
     } catch (e) {
       console.error("Error deleting slot booking:", e);
       showAlert("Something went wrong while deleting booking!!", "error");
