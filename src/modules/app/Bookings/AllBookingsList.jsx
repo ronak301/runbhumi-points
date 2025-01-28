@@ -17,11 +17,13 @@ import useStore from "../../../zustand/useStore";
 import { getPoints, isValidPoints } from "../Points/Points";
 import useBookingsManager from "../hooks/useBookingsManager";
 import NoBookings from "./NoBookings";
+import useCurrentProperty from "../hooks/useCurrentProperty";
 
 export default function AllBookingsList() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { usersWithPoints } = useStore();
   const { loading, loadMore, bookings } = useBookingsManager();
+  const { property } = useCurrentProperty();
 
   const getSlotsInfo = (booking) => {
     const slots = booking?.slots;
@@ -41,6 +43,7 @@ export default function AllBookingsList() {
     }
   };
   const noBookings = !loading && isEmpty(bookings);
+  const title = property?.property?.title;
 
   return (
     <>
@@ -146,7 +149,7 @@ export default function AllBookingsList() {
                         <IconButton
                           onClick={() => {
                             const message = `
-*🏏Runbhumi Mewar Booking Confirmation🏏*
+*🏏${title} Booking Confirmation🏏*
 Name: ${name}
 Mobile: ${num}
 Location - F-266, Road No. 12, Near Airtel Office, Madri Industrial Area

@@ -20,14 +20,18 @@ import useBookingsManager from "../hooks/useBookingsManager";
 import useCurrentProperty from "../hooks/useCurrentProperty";
 
 export default function AddBookingModal({ isOpen, onClose }) {
-  const { propertyId, setInput, input } = useCurrentProperty();
+  const { propertyId, setInput, input, bookedSlots, slotLoading } =
+    useCurrentProperty();
   const [selectedSlots, setSelectedSlots] = React.useState([]); // [slot1, slot2, slot3]
   const isUpdating = false;
   const [isAddBookingDisabled, setIsAddBookingDisabled] = React.useState(true);
   const [additionOrUpdationInProgress, setAdditionOrUpdationInProgress] =
     React.useState(false);
+
   const [totalAmount, setTotalAmount] = React.useState(0);
   const { addSlotBooking } = useBookingsManager();
+
+  console.log("great2", bookedSlots);
 
   React.useEffect(() => {
     const { name, number, date } = input;
@@ -135,6 +139,8 @@ export default function AddBookingModal({ isOpen, onClose }) {
               input={input}
               selectedSlots={selectedSlots}
               setSelectedSlots={setSelectedSlots}
+              bookedSlots={bookedSlots}
+              slotLoading={slotLoading}
             />
             <FormLabel mb={-2} mt={3}>
               Total Amount

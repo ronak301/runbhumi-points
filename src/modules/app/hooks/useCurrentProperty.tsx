@@ -29,6 +29,7 @@ const useCurrentProperty = () => {
   const [loading, setLoading] = useState(true);
   const [bookedSlots, setBookedSlots] = useState([]);
   const [input, setInput] = useState({ date: moment().format("YYYY-MM-DD") });
+  const [slotLoading, setSlotLoading] = useState(false);
 
   const storedUser = JSON.parse(localStorage.getItem("user") ?? "{}");
   const propertyId = storedUser?.propertyId;
@@ -116,7 +117,6 @@ const useCurrentProperty = () => {
 
           // Set the state with fetched and sorted data
           setProperty(fullPropertyData as any);
-
           console.log("Fetched and stored property data from Firestore");
         } else {
           console.log("Property not found in Firestore");
@@ -135,9 +135,9 @@ const useCurrentProperty = () => {
   useEffect(() => {
     if (!propertyId || !input.date) return; // Early exit if no propertyId or date
 
+    setSlotLoading(true);
     const fetchBookedSlots = async () => {
       try {
-        setLoading(true);
         const slots = await getBookedSlotsForDateAndPlayground(
           input.date,
           propertyId
@@ -147,14 +147,22 @@ const useCurrentProperty = () => {
       } catch (err) {
         console.error("Error fetching booked slots:", err);
       } finally {
-        setLoading(false);
+        setSlotLoading(false);
       }
     };
 
     fetchBookedSlots(); // Fetch booked slots when date changes
   }, [input.date, propertyId]); // Re-run whenever date or propertyId changes
 
-  return { property, bookedSlots, setInput, input, loading, propertyId };
+  return {
+    property,
+    bookedSlots,
+    setInput,
+    input,
+    loading,
+    propertyId,
+    slotLoading,
+  };
 };
 
 export default useCurrentProperty;

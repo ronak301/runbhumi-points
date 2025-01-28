@@ -57,7 +57,8 @@ export default function HomeTab({ onLogout }) {
         px={6}
         boxShadow="sm">
         <Text fontSize="lg" color="white" fontWeight="bold">
-          {property?.title || "Loading..."} {/* Safely access user title */}
+          {property?.property?.title || "Loading..."}{" "}
+          {/* Safely access user title */}
         </Text>
       </Box>
 

@@ -4,12 +4,19 @@ import { Button, Grid, Spinner, Text } from "@chakra-ui/react";
 import moment from "moment";
 import useCurrentProperty from "../hooks/useCurrentProperty";
 
-function SlotSelector({ setSelectedSlots, selectedSlots }) {
-  const { property, bookedSlots: propBookedSlots } = useCurrentProperty();
+function SlotSelector({
+  setSelectedSlots,
+  selectedSlots,
+  bookedSlots,
+  slotLoading,
+}) {
+  const { property } = useCurrentProperty();
+  console.log("great3", bookedSlots);
   const slots = property?.slots;
-  const bookedSlots = propBookedSlots;
-  const isLoading = false;
-  console.log("bookedSlots", propBookedSlots);
+
+  React.useEffect(() => {
+    console.log("Updated bookedSlots:", bookedSlots);
+  }, [bookedSlots]);
 
   const onClick = (slot) => {
     setSelectedSlots((prev) => {
@@ -22,7 +29,7 @@ function SlotSelector({ setSelectedSlots, selectedSlots }) {
     });
   };
 
-  return isLoading ? (
+  return slotLoading ? (
     <Spinner />
   ) : (
     <Grid templateColumns="repeat(3, 1fr)" gap={4}>
