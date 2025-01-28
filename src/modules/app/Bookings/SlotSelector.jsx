@@ -1,34 +1,15 @@
 import React, { memo } from "react";
-import {
-  getAllProperties,
-  getAllSlots,
-  getBookedSlotsForDateAndPlayground,
-} from "../api/slots";
 import { filter, map } from "lodash";
 import { Button, Grid, Spinner, Text } from "@chakra-ui/react";
 import moment from "moment";
+import useCurrentProperty from "../hooks/useCurrentProperty";
 
-function SlotSelector({ input, setSelectedSlots, selectedSlots }) {
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [slots, setSlots] = React.useState([]);
-  const [bookedSlots, setBookedSlots] = React.useState([]);
-
-  React.useEffect(() => {
-    setIsLoading(true);
-    getAllProperties().then((data) => {
-      const playground = data[0].doc;
-      getAllSlots(playground).then((allSlots) => {
-        setSlots(allSlots);
-      });
-      getBookedSlotsForDateAndPlayground(
-        input?.date || moment().format("YYYY-MM-DD"),
-        playground
-      ).then((currentDayBookedSlots) => {
-        setBookedSlots(currentDayBookedSlots);
-        setIsLoading(false);
-      });
-    });
-  }, [input?.date]);
+function SlotSelector({ setSelectedSlots, selectedSlots }) {
+  const { property, bookedSlots: propBookedSlots } = useCurrentProperty();
+  const slots = property?.slots;
+  const bookedSlots = propBookedSlots;
+  const isLoading = false;
+  console.log("bookedSlots", propBookedSlots);
 
   const onClick = (slot) => {
     setSelectedSlots((prev) => {
@@ -40,9 +21,6 @@ function SlotSelector({ input, setSelectedSlots, selectedSlots }) {
       }
     });
   };
-
-  console.log("selectedSlots", selectedSlots);
-  console.log("bookedSlots", bookedSlots);
 
   return isLoading ? (
     <Spinner />

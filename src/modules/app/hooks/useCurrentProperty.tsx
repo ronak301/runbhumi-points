@@ -1,17 +1,41 @@
 import { useState, useEffect } from "react";
-import { doc, getDoc } from "firebase/firestore";
+import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 import { db } from "../../../firebase";
+import moment from "moment";
+
+// Function to fetch booked slots for a given date and propertyId
+const getBookedSlotsForDateAndPlayground = async (
+  date: any,
+  propertyId: any
+) => {
+  let slots: any = [];
+
+  const slotsCollectionRef = collection(
+    db,
+    `properties/${propertyId}/bookings/${date}/bookedSlot`
+  );
+
+  const slotsQuerySnapshot = await getDocs(slotsCollectionRef);
+
+  slotsQuerySnapshot.forEach((slotDoc) => {
+    slots.push({ ...slotDoc.data(), id: slotDoc.id });
+  });
+
+  return slots;
+};
 
 const useCurrentProperty = () => {
   const [property, setProperty] = useState(null);
-  const [owner, setOwner] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [bookedSlots, setBookedSlots] = useState([]);
+  const [input, setInput] = useState({ date: moment().format("YYYY-MM-DD") });
+
   const storedUser = JSON.parse(localStorage.getItem("user") ?? "{}");
+  const propertyId = storedUser?.propertyId;
 
   const CACHE_EXPIRY_TIME = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
   useEffect(() => {
-    const propertyId = storedUser?.propertyId;
     if (!propertyId) {
       setLoading(false); // No propertyId available, stop loading
       return;
@@ -34,50 +58,103 @@ const useCurrentProperty = () => {
       try {
         setLoading(true);
 
-        // Check cache first
+        // Check if cache is valid first
         if (isCacheValid()) {
           const cachedData = JSON.parse(
             localStorage.getItem(`property-${propertyId}`) || "{}"
           );
-          setProperty(cachedData.property);
-          setOwner(cachedData.owner);
-          setLoading(false);
-          return; // Skip fetching from Firestore if cache is valid
+
+          // If cache is valid, set the state from cache
+          if (cachedData) {
+            console.log("cachedData", cachedData);
+            setProperty(cachedData);
+            console.log("Loaded property data from cache");
+            setLoading(false);
+            return; // Skip Firestore fetch if data is already in cache
+          }
         }
 
-        // Fetch from Firestore if no valid cache
-        console.log("fetching prop info");
+        // If no valid cache, fetch from Firestore
+        console.log("Fetching property data from Firestore...");
         const propertyRef = doc(db, "properties", propertyId);
+
+        // Fetch property data
         const propertyDoc = await getDoc(propertyRef);
 
         if (propertyDoc.exists()) {
-          // Save the data in cache with a timestamp
+          // Get the property data
+          const propertyData = propertyDoc.data();
+
+          // Fetch the slots subcollection for this property
+          const slotsRef = collection(propertyRef, "slots");
+          const slotsSnapshot = await getDocs(slotsRef);
+          let slotsData = slotsSnapshot.docs.map((doc) => doc.data());
+
+          // Sort the slots by the `sort` field
+          slotsData = slotsData.sort((a, b) => a.sort - b.sort);
+
+          // Get the stored user data for the owner (assuming `storedUser` exists in your app)
+          const owner = storedUser.owner;
+
+          // Combine property info and slots data into one object
+          const fullPropertyData = {
+            property: propertyData,
+            slots: slotsData,
+            owner: owner,
+          };
+
+          // Cache the fetched data
           localStorage.setItem(
             `property-${propertyId}`,
             JSON.stringify({
-              property: propertyDoc.data(),
-              owner: storedUser.owner, // Assuming owner is stored in the user data
+              property: propertyData,
+              slots: slotsData,
+              owner: owner,
               timestamp: Date.now(),
             })
           );
 
-          // Set the property and owner state
-          setProperty(propertyDoc.data() as any);
-          setOwner(storedUser.owner);
+          // Set the state with fetched and sorted data
+          setProperty(fullPropertyData as any);
+
+          console.log("Fetched and stored property data from Firestore");
         } else {
-          console.log("Property not found");
+          console.log("Property not found in Firestore");
         }
       } catch (err) {
-        console.error("Error fetching property data", err);
+        console.error("Error fetching property data:", err);
       } finally {
         setLoading(false);
       }
     };
 
     fetchPropertyData();
-  }, [storedUser?.propertyId]); // Re-run when the propertyId changes
+  }, [propertyId]); // Re-run when the propertyId changes
 
-  return { property, owner, loading, propertyId: storedUser?.propertyId };
+  // Fetch booked slots for a specific date whenever the date input changes
+  useEffect(() => {
+    if (!propertyId || !input.date) return; // Early exit if no propertyId or date
+
+    const fetchBookedSlots = async () => {
+      try {
+        setLoading(true);
+        const slots = await getBookedSlotsForDateAndPlayground(
+          input.date,
+          propertyId
+        );
+        setBookedSlots(slots as any);
+        console.log("Fetched booked slots:", slots);
+      } catch (err) {
+        console.error("Error fetching booked slots:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBookedSlots(); // Fetch booked slots when date changes
+  }, [input.date, propertyId]); // Re-run whenever date or propertyId changes
+
+  return { property, bookedSlots, setInput, input, loading, propertyId };
 };
 
 export default useCurrentProperty;

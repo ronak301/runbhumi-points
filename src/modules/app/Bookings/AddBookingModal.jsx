@@ -20,10 +20,7 @@ import useBookingsManager from "../hooks/useBookingsManager";
 import useCurrentProperty from "../hooks/useCurrentProperty";
 
 export default function AddBookingModal({ isOpen, onClose }) {
-  const { propertyId } = useCurrentProperty();
-  const [input, setInput] = React.useState({
-    date: moment().format("YYYY-MM-DD"),
-  });
+  const { propertyId, setInput, input } = useCurrentProperty();
   const [selectedSlots, setSelectedSlots] = React.useState([]); // [slot1, slot2, slot3]
   const isUpdating = false;
   const [isAddBookingDisabled, setIsAddBookingDisabled] = React.useState(true);
