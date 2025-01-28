@@ -46,10 +46,6 @@ const theme = extendTheme({
           borderColor: "gray.500",
           color: "gray.500",
         },
-        solid: {
-          backgroundColor: "black",
-          color: "white",
-        },
       },
     },
   },
