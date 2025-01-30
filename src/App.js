@@ -16,12 +16,15 @@ import AddBookingPage from "./modules/app/Bookings/AddBookingPage";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true); // To avoid showing routes before authentication check
 
   useEffect(() => {
+    // Simulate a loading state until we finish checking auth status
     const user = localStorage.getItem("user");
     if (user) {
       setIsAuthenticated(true);
     }
+    setLoading(false); // Finished checking authentication
   }, []);
 
   const onLogin = () => {
@@ -33,13 +36,31 @@ function App() {
     localStorage.clear();
   };
 
+  // Avoid showing routes before authentication check
+  if (loading) {
+    return null; // You can return a loading spinner here if you want
+  }
+
   return (
     <ChakraProvider theme={theme}>
       <AlertProvider>
         <Router>
           <Routes>
             {/* Public Routes */}
-            <Route path="/" element={<Website />} />
+            <Route
+              path="/"
+              element={
+                isAuthenticated ? (
+                  <Navigate
+                    to={`/home/property/${
+                      JSON.parse(localStorage.getItem("user")).propertyId
+                    }`}
+                  />
+                ) : (
+                  <Website />
+                )
+              }
+            />
 
             <Route
               path="/login"
