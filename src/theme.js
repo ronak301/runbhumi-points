@@ -34,6 +34,11 @@ const theme = extendTheme({
       500: "#333333", // Dark gray for text and active state
       700: "#1A1A1A", // Darker gray for deep backgrounds
     },
+    green: {
+      500: "rgb(23, 52, 18)",
+      600: "rgb(23, 52, 18)",
+      700: "rgb(23, 52, 18)",
+    },
   },
   components: {
     Button: {

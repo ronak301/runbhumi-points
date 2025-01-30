@@ -45,7 +45,7 @@ const Website = ({ onLoginClick }: any) => {
   const testimonials = [
     {
       name: "Mohit Fattawat",
-      position: "Director, LBS School, Chittor",
+      position: "Director, LBS Sports Junction, Chittor",
       testimonial:
         "TurfWale provided excellent service! The turf quality is top-notch.",
       image:
@@ -229,7 +229,7 @@ const Website = ({ onLoginClick }: any) => {
                 <Button
                   size="lg"
                   colorScheme="green"
-                  bg="green.500"
+                  bg="green.600"
                   _hover={{ bg: "green.600" }}
                   mb={{ base: 4, sm: 0 }} // Margin bottom for mobile view
                 >

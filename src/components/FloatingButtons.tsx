@@ -40,7 +40,7 @@ const FloatingButtons = () => {
         boxShadow="0px 4px 10px rgba(0, 128, 0, 0.2)"
         _hover={{ backgroundColor: "green.600", transform: "scale(1.2)" }}
         _active={{ backgroundColor: "green.700", transform: "scale(1)" }}
-        fontSize="30px"
+        fontSize="24px"
       />
 
       <IconButton
@@ -54,7 +54,7 @@ const FloatingButtons = () => {
         boxShadow="0px 4px 10px rgba(0, 0, 255, 0.2)"
         _hover={{ backgroundColor: "blue.600", transform: "scale(1.2)" }}
         _active={{ backgroundColor: "blue.700", transform: "scale(1)" }}
-        fontSize="30px"
+        fontSize="24px"
       />
 
       <IconButton
@@ -68,7 +68,7 @@ const FloatingButtons = () => {
         boxShadow="0px 4px 10px rgba(255, 0, 0, 0.2)"
         _hover={{ backgroundColor: "red.600", transform: "scale(1.2)" }}
         _active={{ backgroundColor: "red.700", transform: "scale(1)" }}
-        fontSize="30px"
+        fontSize="24px"
       />
     </Box>
   );

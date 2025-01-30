@@ -11,13 +11,16 @@ import {
   DrawerContent,
   DrawerCloseButton,
   useBreakpointValue,
+  Button,
 } from "@chakra-ui/react";
 import { HamburgerIcon } from "@chakra-ui/icons"; // Elegant hamburger icon
 import { Link as ScrollLink } from "react-scroll";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [activeLink, setActiveLink] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const handleLinkClick = (section: string) => {
     setActiveLink(section);
@@ -29,6 +32,11 @@ const Navbar = () => {
   // Border style for active item
   const activeBorderColor = "#63B853"; // Primary color for active border
   const hoverBgColor = "#f4f4f4"; // Subtle hover effect for items
+
+  const handleLoginClick = () => {
+    // Navigate to the login page when the button is clicked
+    navigate("/login");
+  };
 
   return (
     <Box
@@ -88,25 +96,52 @@ const Navbar = () => {
       {/* Mobile Navigation */}
       <Flex
         display={{ base: "flex", md: "none" }}
-        justifyContent="flex-start"
         alignItems="center"
         px={4}
-        py={2}>
-        <IconButton
-          aria-label="Open Menu"
-          icon={<HamburgerIcon />}
-          onClick={onOpen}
-          variant="ghost"
-          color="gray.600"
-        />
-        <Text
-          fontSize="xl"
-          fontWeight="bold"
-          color="#333"
-          cursor="pointer"
-          onClick={() => handleLinkClick("About")}>
-          Turfwale
-        </Text>
+        py={2}
+        justifyContent={"space-between"}>
+        <Flex justifyContent="flex-start" alignItems="center">
+          <IconButton
+            aria-label="Open Menu"
+            icon={<HamburgerIcon />}
+            onClick={onOpen}
+            variant="ghost"
+            color="gray.600"
+          />
+          <Text
+            fontSize="xl"
+            fontWeight="bold"
+            color="#333"
+            cursor="pointer"
+            onClick={() => handleLinkClick("About")}>
+            Turfwale
+          </Text>
+        </Flex>
+        <Button
+          variant="outline" // This ensures the button has a border
+          borderColor="green.600" // Set the border color to your custom green
+          color="green.600" // Text color to match the border
+          _hover={{
+            backgroundColor: "green.600", // Change background on hover
+            color: "white", // Text color changes to white on hover
+            borderColor: "green.700", // Darker green border on hover
+          }}
+          _active={{
+            backgroundColor: "green.700", // Dark green when the button is active (clicked)
+            color: "white",
+          }}
+          _focus={{
+            borderColor: "green.700", // Focus state border color
+            boxShadow: "0 0 0 2px rgba(23, 52, 18, 0.6)", // Optional shadow for focus state
+          }}
+          padding="8px 16px" // Add padding to make the button larger
+          borderRadius="8px" // Rounded corners
+          fontWeight="600" // Slightly bold text for emphasis
+          fontSize="16px" // Medium font size
+          onClick={handleLoginClick} // Add the onClick handler to navigate
+        >
+          Login
+        </Button>
       </Flex>
 
       {/* Mobile Drawer */}
