@@ -11,8 +11,8 @@ function SlotSelector({
   slotLoading,
 }) {
   const { property } = useCurrentProperty();
-  console.log("great3", bookedSlots);
-  const slots = property?.slots;
+  console.log("great3", property);
+  const slots = property?.slots || property?.property?.slots;
 
   React.useEffect(() => {
     console.log("Updated bookedSlots:", bookedSlots);

@@ -97,7 +97,6 @@ const useCurrentProperty = () => {
           // Combine property info and slots data into one object
           const fullPropertyData = {
             property: propertyData,
-            slots: slotsData,
             owner: owner,
           };
 

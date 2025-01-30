@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Button, Flex, Box, useDisclosure, Spinner } from "@chakra-ui/react";
 import { isEmpty, map } from "lodash";
 import useStore from "../../../zustand/useStore";
-import useBookingsManager from "../hooks/useBookingsManager";
+import useBookingsManager, { LIMIT } from "../hooks/useBookingsManager";
 import NoBookings from "./NoBookings";
 import useCurrentProperty from "../hooks/useCurrentProperty";
 import BookingCard from "./BookingCard";
@@ -11,7 +11,7 @@ import { Link } from "react-router-dom";
 export default function AllBookingsList() {
   const { usersWithPoints } = useStore();
   const { loading, loadMore, bookings, fetchBookings } = useBookingsManager();
-  const { property } = useCurrentProperty();
+  const { property, propertyId } = useCurrentProperty();
 
   const noBookings = !loading && isEmpty(bookings);
   const title = property?.property?.title;
@@ -35,7 +35,7 @@ export default function AllBookingsList() {
             mt={1}
             mb={2}>
             <Box />
-            <Link to="/add-booking">
+            <Link to={`/home/property/${propertyId}/add-booking`}>
               <Button colorScheme="blue" alignSelf={"flex-end"}>
                 Add Booking
               </Button>
@@ -74,9 +74,11 @@ export default function AllBookingsList() {
                 );
               })}
             </Box>
-            <Button mb={32} onClick={loadMore} colorScheme="blue" mt={8}>
-              Load More
-            </Button>
+            {bookings?.length >= LIMIT ? (
+              <Button mb={32} onClick={loadMore} colorScheme="blue" mt={8}>
+                Load More
+              </Button>
+            ) : null}
           </>
         )}
       </Flex>

@@ -37,8 +37,8 @@ const Login = ({ onLogin }) => {
       },
     },
     9664317924: {
-      password: "1234",
-      propertyId: "JNznXP3zKHF6PL08RwVv",
+      password: "7924",
+      propertyId: "4HJl3JYH5TzUeylFEHKj",
       title: "Velocity Turf",
       owner: {
         firstName: "The Velocity Turf",

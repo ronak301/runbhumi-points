@@ -1,13 +1,13 @@
 const featureConfig = {
-  JNznXP3zKHF6PL08RwVv: {
-    points: false, // Feature "Points" enabled for this property
-    bookings: true, // Feature "Bookings" enabled for this property
-    profile: true, // Feature "Profile" enabled for this property
+  "4HJl3JYH5TzUeylFEHKj": {
+    points: false,
+    bookings: true,
+    profile: true,
   },
   iNANAwfMb6EXNtp7MRwJ: {
-    points: true, // Feature "Points" disabled for this property
-    bookings: true, // Feature "Bookings" enabled for this property
-    profile: true, // Feature "Profile" enabled for this property
+    points: true,
+    bookings: true,
+    profile: true,
   },
 };
 

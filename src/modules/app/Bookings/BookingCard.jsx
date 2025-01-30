@@ -9,17 +9,18 @@ import {
 } from "@chakra-ui/react";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import moment from "moment";
-import { map } from "lodash";
+import { map, property } from "lodash";
 import { DeleteBooking } from "../../../components/DeleteBooking";
 import { getPoints, isValidPoints } from "../Points/Points";
 import useBookingsManager from "../hooks/useBookingsManager";
+import useCurrentProperty from "../hooks/useCurrentProperty";
 
 // This component represents each individual booking's card
 const BookingCard = ({ onComplete, booking, title, usersWithPoints }) => {
   const num = String(booking?.customer?.number);
   const updatedNumber = num?.startsWith("91") ? num : `91${num}`;
   const name = booking?.customer?.name;
-  const { fetchBookings } = useBookingsManager();
+  const { propertyId } = useCurrentProperty();
   const advancedAmountString = booking?.amountSumary?.advanced
     ? `Advance Received: Rs. ${booking?.amountSumary?.advanced}`
     : "";
@@ -51,6 +52,39 @@ const BookingCard = ({ onComplete, booking, title, usersWithPoints }) => {
   const pointsAvailable = isValidPoints(linkedUser)
     ? getPoints(linkedUser?.points)
     : 0;
+
+  const getMessage = () => {
+    switch (propertyId) {
+      case "iNANAwfMb6EXNtp7MRwJ":
+        return `
+*🏏${title} Booking Confirmation🏏*
+Name: ${name}
+Mobile: ${num}
+Location: F-266, Road No. 12, Near Airtel Office, Madri Industrial Area
+Map: https://maps.app.goo.gl/QAs3A9APjdqRZfmS9
+Date of Booking: ${moment(booking?.bookingDate).format("DD-MM-YYYY")}
+Time Slots: ${getSlotsInfo(booking)}
+*Total Amount: Rs. ${booking?.amountSumary?.total}*
+${advancedAmountString}
+Points Available: ${pointsAvailable}
+              `;
+        break;
+      case "4HJl3JYH5TzUeylFEHKj":
+        return `
+*🏏${title} Booking Confirmation🏏*
+Name: ${name}
+Mobile: ${num}
+Date of Booking: ${moment(booking?.bookingDate).format("DD-MM-YYYY")}
+Time Slots: ${getSlotsInfo(booking)}
+*Total Amount: Rs. ${booking?.amountSumary?.total}*
+${advancedAmountString}
+              `;
+      default:
+        return null;
+    }
+  };
+
+  const message = getMessage();
 
   return (
     <Box
@@ -90,18 +124,6 @@ const BookingCard = ({ onComplete, booking, title, usersWithPoints }) => {
         <Box>
           <IconButton
             onClick={() => {
-              const message = `
-*🏏${title} Booking Confirmation🏏*
-Name: ${name}
-Mobile: ${num}
-Location: F-266, Road No. 12, Near Airtel Office, Madri Industrial Area
-Map: https://maps.app.goo.gl/QAs3A9APjdqRZfmS9
-Date of Booking: ${moment(booking?.bookingDate).format("DD-MM-YYYY")}
-Time Slots: ${getSlotsInfo(booking)}
-*Total Amount: Rs. ${booking?.amountSumary?.total}*
-${advancedAmountString}
-Points Available: ${pointsAvailable}
-              `;
               window.open(
                 `https://api.whatsapp.com/send/?phone=${updatedNumber}&text=${encodeURIComponent(
                   message

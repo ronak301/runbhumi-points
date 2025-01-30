@@ -16,7 +16,7 @@ import { db } from "../../../firebase";
 import { showAlert } from "../../../context/AlertContext";
 import useCurrentProperty from "./useCurrentProperty";
 
-const LIMIT = 2;
+export const LIMIT = 20;
 
 const useBookingsManager = () => {
   const { propertyId } = useCurrentProperty();

@@ -11,13 +11,12 @@ import {
 import Website from "./modules/website/index";
 import { useState, useEffect } from "react";
 import Login from "./modules/auth/Login";
-import AdminPanel from "./modules/admin/AdminPanel"; // Import AdminPanel
+import AdminPanel from "./modules/admin/AdminPanel";
 import AddBookingPage from "./modules/app/Bookings/AddBookingPage";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Check if the user is authenticated based on localStorage
   useEffect(() => {
     const user = localStorage.getItem("user");
     if (user) {
@@ -46,7 +45,6 @@ function App() {
               path="/login"
               element={
                 isAuthenticated ? (
-                  // If authenticated, redirect to home with dynamic propertyId
                   <Navigate
                     to={`/home/property/${
                       JSON.parse(localStorage.getItem("user")).propertyId
@@ -58,7 +56,6 @@ function App() {
               }
             />
 
-            {/* /home route for authenticated users */}
             <Route
               path="/home"
               element={
@@ -74,7 +71,13 @@ function App() {
               }
             />
 
-            <Route path="/add-booking" element={<AddBookingPage />} />
+            {/* Updated path for AddBookingPage */}
+            <Route
+              path="/home/property/:propertyId/add-booking"
+              element={
+                isAuthenticated ? <AddBookingPage /> : <Navigate to="/login" />
+              }
+            />
 
             {/* Dynamic Route for Property Home */}
             <Route
@@ -89,10 +92,7 @@ function App() {
             />
 
             {/* Admin Routes */}
-            <Route
-              path="/admin"
-              element={<Navigate to="/admin/home" />} // Redirect /admin to /admin/home
-            />
+            <Route path="/admin" element={<Navigate to="/admin/home" />} />
             <Route
               path="/admin/*"
               element={

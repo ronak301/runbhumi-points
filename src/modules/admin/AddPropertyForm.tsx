@@ -68,18 +68,25 @@ const AddPropertyForm: React.FC<any> = ({
   // Function to handle form submission
   const handleSubmit = async () => {
     try {
-      // Add property to Firebase Firestore
-      const docRef = await addDoc(collection(db, "properties"), {
+      // Add the property
+      const propertyRef = await addDoc(collection(db, "properties"), {
         title,
         description,
         imgUrl,
-        slots,
       });
-      console.log("Property added with ID: ", docRef.id);
-      onPropertyAdded(); // Refetch properties after adding new one
+
+      // Add slots as sub-collection for this property
+      const slotsRef = collection(db, "properties", propertyRef.id, "slots");
+      for (let slot of slots) {
+        await addDoc(slotsRef, slot);
+      }
+
+      await onPropertyAdded(); // Refetch properties after adding new one
       onClose(); // Close the modal
+
+      console.log("Property and slots added successfully");
     } catch (error) {
-      console.error("Error adding property: ", error);
+      console.error("Error adding property with slots: ", error);
     }
   };
 
@@ -125,6 +132,7 @@ const AddPropertyForm: React.FC<any> = ({
                       onChange={(e) => {
                         const updatedSlots = [...slots];
                         updatedSlots[index].price = Number(e.target.value);
+                        console.log("updatedSlots", updatedSlots);
                         setSlots(updatedSlots);
                       }}
                       placeholder="Price"
