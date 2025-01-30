@@ -1,14 +1,14 @@
+import { useEffect } from "react";
 import { Button, Flex, Box, useDisclosure, Spinner } from "@chakra-ui/react";
-import AddBookingModal from "./AddBookingModal";
 import { isEmpty, map } from "lodash";
 import useStore from "../../../zustand/useStore";
 import useBookingsManager from "../hooks/useBookingsManager";
 import NoBookings from "./NoBookings";
 import useCurrentProperty from "../hooks/useCurrentProperty";
 import BookingCard from "./BookingCard";
+import { Link } from "react-router-dom";
 
 export default function AllBookingsList() {
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const { usersWithPoints } = useStore();
   const { loading, loadMore, bookings } = useBookingsManager();
   const { property } = useCurrentProperty();
@@ -24,7 +24,6 @@ export default function AllBookingsList() {
         paddingRight={"1%"}
         minH={"70vh"}
         flexDirection={"column"}>
-        <AddBookingModal isOpen={isOpen} onClose={onClose} />
         <Flex mt={4} flexDirection={"column"}>
           <Flex
             flexDirection={"row"}
@@ -32,14 +31,11 @@ export default function AllBookingsList() {
             mt={1}
             mb={2}>
             <Box />
-            <Button
-              onClick={() => {
-                onOpen();
-              }}
-              colorScheme="blue"
-              alignSelf={"flex-end"}>
-              Add Booking
-            </Button>
+            <Link to="/add-booking">
+              <Button colorScheme="blue" alignSelf={"flex-end"}>
+                Add Booking
+              </Button>
+            </Link>
           </Flex>
         </Flex>
         {loading ? (

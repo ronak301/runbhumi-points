@@ -16,7 +16,7 @@ import { db } from "../../../firebase";
 import { showAlert } from "../../../context/AlertContext";
 import useCurrentProperty from "./useCurrentProperty";
 
-const LIMIT = 10;
+const LIMIT = 2;
 
 const useBookingsManager = () => {
   const { propertyId } = useCurrentProperty();
@@ -199,12 +199,12 @@ const useBookingsManager = () => {
           await addDoc(bookedSlotCollectionRef, slotInfo);
         })
       );
+      await fetchBookings(false, true); // Force fresh data (no cache)
 
       console.log("Booking added successfully!");
       showAlert("Booking added successfully!!", "success");
 
       // Force fetching of bookings (no cache)
-      fetchBookings(false, true); // Force fresh data (no cache)
     } catch (e) {
       console.error("Error adding slot booking:", e);
       showAlert("Something went wrong while adding booking!!", "error");

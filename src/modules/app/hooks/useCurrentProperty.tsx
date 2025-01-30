@@ -27,9 +27,7 @@ const getBookedSlotsForDateAndPlayground = async (
 const useCurrentProperty = () => {
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [bookedSlots, setBookedSlots] = useState([]);
   const [input, setInput] = useState({ date: moment().format("YYYY-MM-DD") });
-  const [slotLoading, setSlotLoading] = useState(false);
 
   const storedUser = JSON.parse(localStorage.getItem("user") ?? "{}");
   const propertyId = storedUser?.propertyId;
@@ -131,37 +129,14 @@ const useCurrentProperty = () => {
     fetchPropertyData();
   }, [propertyId]); // Re-run when the propertyId changes
 
-  // Fetch booked slots for a specific date whenever the date input changes
-  useEffect(() => {
-    if (!propertyId || !input.date) return; // Early exit if no propertyId or date
-
-    setSlotLoading(true);
-    const fetchBookedSlots = async () => {
-      try {
-        const slots = await getBookedSlotsForDateAndPlayground(
-          input.date,
-          propertyId
-        );
-        setBookedSlots(slots as any);
-        console.log("Fetched booked slots:", slots);
-      } catch (err) {
-        console.error("Error fetching booked slots:", err);
-      } finally {
-        setSlotLoading(false);
-      }
-    };
-
-    fetchBookedSlots(); // Fetch booked slots when date changes
-  }, [input.date, propertyId]); // Re-run whenever date or propertyId changes
+  // Re-run whenever date or propertyId changes
 
   return {
     property,
-    bookedSlots,
     setInput,
     input,
     loading,
     propertyId,
-    slotLoading,
   };
 };
 

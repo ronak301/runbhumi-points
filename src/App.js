@@ -12,6 +12,7 @@ import Website from "./modules/website/index";
 import { useState, useEffect } from "react";
 import Login from "./modules/auth/Login";
 import AdminPanel from "./modules/admin/AdminPanel"; // Import AdminPanel
+import AddBookingPage from "./modules/app/Bookings/AddBookingPage";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -72,6 +73,8 @@ function App() {
                 )
               }
             />
+
+            <Route path="/add-booking" element={<AddBookingPage />} />
 
             {/* Dynamic Route for Property Home */}
             <Route
