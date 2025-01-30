@@ -102,8 +102,8 @@ export default function HomeTab({ onLogout }) {
           align="center">
           <TabList display="flex" justifyContent="space-around">
             <Tab
-              _selected={{ color: "green.500" }}
-              color="white"
+              _selected={{ color: "white" }}
+              color="grey"
               flexDirection="column"
               alignItems="center">
               <Icon as={FaCalendarAlt} boxSize={5} />
@@ -112,8 +112,8 @@ export default function HomeTab({ onLogout }) {
             {/* Conditionally Render the Points Tab */}
             {features.points ? (
               <Tab
-                _selected={{ color: "green.500" }}
-                color="white"
+                _selected={{ color: "white" }}
+                color="grey"
                 flexDirection="column"
                 alignItems="center">
                 <Icon as={FaStar} boxSize={5} />
@@ -122,8 +122,8 @@ export default function HomeTab({ onLogout }) {
             ) : null}{" "}
             {/* Don't render Points tab if feature is disabled */}
             <Tab
-              _selected={{ color: "green.500" }}
-              color="white"
+              _selected={{ color: "white" }}
+              color="grey"
               flexDirection="column"
               alignItems="center">
               <Icon as={FaUser} boxSize={5} />
