@@ -215,7 +215,7 @@ const useBookingsManager = () => {
   };
 
   // Delete a slot booking
-  const deleteSlotBooking = async (id, date) => {
+  const deleteSlotBooking = async (id, date, onComplete) => {
     if (busy) return;
     setBusy(true);
     setLoading(true);
@@ -235,9 +235,10 @@ const useBookingsManager = () => {
         }
       });
 
+      await onComplete?.();
+
       console.log("Booking deleted successfully!");
       showAlert("Booking deleted successfully!!", "success");
-      fetchBookings(false, true); // Force fresh data (no cache)
     } catch (e) {
       console.error("Error deleting slot booking:", e);
       showAlert("Something went wrong while deleting booking!!", "error");

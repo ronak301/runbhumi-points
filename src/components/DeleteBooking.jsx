@@ -16,14 +16,14 @@ import { db } from "../firebase";
 import { DeleteIcon } from "@chakra-ui/icons";
 import useBookingsManager from "../modules/app/hooks/useBookingsManager";
 
-export function DeleteBooking({ booking }) {
+export function DeleteBooking({ booking, onComplete }) {
   const id = booking?.id;
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = React.useRef();
-  const { deleteSlotBooking } = useBookingsManager();
+  const { deleteSlotBooking, loading } = useBookingsManager();
 
-  const onDeleteEntry = () => {
-    deleteSlotBooking(id, booking?.bookingDate);
+  const onDeleteEntry = async () => {
+    await deleteSlotBooking(id, booking?.bookingDate, onComplete);
     onClose();
   };
 
@@ -59,7 +59,11 @@ export function DeleteBooking({ booking }) {
               <Button ref={cancelRef} onClick={onClose}>
                 Cancel
               </Button>
-              <Button colorScheme="red" onClick={onDeleteEntry} ml={3}>
+              <Button
+                isLoading={loading}
+                colorScheme="red"
+                onClick={onDeleteEntry}
+                ml={3}>
                 Delete
               </Button>
             </AlertDialogFooter>

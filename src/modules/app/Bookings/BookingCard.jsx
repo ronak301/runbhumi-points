@@ -12,12 +12,14 @@ import moment from "moment";
 import { map } from "lodash";
 import { DeleteBooking } from "../../../components/DeleteBooking";
 import { getPoints, isValidPoints } from "../Points/Points";
+import useBookingsManager from "../hooks/useBookingsManager";
 
 // This component represents each individual booking's card
-const BookingCard = ({ booking, title, usersWithPoints }) => {
+const BookingCard = ({ onComplete, booking, title, usersWithPoints }) => {
   const num = String(booking?.customer?.number);
   const updatedNumber = num?.startsWith("91") ? num : `91${num}`;
   const name = booking?.customer?.name;
+  const { fetchBookings } = useBookingsManager();
   const advancedAmountString = booking?.amountSumary?.advanced
     ? `Advance Received: Rs. ${booking?.amountSumary?.advanced}`
     : "";
@@ -84,7 +86,7 @@ const BookingCard = ({ booking, title, usersWithPoints }) => {
       </Text>
 
       <Flex justifyContent={"space-between"} mt={4}>
-        <DeleteBooking booking={booking} />
+        <DeleteBooking booking={booking} onComplete={onComplete} />
         <Box>
           <IconButton
             onClick={() => {

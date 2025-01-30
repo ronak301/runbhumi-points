@@ -10,11 +10,15 @@ import { Link } from "react-router-dom";
 
 export default function AllBookingsList() {
   const { usersWithPoints } = useStore();
-  const { loading, loadMore, bookings } = useBookingsManager();
+  const { loading, loadMore, bookings, fetchBookings } = useBookingsManager();
   const { property } = useCurrentProperty();
 
   const noBookings = !loading && isEmpty(bookings);
   const title = property?.property?.title;
+
+  const onComplete = async () => {
+    await fetchBookings(false, true);
+  };
 
   return (
     <>
@@ -65,6 +69,7 @@ export default function AllBookingsList() {
                     booking={singleBooking}
                     title={title}
                     usersWithPoints={usersWithPoints}
+                    onComplete={onComplete}
                   />
                 );
               })}

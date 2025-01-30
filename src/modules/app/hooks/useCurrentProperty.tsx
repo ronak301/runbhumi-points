@@ -65,7 +65,6 @@ const useCurrentProperty = () => {
 
           // If cache is valid, set the state from cache
           if (cachedData) {
-            console.log("cachedData", cachedData);
             setProperty(cachedData);
             console.log("Loaded property data from cache");
             setLoading(false);
