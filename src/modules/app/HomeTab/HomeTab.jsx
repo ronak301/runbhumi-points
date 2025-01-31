@@ -94,11 +94,16 @@ export default function HomeTab({ onLogout }) {
         width="100%"
         backgroundColor="rgb(20,20,20)"
         boxShadow="lg"
+        alignItems={"center"}
+        justifyContent={"center"}
+        d="flex"
+        h={20}
         zIndex={10}>
         <Tabs
           index={activeTabIndex}
           onChange={handleTabChange}
           variant="unstyled"
+          mt={2}
           align="center">
           <TabList display="flex" justifyContent="space-around">
             <Tab
@@ -107,7 +112,9 @@ export default function HomeTab({ onLogout }) {
               flexDirection="column"
               alignItems="center">
               <Icon as={FaCalendarAlt} boxSize={5} />
-              <Text fontSize="sm">Bookings</Text>
+              <Text fontSize="sm" mt={1}>
+                Bookings
+              </Text>
             </Tab>
             {/* Conditionally Render the Points Tab */}
             {features.points ? (
@@ -117,7 +124,9 @@ export default function HomeTab({ onLogout }) {
                 flexDirection="column"
                 alignItems="center">
                 <Icon as={FaStar} boxSize={5} />
-                <Text fontSize="sm">Points</Text>
+                <Text fontSize="sm" mt={1}>
+                  Points
+                </Text>
               </Tab>
             ) : null}{" "}
             {/* Don't render Points tab if feature is disabled */}
@@ -127,7 +136,9 @@ export default function HomeTab({ onLogout }) {
               flexDirection="column"
               alignItems="center">
               <Icon as={FaUser} boxSize={5} />
-              <Text fontSize="sm">Profile</Text>
+              <Text fontSize="sm" mt={1}>
+                Profile
+              </Text>
             </Tab>
           </TabList>
         </Tabs>

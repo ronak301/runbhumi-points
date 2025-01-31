@@ -74,6 +74,8 @@ Points Available: ${pointsAvailable}
 *🏏${title} Booking Confirmation🏏*
 Name: ${name}
 Mobile: ${num}
+Location: Behind Vatsalya academy, Tagore Nagar, Sector 4, Pooja Nagar, Hiran Magri
+Map: https://maps.app.goo.gl/gCNNeNtW6yQEAmmKA
 Date of Booking: ${moment(booking?.bookingDate).format("DD-MM-YYYY")}
 Time Slots: ${getSlotsInfo(booking)}
 *Total Amount: Rs. ${booking?.amountSumary?.total}*

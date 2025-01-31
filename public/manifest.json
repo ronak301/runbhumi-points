@@ -1,25 +1,29 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "TurfWale", // Short name of your app
+  "name": "TurfWale Application", // Full name of your app
   "icons": [
     {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
+      "src": "favicon.ico", // Your favicon
+      "sizes": "64x64 32x32 24x24 16x16", // Icon sizes
+      "type": "image/x-icon" // Icon type
     },
     {
-      "src": "logo.jpg",
+      "src": "logo.jpg", // Your logo file (replace with your logo)
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192" // Icon size for 192x192 (for Android devices)
     },
     {
-      "src": "logo512.png",
+      "src": "logo.jpg", // Another icon for 512x512 (used for Android)
       "type": "image/png",
       "sizes": "512x512"
     }
   ],
-  "start_url": ".",
-  "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "start_url": ".", // The URL that the app should open to (relative)
+  "display": "standalone", // Display mode: standalone (without browser chrome)
+  "theme_color": "#FFFFFF", // Theme color (status bar and app chrome)
+  "background_color": "#FFFFFF", // Background color when the app is launched
+  "description": "Your app description goes here", // A short description of your app
+  "orientation": "portrait", // Lock orientation to portrait mode (optional)
+  "scope": "/", // Define the scope of your app's URLs (typically the root of your app)
+  "lang": "en" // Language for your app (optional)
 }
