@@ -1,21 +1,20 @@
-import React, { useState } from "react";
+import { HamburgerIcon } from "@chakra-ui/icons"; // Elegant hamburger icon
 import {
   Box,
-  Flex,
-  Text,
-  IconButton,
-  useDisclosure,
+  Button,
   Drawer,
   DrawerBody,
-  DrawerOverlay,
-  DrawerContent,
   DrawerCloseButton,
-  useBreakpointValue,
-  Button,
+  DrawerContent,
+  DrawerOverlay,
+  Flex,
+  IconButton,
+  Text,
+  useDisclosure,
 } from "@chakra-ui/react";
-import { HamburgerIcon } from "@chakra-ui/icons"; // Elegant hamburger icon
-import { Link as ScrollLink } from "react-scroll";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Link as ScrollLink } from "react-scroll";
 
 const Navbar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -27,11 +26,17 @@ const Navbar = () => {
     onClose(); // Close the drawer on item click
   };
 
-  const navItems = ["About", "Features", "Gallery", "Testimonials", "Contact"];
+  const navItems = [
+    "About",
+    "Projects",
+    "Features",
+    "Gallery",
+    "Testimonials",
+    "Contact",
+  ];
 
   // Border style for active item
   const activeBorderColor = "#63B853"; // Primary color for active border
-  const hoverBgColor = "#f4f4f4"; // Subtle hover effect for items
 
   const handleLoginClick = () => {
     // Navigate to the login page when the button is clicked

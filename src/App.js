@@ -1,134 +1,155 @@
-import { ChakraProvider } from "@chakra-ui/react";
-import theme from "./theme";
-import HomeTab from "./modules/app/HomeTab/HomeTab";
-import { AlertProvider } from "./context/AlertContext";
+import { ChakraProvider, Box } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 import {
+  Navigate,
+  Route,
   BrowserRouter as Router,
   Routes,
-  Route,
-  Navigate,
+  useLocation,
 } from "react-router-dom";
-import Website from "./modules/website/index";
-import { useState, useEffect } from "react";
-import Login from "./modules/auth/Login";
+import { AlertProvider } from "./context/AlertContext";
 import AdminPanel from "./modules/admin/AdminPanel";
 import AddBookingPage from "./modules/app/Bookings/AddBookingPage";
+import HomeTab from "./modules/app/HomeTab/HomeTab";
+import Login from "./modules/auth/Login";
+import Footer from "./modules/website/Footer";
+import Website from "./modules/website/index";
+import Navbar from "./modules/website/Navbar";
+import Projects from "./modules/website/Projects/Projects";
+import theme from "./theme";
+import FloatingButtons from "./components/FloatingButtons";
+import ProjectDetail from "./modules/website/Projects/ProjectDetail";
 
-function App() {
+const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true); // To avoid showing routes before authentication check
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate a loading state until we finish checking auth status
     const user = localStorage.getItem("user");
     if (user) {
       setIsAuthenticated(true);
     }
-    setLoading(false); // Finished checking authentication
+    setLoading(false);
   }, []);
 
-  const onLogin = () => {
-    setIsAuthenticated(true);
-  };
-
+  const onLogin = () => setIsAuthenticated(true);
   const onLogout = () => {
     setIsAuthenticated(false);
     localStorage.clear();
   };
 
-  // Avoid showing routes before authentication check
-  if (loading) {
-    return null; // You can return a loading spinner here if you want
-  }
+  if (loading) return null;
 
   return (
     <ChakraProvider theme={theme}>
       <AlertProvider>
         <Router>
-          <Routes>
-            {/* Public Routes */}
-            <Route
-              path="/"
-              element={
-                isAuthenticated ? (
-                  <Navigate
-                    to={`/home/property/${
-                      JSON.parse(localStorage.getItem("user")).propertyId
-                    }`}
-                  />
-                ) : (
-                  <Website />
-                )
-              }
-            />
-
-            <Route
-              path="/login"
-              element={
-                isAuthenticated ? (
-                  <Navigate
-                    to={`/home/property/${
-                      JSON.parse(localStorage.getItem("user")).propertyId
-                    }`}
-                  />
-                ) : (
-                  <Login onLogin={onLogin} />
-                )
-              }
-            />
-
-            <Route
-              path="/home"
-              element={
-                isAuthenticated ? (
-                  <Navigate
-                    to={`/home/property/${
-                      JSON.parse(localStorage.getItem("user")).propertyId
-                    }`}
-                  />
-                ) : (
-                  <Navigate to="/login" />
-                )
-              }
-            />
-
-            {/* Updated path for AddBookingPage */}
-            <Route
-              path="/home/property/:propertyId/add-booking"
-              element={
-                isAuthenticated ? <AddBookingPage /> : <Navigate to="/login" />
-              }
-            />
-
-            {/* Dynamic Route for Property Home */}
-            <Route
-              path="/home/property/:id"
-              element={
-                isAuthenticated ? (
-                  <HomeTab onLogout={onLogout} />
-                ) : (
-                  <Navigate to="/login" />
-                )
-              }
-            />
-
-            {/* Admin Routes */}
-            <Route path="/admin" element={<Navigate to="/admin/home" />} />
-            <Route
-              path="/admin/*"
-              element={
-                isAuthenticated ? (
-                  <AdminPanel onLogout={onLogout} />
-                ) : (
-                  <Navigate to="/login" />
-                )
-              }
-            />
-          </Routes>
+          <AppContent
+            isAuthenticated={isAuthenticated}
+            onLogout={onLogout}
+            onLogin={onLogin}
+          />
         </Router>
       </AlertProvider>
     </ChakraProvider>
   );
-}
+};
+
+const AppContent = ({ isAuthenticated, onLogout, onLogin }) => {
+  const location = useLocation();
+  const showNavbarFooter = ["/", "/projects", "/projects/:id"].some((path) =>
+    location.pathname.startsWith(path.replace(":id", ""))
+  );
+
+  return (
+    <Box display="flex" flexDirection="column" minH="100vh">
+      {/* Navbar */}
+      {showNavbarFooter && <Navbar />}
+
+      {/* Main Content Area */}
+      <Box flex="1" as="main" pt="16">
+        <Routes>
+          <Route
+            path="/"
+            element={
+              isAuthenticated ? (
+                <Navigate
+                  to={`/home/property/${
+                    JSON.parse(localStorage.getItem("user")).propertyId
+                  }`}
+                />
+              ) : (
+                <Website />
+              )
+            }
+          />
+          <Route path="/projects" element={<Projects />} />
+          <Route path="/projects/:slug" element={<ProjectDetail />} />
+          <Route
+            path="/login"
+            element={
+              isAuthenticated ? (
+                <Navigate
+                  to={`/home/property/${
+                    JSON.parse(localStorage.getItem("user")).propertyId
+                  }`}
+                />
+              ) : (
+                <Login onLogin={onLogin} />
+              )
+            }
+          />
+          <Route
+            path="/home"
+            element={
+              isAuthenticated ? (
+                <Navigate
+                  to={`/home/property/${
+                    JSON.parse(localStorage.getItem("user")).propertyId
+                  }`}
+                />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/home/property/:propertyId/add-booking"
+            element={
+              isAuthenticated ? <AddBookingPage /> : <Navigate to="/login" />
+            }
+          />
+          <Route
+            path="/home/property/:id"
+            element={
+              isAuthenticated ? (
+                <HomeTab onLogout={onLogout} />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route path="/admin" element={<Navigate to="/admin/home" />} />
+          <Route
+            path="/admin/*"
+            element={
+              isAuthenticated ? (
+                <AdminPanel onLogout={onLogout} />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+        </Routes>
+      </Box>
+
+      {/* Floating Buttons */}
+      {showNavbarFooter && <FloatingButtons />}
+
+      {/* Footer (Sticks to bottom if content is short) */}
+      {showNavbarFooter && <Footer />}
+    </Box>
+  );
+};
 
 export default App;
