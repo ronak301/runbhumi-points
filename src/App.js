@@ -19,6 +19,8 @@ import Projects from "./modules/website/Projects/Projects";
 import theme from "./theme";
 import FloatingButtons from "./components/FloatingButtons";
 import ProjectDetail from "./modules/website/Projects/ProjectDetail";
+import AllBlogs from "./modules/website/Blogs/AllBlogs";
+import BlogDetail from "./modules/website/Blogs/BlogDetail";
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -85,6 +87,9 @@ const AppContent = ({ isAuthenticated, onLogout, onLogin }) => {
           />
           <Route path="/projects" element={<Projects />} />
           <Route path="/projects/:slug" element={<ProjectDetail />} />
+
+          <Route path="/blogs" element={<AllBlogs />} />
+          <Route path="/blogs/:slug" element={<BlogDetail />} />
           <Route
             path="/login"
             element={

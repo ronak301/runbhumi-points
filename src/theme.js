@@ -39,6 +39,13 @@ const theme = extendTheme({
       600: "rgb(23, 52, 18)",
       700: "rgb(23, 52, 18)",
     },
+    pastel: {
+      0: "#FFEBE6",
+      1: "#E6F7FF",
+      2: "#E9F5E9",
+      3: "#FFF3CD",
+      4: "#FCE4EC",
+    },
   },
   components: {
     Button: {
