@@ -65,7 +65,6 @@ const AppContent = ({ isAuthenticated, onLogout, onLogin }) => {
 
   return (
     <Box display="flex" flexDirection="column" minH="100vh">
-      {/* Navbar */}
       {showNavbarFooter && <Navbar />}
 
       {/* Main Content Area */}
