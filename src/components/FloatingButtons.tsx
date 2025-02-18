@@ -23,7 +23,7 @@ const FloatingButtons = () => {
   return (
     <Box
       position="fixed"
-      bottom="20px"
+      bottom="80px"
       right="20px"
       display="flex"
       flexDirection="column"

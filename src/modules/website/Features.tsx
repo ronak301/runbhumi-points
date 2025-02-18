@@ -13,7 +13,7 @@ export default function Features() {
       p={8}
       textAlign="center"
       py={16}
-      bg="gray.100">
+      bg="white">
       <Heading size="lg" color="green.600" textDecoration="underline">
         Our Features
       </Heading>

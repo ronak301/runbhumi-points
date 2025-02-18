@@ -7,8 +7,10 @@ import {
   useToast,
   VStack,
   Heading,
+  IconButton,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import { ArrowBackIcon } from "@chakra-ui/icons";
 
 const Login = ({ onLogin }) => {
   const [mobileNo, setMobileNo] = useState("");
@@ -16,7 +18,6 @@ const Login = ({ onLogin }) => {
   const toast = useToast();
   const navigate = useNavigate();
 
-  // Mapping of mobile numbers to passwords and property IDs
   const userMap = {
     7042770304: {
       password: "1234",
@@ -51,7 +52,6 @@ const Login = ({ onLogin }) => {
     const user = userMap[mobileNo];
 
     if (user && user.password === password) {
-      // Store user info and property ID in localStorage
       localStorage.setItem(
         "user",
         JSON.stringify({
@@ -77,9 +77,19 @@ const Login = ({ onLogin }) => {
 
   return (
     <Box minHeight="100vh" display="flex" flexDirection="column">
-      {/* Top Bar */}
-      <Box bg="teal.500" p={4} color="white">
-        <Heading size="md" textAlign="center">
+      {/* Top Bar with Bigger Back Button */}
+      <Box bg="teal.500" p={4} color="white" display="flex" alignItems="center">
+        <IconButton
+          icon={<ArrowBackIcon boxSize={6} />} // Increased icon size
+          variant="ghost"
+          color="white"
+          onClick={() => navigate("/")}
+          aria-label="Back to Home"
+          _hover={{ bg: "teal.600" }}
+          mr={4}
+          fontSize="2xl" // Bigger icon button
+        />
+        <Heading size="md" textAlign="center" flex="1">
           Turfwale
         </Heading>
       </Box>

@@ -93,7 +93,7 @@ export const blogs = [
     </p>
     
     <p style="text-align: center; margin-top: 1rem;">
-      📞 <a href="https://turfwale.com/contact" target="_blank" style="background-color: #2b6cb0; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold; display: inline-block;">
+      <a href="https://turfwale.com/contact" target="_blank" style="background-color: #2b6cb0; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold; display: inline-block;">
         Contact Turfwale Now
       </a>
     </p>

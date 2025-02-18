@@ -27,7 +27,7 @@ const BlogDetail = () => {
   }
 
   return (
-    <Container maxW="container.md" py={10}>
+    <Container maxW="container.md" py={20}>
       {/* SEO Meta Tags */}
       <Helmet>
         <title>{blog.metaTitle}</title>

@@ -9,7 +9,7 @@ export default function Gallery() {
       p={8}
       textAlign="center"
       py={16}
-      bg="gray.50">
+      bg="white">
       <Heading size="lg" color="green.600" textDecoration="underline">
         Our Gallery
       </Heading>

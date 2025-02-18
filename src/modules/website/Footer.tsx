@@ -6,7 +6,7 @@ const MotionBox = motion(Box);
 export default function Footer() {
   return (
     <MotionBox
-      bg="green.600"
+      bg="green.500"
       color="white"
       textAlign="center"
       py={6}

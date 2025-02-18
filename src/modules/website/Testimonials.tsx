@@ -30,7 +30,7 @@ export default function Testimonials() {
       spacing={8}
       p={8}
       textAlign="center"
-      bg="gray.50"
+      bg="white"
       py={16}>
       <Heading size="lg" color="green.600" textDecoration="underline">
         What Our Clients Say

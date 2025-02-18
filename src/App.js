@@ -21,6 +21,8 @@ import FloatingButtons from "./components/FloatingButtons";
 import ProjectDetail from "./modules/website/Projects/ProjectDetail";
 import AllBlogs from "./modules/website/Blogs/AllBlogs";
 import BlogDetail from "./modules/website/Blogs/BlogDetail";
+import CricketTurf from "./modules/website/Products/CricketTurf";
+import FootballTurf from "./modules/website/Products/FootballTurf";
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -59,16 +61,20 @@ const App = () => {
 
 const AppContent = ({ isAuthenticated, onLogout, onLogin }) => {
   const location = useLocation();
-  const showNavbarFooter = ["/", "/projects", "/projects/:id"].some((path) =>
-    location.pathname.startsWith(path.replace(":id", ""))
-  );
+  const showNavbarFooter =
+    ["/", "/projects", "/projects/:id", "/blogs", "/blogs/:slug"].some((path) =>
+      location.pathname.startsWith(path.replace(":id", ""))
+    ) &&
+    !["/login", "/admin", "/home"].some((path) =>
+      location.pathname.startsWith(path)
+    );
 
   return (
     <Box display="flex" flexDirection="column" minH="100vh">
       {showNavbarFooter && <Navbar />}
 
       {/* Main Content Area */}
-      <Box flex="1" as="main" pt="16">
+      <Box flex="1" as="main" mt={20} d="flex">
         <Routes>
           <Route
             path="/"
@@ -84,6 +90,10 @@ const AppContent = ({ isAuthenticated, onLogout, onLogin }) => {
               )
             }
           />
+
+          <Route path="/cricket-turf" element={<CricketTurf />} />
+          <Route path="/football-turf" element={<FootballTurf />} />
+
           <Route path="/projects" element={<Projects />} />
           <Route path="/projects/:slug" element={<ProjectDetail />} />
 
