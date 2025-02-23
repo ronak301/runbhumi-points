@@ -15,7 +15,7 @@ export default function About() {
   return (
     <VStack id="about" spacing={8} p={8} textAlign="center" bg="white" py={16}>
       <Heading
-        style={{ fontFamily: "Neulis Alt, sans-serif" }}
+        style={{ fontFamily: "Sora, sans-serif" }}
         size="lg"
         color="green.600"
         textDecoration="underline">

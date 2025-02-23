@@ -7,12 +7,14 @@ import Gallery from "./Gallery";
 import Hero from "./Hero";
 import Testimonials from "./Testimonials";
 import Faq from "./Faq";
+import WhatWeDo from "./WhatWeDo";
 
 const Website = () => {
   return (
     <ChakraProvider>
       <Box>
         <Hero />
+        <WhatWeDo />
         <About />
         <Features />
         <Gallery />

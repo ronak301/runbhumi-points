@@ -3,26 +3,26 @@ import { extendTheme } from "@chakra-ui/react";
 
 const theme = extendTheme({
   fonts: {
-    heading: `'Neulis Alt', sans-serif`,
-    body: `'Neulis Alt', sans-serif`,
+    heading: "'Sora', sans-serif",
+    body: "'Sora', sans-serif",
   },
   styles: {
     global: {
       "@font-face": [
         {
-          fontFamily: "Neulis Alt",
-          src: "url('/fonts/NeulisAlt-Regular.ttf') format('truetype')",
+          fontFamily: "Sora",
+          src: "url('/fonts/Sora-Regular.ttf') format('truetype')",
           fontWeight: "normal",
           fontStyle: "normal",
         },
       ],
       body: {
-        fontFamily: "Neulis Alt, sans-serif",
+        fontFamily: "Sora, sans-serif",
         backgroundColor: "#ffffff", // White background for the body
         color: "#333333", // Charcoal text color
       },
       "*": {
-        fontFamily: "Neulis Alt, sans-serif",
+        fontFamily: "Sora, sans-serif",
       },
     },
   },

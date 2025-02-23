@@ -1,201 +1,100 @@
-import { HamburgerIcon, ChevronDownIcon } from "@chakra-ui/icons";
+import { useState } from "react";
 import {
   Box,
-  Button,
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerOverlay,
   Flex,
+  Link,
   IconButton,
-  Text,
+  useColorModeValue,
   Menu,
   MenuButton,
   MenuList,
   MenuItem,
-  useDisclosure,
+  Text,
+  Button,
   VStack,
-  useColorModeValue,
 } from "@chakra-ui/react";
-import { useNavigate, useLocation } from "react-router-dom";
-
-export const PRIMARY_COLOR = "rgb(23, 52, 18)";
-const HOVER_BG_COLOR = "#58D68D";
-const TEXT_COLOR = "#333";
+import { HamburgerIcon, CloseIcon, ChevronDownIcon } from "@chakra-ui/icons";
 
 const Navbar = () => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [isOpen, setIsOpen] = useState(false);
 
-  // Function to highlight the selected nav item
-  const getNavItemStyles = (route: any) => {
-    return location.pathname === route
-      ? { fontWeight: "bold", color: PRIMARY_COLOR }
-      : { fontWeight: "normal", color: TEXT_COLOR };
+  const toggleMenu = () => {
+    setIsOpen(!isOpen);
   };
-
-  const navItems = [
-    { label: "Home", route: "/" },
-    { label: "About Us", route: "/about" },
-    {
-      label: "Products",
-      subMenu: [
-        { label: "Cricket Turf", route: "/cricket-turf" },
-        { label: "Football Turf", route: "/football-turf" },
-      ],
-    },
-    { label: "Projects", route: "/projects" },
-    { label: "Maintenance", route: "/maintenance" },
-    { label: "News", route: "/blogs" },
-    { label: "Contact Us", route: "/contact" },
-  ];
 
   return (
     <Box
-      as="nav"
+      bg={useColorModeValue("white", "gray.900")}
+      px={32}
+      boxShadow="md"
       position="fixed"
       top={0}
+      left={0}
       width="100%"
-      zIndex={10}
-      bg={useColorModeValue("white", "gray.800")}
-      shadow="lg"
-      borderBottom="2px solid #f0f0f0">
-      <Flex justifyContent="space-between" alignItems="center" px={8} py={4}>
-        <Text
-          fontSize="3xl"
-          fontWeight="bold"
-          color={PRIMARY_COLOR}
-          cursor="pointer"
-          onClick={() => navigate("/")}>
+      zIndex={10}>
+      <Flex
+        h={16}
+        alignItems={"center"}
+        justifyContent={"space-between"}
+        mx="auto">
+        <Text fontSize="xl" fontWeight="bold">
           Turfwale
         </Text>
-
-        {/* Desktop Navigation */}
-        <Flex gap={6} display={{ base: "none", md: "flex" }}>
-          {navItems.map((item, idx) =>
-            item.subMenu ? (
-              <Menu key={idx}>
-                <MenuButton
-                  fontSize={"md"}
-                  as={Button}
-                  _hover={{ color: PRIMARY_COLOR }}>
-                  {item.label} <ChevronDownIcon ml={2} />
-                </MenuButton>
-                <MenuList>
-                  {item.subMenu.map((subItem, subIdx) => (
-                    <MenuItem
-                      key={subIdx}
-                      onClick={() => navigate(subItem.route)}
-                      _hover={{
-                        color: PRIMARY_COLOR,
-                      }}>
-                      {subItem.label}
-                    </MenuItem>
-                  ))}
-                </MenuList>
-              </Menu>
-            ) : (
-              <Button
-                fontSize={"md"}
-                key={idx}
+        <Flex alignItems="center">
+          <Flex
+            display={{ base: "none", md: "flex" }}
+            gap={6}
+            alignItems="center">
+            <Button variant="ghost">Home</Button>
+            <Button variant="ghost">Projects</Button>
+            <Menu>
+              <MenuButton
+                as={Button}
                 variant="ghost"
-                onClick={() => navigate(item.route)}
-                _hover={{ color: PRIMARY_COLOR }}
-                sx={getNavItemStyles(item.route)}>
-                {item.label}
-              </Button>
-            )
-          )}
+                rightIcon={<ChevronDownIcon />}>
+                Products
+              </MenuButton>
+              <MenuList>
+                <MenuItem>Cricket Turf</MenuItem>
+                <MenuItem>Football Turf</MenuItem>
+              </MenuList>
+            </Menu>
+          </Flex>
+          <IconButton
+            size="md"
+            icon={isOpen ? <CloseIcon /> : <HamburgerIcon />}
+            aria-label="Open Menu"
+            display={{ md: "none" }}
+            onClick={toggleMenu}
+            ml={2}
+          />
         </Flex>
-
-        {/* Call Us Button */}
-        <Button
-          bg={PRIMARY_COLOR}
-          color="white"
-          paddingX={6}
-          paddingY={3}
-          borderRadius="full"
-          fontWeight="bold"
-          onClick={() => (window.location.href = "tel:+916377478355")}>
-          Call Us Now
-        </Button>
-
-        {/* Hamburger icon for mobile */}
-        <IconButton
-          aria-label="Open menu"
-          icon={<HamburgerIcon />}
-          display={{ base: "inline-flex", md: "none" }}
-          onClick={onOpen}
-          color={PRIMARY_COLOR}
-        />
       </Flex>
-
-      {/* Drawer for mobile */}
-      <Drawer isOpen={isOpen} onClose={onClose} placement="left">
-        <DrawerOverlay />
-        <DrawerContent bg="white" borderRadius="xl" paddingX={4} paddingY={6}>
-          <DrawerCloseButton />
-          <DrawerBody>
-            <VStack spacing={6} mt={12}>
-              {/* Mobile Navigation */}
-              {navItems.map((item, idx) =>
-                item.subMenu ? (
-                  <Box key={idx}>
-                    <Text fontWeight="bold" fontSize="xl" mb={4}>
-                      {item.label}
-                    </Text>
-                    <VStack pl={4} spacing={4} align="stretch">
-                      {item.subMenu.map((subItem, subIdx) => (
-                        <Button
-                          key={subIdx}
-                          variant="ghost"
-                          onClick={() => {
-                            navigate(subItem.route);
-                            onClose();
-                          }}
-                          _hover={{ color: PRIMARY_COLOR }}
-                          sx={getNavItemStyles(subItem.route)}>
-                          {subItem.label}
-                        </Button>
-                      ))}
-                    </VStack>
-                  </Box>
-                ) : (
-                  <Button
-                    key={idx}
-                    variant="ghost"
-                    onClick={() => {
-                      navigate(item.route);
-                      onClose();
-                    }}
-                    _hover={{ color: PRIMARY_COLOR }}
-                    sx={getNavItemStyles(item.route)}>
-                    {item.label}
-                  </Button>
-                )
-              )}
-
-              {/* Call Us Button in Drawer */}
-              <Button
-                bg={PRIMARY_COLOR}
-                color="white"
-                paddingX={6}
-                paddingY={3}
-                borderRadius="full"
-                fontWeight="bold"
-                _hover={{ color: PRIMARY_COLOR }}
-                onClick={() => {
-                  window.location.href = "tel:+916377478355";
-                  onClose();
-                }}>
-                Call Us Now
-              </Button>
-            </VStack>
-          </DrawerBody>
-        </DrawerContent>
-      </Drawer>
+      {isOpen ? (
+        <Box pb={4} display={{ md: "none" }}>
+          <VStack spacing={4} align="stretch">
+            <Button w="full" variant="ghost">
+              Home
+            </Button>
+            <Button w="full" variant="ghost">
+              Projects
+            </Button>
+            <Menu>
+              <MenuButton
+                as={Button}
+                w="full"
+                variant="ghost"
+                rightIcon={<ChevronDownIcon />}>
+                Products
+              </MenuButton>
+              <MenuList>
+                <MenuItem>Cricket Turf</MenuItem>
+                <MenuItem>Football Turf</MenuItem>
+              </MenuList>
+            </Menu>
+          </VStack>
+        </Box>
+      ) : null}
     </Box>
   );
 };

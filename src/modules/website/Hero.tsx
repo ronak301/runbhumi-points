@@ -1,93 +1,91 @@
-import { Box, Button, Heading, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Heading,
+  Text,
+  VStack,
+  HStack,
+  Image,
+} from "@chakra-ui/react";
 import { Link } from "react-scroll";
-
-import { motion } from "framer-motion";
-
-const MotionBox = motion(Box);
 
 export default function Hero() {
   return (
-    <MotionBox
+    <Box
       id="hero"
-      bgImage={`url(https://images.pexels.com/photos/9420724/pexels-photo-9420724.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2)`}
-      bgSize="cover"
-      bgPosition="center"
-      bgRepeat="no-repeat"
-      position="relative"
-      color="white"
-      textAlign="center"
-      minHeight={{ base: "70vh", md: "85vh" }}
+      bg="white"
+      minHeight="80vh"
       display="flex"
+      flexDirection={{ base: "column", md: "row" }}
       alignItems="center"
-      justifyContent="center"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 1 }}>
-      {/* Overlay */}
-      <Box
-        position="absolute"
-        top={0}
-        left={0}
-        right={0}
-        bottom={0}
-        bg="black"
-        opacity={0.3}
-        zIndex={1}
-      />
-      {/* Content */}
-      <Box position="relative" zIndex={2} textAlign="center" px={4}>
+      justifyContent="space-between"
+      px={{ base: 6, md: 32 }}
+      py={{ base: 10, md: 20 }}
+      gap={10}>
+      {/* Left Section (Text + CTA) */}
+      <Box flex="1" textAlign={{ base: "center", md: "left" }}>
+        <Text fontSize="lg" color="red.500" fontWeight="bold">
+          Elevate Your Game with
+        </Text>
         <Heading
           as="h1"
-          fontSize={{ base: "4xl", md: "6xl", lg: "7xl" }}
-          fontWeight="extrabold"
-          mb={6}
-          textShadow="3px 3px rgba(0, 0, 0, 0.5)"
-          lineHeight="1.1"
-          letterSpacing="wide"
-          style={{ fontFamily: "Neulis Alt, sans-serif" }}
-          textAlign="center">
-          Turfwale
-        </Heading>
-        <Text
-          fontSize={{ base: "2xl", md: "4xl", lg: "5xl" }}
+          fontSize={{ base: "3xl", md: "5xl" }}
           fontWeight="bold"
-          mb={8}
-          textShadow="2px 2px #000000"
-          lineHeight="1.2">
-          India&apos;s Leading Sports Infra Manufacturer
+          style={{ fontFamily: "Sora, sans-serif" }}>
+          High-Performance Sports Courts <br />
+          <Text as="span" color="black" fontWeight="extrabold">
+            Built for Champions
+          </Text>
+        </Heading>
+
+        <Text fontSize="lg" opacity={0.8} maxW="xl" mt={4}>
+          At{" "}
+          <Text as="span" fontWeight="bold">
+            Turfwale
+          </Text>
+          , we specialize in crafting premium-quality sports surfaces tailored
+          to your needs. Whether it's football, tennis, or multi-sport
+          facilities, we bring expertise and innovation to every
+          project—ensuring top-tier durability, safety, and performance.
         </Text>
-        {/* CTA Buttons */}
-        <Box
+
+        <HStack
+          spacing={6}
           mt={6}
-          display="flex"
-          flexDirection={{ base: "column", sm: "row" }}
-          gap={4}>
+          justify={{ base: "center", md: "flex-start" }}>
           <Link to="contact-form" smooth={true} duration={800} offset={-70}>
-            {" "}
-            {/* Added smooth scrolling */}
             <Button
               size="lg"
               colorScheme="green"
-              bg="green.600"
-              _hover={{ bg: "green.600" }}
-              mb={{ base: 4, sm: 0 }} // Margin bottom for mobile view
-            >
-              Get a Free Consultation
+              bg="green.500"
+              _hover={{ bg: "green.600" }}>
+              Get Started
             </Button>
           </Link>
-          <Link to="about" smooth={true} duration={800} offset={-70}>
-            {" "}
-            {/* Added smooth scrolling */}
+          <Link to="projects" smooth={true} duration={800} offset={-70}>
             <Button
               size="lg"
-              colorScheme="white"
+              colorScheme="gray"
               variant="outline"
-              _hover={{ bg: "whiteAlpha.300" }}>
-              Learn More
+              _hover={{ bg: "gray.200" }}>
+              View Our Work
             </Button>
           </Link>
-        </Box>
+        </HStack>
       </Box>
-    </MotionBox>
+
+      {/* Right Section (Local Image) */}
+      <Box flex="1" display="flex" justifyContent="center">
+        <Image
+          src="/images/hero-image.jpg"
+          alt="Turf Construction"
+          maxW={{ base: "100%", md: "100%" }}
+          maxH={{ base: "300px", md: "500px" }}
+          objectFit="contain" // Ensures image fits without cropping
+          borderRadius="lg"
+          boxShadow="lg"
+        />
+      </Box>
+    </Box>
   );
 }
