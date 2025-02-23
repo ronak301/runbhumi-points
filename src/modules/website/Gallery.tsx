@@ -1,4 +1,4 @@
-import { Grid, GridItem, Heading, Image, VStack } from "@chakra-ui/react";
+import { Grid, GridItem, Heading, Image, Text, VStack } from "@chakra-ui/react";
 import React from "react";
 
 export default function Gallery() {
@@ -10,9 +10,9 @@ export default function Gallery() {
       textAlign="center"
       py={16}
       bg="white">
-      <Heading size="lg" color="green.600" textDecoration="underline">
-        Our Gallery
-      </Heading>
+      <Text fontSize="2xl" fontWeight="bold" mb={6}>
+        Gallery
+      </Text>
       <Grid
         templateColumns={{ base: "repeat(2, 1fr)", sm: "repeat(3, 1fr)" }}
         gap={6}>

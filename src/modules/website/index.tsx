@@ -8,6 +8,7 @@ import Hero from "./Hero";
 import Testimonials from "./Testimonials";
 import Faq from "./Faq";
 import WhatWeDo from "./WhatWeDo";
+import TurfConstruction from "./TurfConstruction";
 
 const Website = () => {
   return (
@@ -15,8 +16,9 @@ const Website = () => {
       <Box>
         <Hero />
         <WhatWeDo />
-        <About />
-        <Features />
+        {/* <About /> */}
+        {/* <Features /> */}
+        <TurfConstruction />
         <Gallery />
         <Testimonials />
         <Faq />

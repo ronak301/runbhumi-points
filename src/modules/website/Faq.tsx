@@ -1,13 +1,12 @@
 import {
   Box,
+  Text,
+  VStack,
   Accordion,
   AccordionItem,
   AccordionButton,
   AccordionPanel,
   AccordionIcon,
-  Text,
-  Container,
-  VStack,
 } from "@chakra-ui/react";
 
 const faqsConfig = [
@@ -59,55 +58,38 @@ const faqsConfig = [
   },
 ];
 
-const FAQComponent = () => {
+const FAQ = () => {
   return (
-    <Container maxW="container.md" py={10}>
-      <VStack spacing={6} align="center">
-        <Text
-          fontSize="3xl"
-          fontWeight="bold"
-          textAlign="center"
-          color="blue.600">
-          Frequently Asked Questions
-        </Text>
-        <Accordion
-          allowMultiple
-          width="full"
-          borderRadius="lg"
-          overflow="hidden"
-          boxShadow="lg">
+    <Box bgGradient="white" py={10} px={5} textAlign="center">
+      <Text fontSize="2xl" fontWeight="bold" mb={6}>
+        FREQUENTLY ASKED QUESTIONS
+      </Text>
+      <Box maxW="800px" mx="auto">
+        <Accordion allowToggle defaultIndex={[0]}>
           {faqsConfig.map((faq, index) => (
-            <AccordionItem key={index} border="none">
+            <AccordionItem
+              key={index}
+              borderRadius="md"
+              overflow="hidden"
+              boxShadow="md"
+              mb={3}>
               <h2>
-                <AccordionButton
-                  _expanded={{ bg: "blue.500", color: "white" }}
-                  p={4}
-                  borderRadius="lg">
-                  <Box
-                    flex="1"
-                    textAlign="left"
-                    fontWeight="medium"
-                    fontSize="lg">
+                <AccordionButton _expanded={{ bg: "blue.500", color: "white" }}>
+                  <Box flex="1" textAlign="left" fontWeight="bold">
                     {faq.question}
                   </Box>
                   <AccordionIcon />
                 </AccordionButton>
               </h2>
-              <AccordionPanel
-                pb={4}
-                fontSize="md"
-                color="gray.700"
-                bg="gray.50"
-                p={4}
-                borderRadius="lg">
+              <AccordionPanel pb={4} textAlign="left" color="gray.700">
                 {faq.answer}
               </AccordionPanel>
             </AccordionItem>
           ))}
         </Accordion>
-      </VStack>
-    </Container>
+      </Box>
+    </Box>
   );
 };
 
-export default FAQComponent;
+export default FAQ;

@@ -49,9 +49,9 @@ export default function ContactUs() {
       textAlign="center"
       bg="white"
       py={16}>
-      <Heading size="lg" color="green.600" textDecoration="underline">
+      <Text fontSize="2xl" fontWeight="bold" mb={6}>
         Contact Us
-      </Heading>
+      </Text>
 
       <MotionBox
         bg="white"

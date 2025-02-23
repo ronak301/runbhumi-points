@@ -25,7 +25,7 @@ const Navbar = () => {
   return (
     <Box
       bg={useColorModeValue("white", "gray.900")}
-      px={32}
+      px={{ base: 5, md: 32 }}
       boxShadow="md"
       position="fixed"
       top={0}
@@ -57,6 +57,8 @@ const Navbar = () => {
               <MenuList>
                 <MenuItem>Cricket Turf</MenuItem>
                 <MenuItem>Football Turf</MenuItem>
+                <MenuItem>PickleBall Court</MenuItem>
+                <MenuItem>Badminton Court</MenuItem>
               </MenuList>
             </Menu>
           </Flex>
@@ -90,6 +92,8 @@ const Navbar = () => {
               <MenuList>
                 <MenuItem>Cricket Turf</MenuItem>
                 <MenuItem>Football Turf</MenuItem>
+                <MenuItem>PickleBall Court</MenuItem>
+                <MenuItem>Badminton Court</MenuItem>
               </MenuList>
             </Menu>
           </VStack>
