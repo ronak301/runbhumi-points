@@ -86,17 +86,17 @@ const Testimonials = () => {
       <Box maxW="900px" mx="auto" overflow="hidden">
         <Slider {...settings}>
           {testimonials.map((testimonial) => (
-            <Box key={testimonial.name} px={2}>
+            <Box key={testimonial.name} px={3}>
               <VStack
                 bg="white"
-                p={5}
+                p={{ base: 4, md: 5 }}
                 borderRadius="xl"
                 boxShadow="lg"
-                spacing={3}
+                spacing={4}
                 align="center"
-                mx={3}
-                maxW="280px"
-                height="320px">
+                mx="auto"
+                maxW={{ base: "90%", md: "280px" }}
+                minH={{ base: "350px", md: "320px" }}>
                 <Image
                   src={testimonial.image}
                   alt={testimonial.name}
@@ -109,7 +109,7 @@ const Testimonials = () => {
                     <StarIcon key={i} color="yellow.400" />
                   ))}
                 </HStack>
-                <Text fontWeight="bold" fontSize="lg">
+                <Text fontWeight="bold" fontSize="lg" textAlign="center">
                   {testimonial.name}
                 </Text>
                 <Text fontSize="sm" color="gray.500" textAlign="center">

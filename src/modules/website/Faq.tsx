@@ -60,7 +60,7 @@ const faqsConfig = [
 
 const FAQ = () => {
   return (
-    <Box bgGradient="white" py={10} px={5} textAlign="center">
+    <Box py={10} px={5} textAlign="center">
       <Text fontSize="2xl" fontWeight="bold" mb={6}>
         FREQUENTLY ASKED QUESTIONS
       </Text>
