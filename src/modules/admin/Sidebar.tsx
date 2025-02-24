@@ -54,6 +54,19 @@ const Sidebar: React.FC = () => {
         >
           Settings
         </Link>
+        <Link
+          as={RouterLink}
+          to="/admin/blogs"
+          p={3}
+          borderRadius="md"
+          w="100%" // Full width
+          bg={isActive("/admin/blogs") ? "gray.500" : "transparent"} // Active state background
+          _hover={{ bg: "gray.600" }} // Hover state background
+          color={isActive("/admin/blogs") ? "white" : "gray.200"} // Active text color
+          _focus={{ boxShadow: "none" }} // Removes focus outline
+        >
+          Blogs
+        </Link>
       </VStack>
     </Box>
   );

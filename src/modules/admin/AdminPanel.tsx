@@ -6,6 +6,8 @@ import { Box, Flex } from "@chakra-ui/react";
 import { Routes, Route } from "react-router-dom";
 import HomeTab from "./HomeTab";
 import SettingsTab from "./SettingsTab"; // Placeholder for SettingsTab
+import BlogsTab from "./BlogsTab";
+import BlogEditor from "./BlogEditor";
 
 interface AdminPanelProps {
   onLogout: () => void;
@@ -24,6 +26,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
         <Routes>
           <Route path="/home" element={<HomeTab />} />
           <Route path="/settings" element={<SettingsTab />} />
+          <Route path="/blogs" element={<BlogsTab />} />
+          <Route path="/blogs/create" element={<BlogEditor />} />
         </Routes>
       </Box>
     </Flex>
