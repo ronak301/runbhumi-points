@@ -74,7 +74,7 @@ const AppContent = ({ isAuthenticated, onLogout, onLogin }) => {
       {showNavbarFooter && <Navbar />}
 
       {/* Main Content Area */}
-      <Box flex="1" as="main" mt={20} d="flex">
+      <Box flex="1" as="main" d="flex">
         <Routes>
           <Route
             path="/"

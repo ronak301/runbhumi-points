@@ -28,7 +28,7 @@ const WhatWeDo = () => {
   return (
     <Box bg="gray.100" py={10} px={{ base: 5, md: 32 }} textAlign="center">
       <Text fontSize="2xl" fontWeight="bold" mb={6}>
-        WHAT WE DO
+        WHAT WE BUILD
       </Text>
       <Grid
         templateColumns={{

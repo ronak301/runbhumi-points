@@ -4,7 +4,6 @@ import {
   Flex,
   Link,
   IconButton,
-  useColorModeValue,
   Menu,
   MenuButton,
   MenuList,
@@ -24,20 +23,19 @@ const Navbar = () => {
 
   return (
     <Box
-      bg={useColorModeValue("white", "gray.900")}
-      px={{ base: 5, md: 32 }}
-      boxShadow="md"
-      position="fixed"
+      position="absolute"
       top={0}
       left={0}
       width="100%"
-      zIndex={10}>
+      px={{ base: 5, md: 32 }}
+      zIndex={10}
+      bg="transparent">
       <Flex
         h={16}
         alignItems={"center"}
         justifyContent={"space-between"}
         mx="auto">
-        <Text fontSize="xl" fontWeight="bold">
+        <Text fontSize="xl" fontWeight="bold" color="white">
           Turfwale
         </Text>
         <Flex alignItems="center">
@@ -45,16 +43,28 @@ const Navbar = () => {
             display={{ base: "none", md: "flex" }}
             gap={6}
             alignItems="center">
-            <Button variant="ghost">Home</Button>
-            <Button variant="ghost">Projects</Button>
+            <Button
+              variant="ghost"
+              color="white"
+              _hover={{ bg: "transparent", cursor: "pointer" }}>
+              Home
+            </Button>
+            <Button
+              variant="ghost"
+              color="white"
+              _hover={{ bg: "transparent", cursor: "pointer" }}>
+              Projects
+            </Button>
             <Menu>
               <MenuButton
+                _hover={{ bg: "transparent", cursor: "pointer" }}
                 as={Button}
                 variant="ghost"
+                color="white"
                 rightIcon={<ChevronDownIcon />}>
                 Products
               </MenuButton>
-              <MenuList>
+              <MenuList bg="white">
                 <MenuItem>Cricket Turf</MenuItem>
                 <MenuItem>Football Turf</MenuItem>
                 <MenuItem>PickleBall Court</MenuItem>
@@ -69,27 +79,32 @@ const Navbar = () => {
             display={{ md: "none" }}
             onClick={toggleMenu}
             ml={2}
+            color="white"
+            variant="ghost"
+            _hover={{ bg: "transparent", cursor: "pointer" }}
           />
         </Flex>
       </Flex>
-      {isOpen ? (
+      {isOpen && (
         <Box pb={4} display={{ md: "none" }}>
           <VStack spacing={4} align="stretch">
-            <Button w="full" variant="ghost">
+            <Button w="full" variant="ghost" color="white">
               Home
             </Button>
-            <Button w="full" variant="ghost">
+            <Button w="full" variant="ghost" color="white">
               Projects
             </Button>
             <Menu>
               <MenuButton
+                _hover={{ bg: "transparent", cursor: "pointer" }}
                 as={Button}
                 w="full"
                 variant="ghost"
+                color="white"
                 rightIcon={<ChevronDownIcon />}>
                 Products
               </MenuButton>
-              <MenuList>
+              <MenuList bg="white">
                 <MenuItem>Cricket Turf</MenuItem>
                 <MenuItem>Football Turf</MenuItem>
                 <MenuItem>PickleBall Court</MenuItem>
@@ -98,7 +113,7 @@ const Navbar = () => {
             </Menu>
           </VStack>
         </Box>
-      ) : null}
+      )}
     </Box>
   );
 };
