@@ -10,9 +10,10 @@ const PageHeader = ({ title, imageUrl }: PageHeaderProps) => {
     <Box
       position="relative"
       width="100%"
-      height="300px"
+      height="340px"
       bgImage={`url(${imageUrl})`}
       bgSize="cover"
+      px={4}
       bgPosition="center"
       bgRepeat="no-repeat"
       display="flex"

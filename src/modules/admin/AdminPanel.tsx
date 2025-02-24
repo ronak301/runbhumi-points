@@ -28,6 +28,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
           <Route path="/settings" element={<SettingsTab />} />
           <Route path="/blogs" element={<BlogsTab />} />
           <Route path="/blogs/create" element={<BlogEditor />} />
+          <Route path="/blogs/edit/:id" element={<BlogEditor />} />
+          {/* ✅ Fix */}
         </Routes>
       </Box>
     </Flex>
