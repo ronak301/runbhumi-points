@@ -12,19 +12,17 @@ import TurfConstruction from "./TurfConstruction";
 
 const Website = () => {
   return (
-    <ChakraProvider>
-      <Box>
-        <Hero />
-        <WhatWeDo />
-        {/* <About /> */}
-        {/* <Features /> */}
-        <TurfConstruction />
-        <Gallery />
-        <Testimonials />
-        <Faq />
-        <ContactUs />
-      </Box>
-    </ChakraProvider>
+    <Box>
+      <Hero />
+      <WhatWeDo />
+      {/* <About /> */}
+      {/* <Features /> */}
+      <TurfConstruction />
+      <Gallery />
+      <Testimonials />
+      <Faq />
+      <ContactUs />
+    </Box>
   );
 };
 

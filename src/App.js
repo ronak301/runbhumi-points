@@ -62,9 +62,13 @@ const App = () => {
 const AppContent = ({ isAuthenticated, onLogout, onLogin }) => {
   const location = useLocation();
   const showNavbarFooter =
-    ["/", "/projects", "/projects/:id", "/blogs", "/blogs/:slug"].some((path) =>
-      location.pathname.startsWith(path.replace(":id", ""))
-    ) &&
+    [
+      "/",
+      "/projects",
+      "/projects/:id",
+      "/news-blogs",
+      "/news-blogs/:slug",
+    ].some((path) => location.pathname.startsWith(path.replace(":id", ""))) &&
     !["/login", "/admin", "/home"].some((path) =>
       location.pathname.startsWith(path)
     );
@@ -97,8 +101,8 @@ const AppContent = ({ isAuthenticated, onLogout, onLogin }) => {
           <Route path="/projects" element={<Projects />} />
           <Route path="/projects/:slug" element={<ProjectDetail />} />
 
-          <Route path="/blogs" element={<AllBlogs />} />
-          <Route path="/blogs/:slug" element={<BlogDetail />} />
+          <Route path="/news-blogs" element={<AllBlogs />} />
+          <Route path="/news-blogs/:slug" element={<BlogDetail />} />
           <Route
             path="/login"
             element={

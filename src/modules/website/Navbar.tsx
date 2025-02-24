@@ -43,18 +43,22 @@ const Navbar = () => {
             display={{ base: "none", md: "flex" }}
             gap={6}
             alignItems="center">
-            <Button
-              variant="ghost"
-              color="white"
-              _hover={{ bg: "transparent", cursor: "pointer" }}>
-              Home
-            </Button>
-            <Button
-              variant="ghost"
-              color="white"
-              _hover={{ bg: "transparent", cursor: "pointer" }}>
-              Projects
-            </Button>
+            <Link href="/" _hover={{ textDecoration: "none" }}>
+              <Button
+                variant="ghost"
+                color="white"
+                _hover={{ bg: "transparent", cursor: "pointer" }}>
+                Home
+              </Button>
+            </Link>
+            <Link href="/projects" _hover={{ textDecoration: "none" }}>
+              <Button
+                variant="ghost"
+                color="white"
+                _hover={{ bg: "transparent", cursor: "pointer" }}>
+                Projects
+              </Button>
+            </Link>
             <Menu>
               <MenuButton
                 _hover={{ bg: "transparent", cursor: "pointer" }}
@@ -65,12 +69,28 @@ const Navbar = () => {
                 Products
               </MenuButton>
               <MenuList bg="white">
-                <MenuItem>Cricket Turf</MenuItem>
-                <MenuItem>Football Turf</MenuItem>
-                <MenuItem>PickleBall Court</MenuItem>
-                <MenuItem>Badminton Court</MenuItem>
+                <Link href="/products/cricket-turf">
+                  <MenuItem>Cricket Turf</MenuItem>
+                </Link>
+                <Link href="/products/football-turf">
+                  <MenuItem>Football Turf</MenuItem>
+                </Link>
+                <Link href="/products/pickleball-court">
+                  <MenuItem>PickleBall Court</MenuItem>
+                </Link>
+                <Link href="/products/badminton-court">
+                  <MenuItem>Badminton Court</MenuItem>
+                </Link>
               </MenuList>
             </Menu>
+            <Link href="/news-blogs" _hover={{ textDecoration: "none" }}>
+              <Button
+                variant="ghost"
+                color="white"
+                _hover={{ bg: "transparent", cursor: "pointer" }}>
+                Blogs
+              </Button>
+            </Link>
           </Flex>
           <IconButton
             size="md"
@@ -87,13 +107,22 @@ const Navbar = () => {
       </Flex>
       {isOpen && (
         <Box pb={4} display={{ md: "none" }}>
-          <VStack spacing={4} align="stretch">
-            <Button w="full" variant="ghost" color="white">
-              Home
-            </Button>
-            <Button w="full" variant="ghost" color="white">
-              Projects
-            </Button>
+          <VStack
+            borderRadius={"md"}
+            spacing={4}
+            align="stretch"
+            backgroundColor="rgba(0,0,0,0.5)"
+            py={4}>
+            <Link href="/" _hover={{ textDecoration: "none" }}>
+              <Button w="full" variant="ghost" color="white">
+                Home
+              </Button>
+            </Link>
+            <Link href="/projects" _hover={{ textDecoration: "none" }}>
+              <Button w="full" variant="ghost" color="white">
+                Projects
+              </Button>
+            </Link>
             <Menu>
               <MenuButton
                 _hover={{ bg: "transparent", cursor: "pointer" }}
@@ -105,12 +134,25 @@ const Navbar = () => {
                 Products
               </MenuButton>
               <MenuList bg="white">
-                <MenuItem>Cricket Turf</MenuItem>
-                <MenuItem>Football Turf</MenuItem>
-                <MenuItem>PickleBall Court</MenuItem>
-                <MenuItem>Badminton Court</MenuItem>
+                <Link href="/products/cricket-turf">
+                  <MenuItem>Cricket Turf</MenuItem>
+                </Link>
+                <Link href="/products/football-turf">
+                  <MenuItem>Football Turf</MenuItem>
+                </Link>
+                <Link href="/products/pickleball-court">
+                  <MenuItem>PickleBall Court</MenuItem>
+                </Link>
+                <Link href="/products/badminton-court">
+                  <MenuItem>Badminton Court</MenuItem>
+                </Link>
               </MenuList>
             </Menu>
+            <Link href="/news-blogs" _hover={{ textDecoration: "none" }}>
+              <Button w="full" variant="ghost" color="white">
+                Blogs
+              </Button>
+            </Link>
           </VStack>
         </Box>
       )}

@@ -29,20 +29,23 @@ export default function Hero() {
       <Box position="relative" zIndex={1} maxW="xl" px={6}>
         <Heading
           as="h1"
+          color="white"
           fontSize={{ base: "4xl", md: "6xl" }}
           fontWeight="bold"
           style={{ fontFamily: "Sora, sans-serif" }}>
           Turfwale
         </Heading>
         <Text fontSize={{ base: "lg", md: "2xl" }} mt={2} opacity={0.9}>
-          Leading Turf Construction Company
+          Leading Cricket and Football Turf Construction Company
         </Text>
         <Link to="contact-form" smooth={true} duration={800} offset={-70}>
           <Button
             mt={6}
             size="lg"
-            colorScheme="green"
-            bg="green.500"
+            borderWidth={1}
+            borderColor={"white"}
+            colorScheme="transparent"
+            bg="transparent"
             _hover={{ bg: "green.600" }}>
             Get a Quote
           </Button>
