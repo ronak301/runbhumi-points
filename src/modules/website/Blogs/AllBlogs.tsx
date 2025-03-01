@@ -47,6 +47,7 @@ const AllBlogs = () => {
           ...(doc.data() as Blog),
           id: doc.id,
         }));
+        console.log("blogList", blogList);
         setBlogs(blogList);
       } catch (error) {
         console.error("Error fetching blogs:", error);

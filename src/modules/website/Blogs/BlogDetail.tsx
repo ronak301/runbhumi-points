@@ -16,8 +16,8 @@ import { useState, useEffect } from "react";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import PageHeader from "../PageHeader";
 import { db } from "../../../firebase";
+import MarkdownRenderer from "../../../MarkdownRenderer";
 
-// ✅ Define TypeScript Interface for Blog
 interface Blog {
   title: string;
   metaTitle: string;
@@ -31,7 +31,7 @@ interface Blog {
 }
 
 const BlogDetail: React.FC = () => {
-  const { slug } = useParams<{ slug?: string }>(); // ✅ Ensure slug can be undefined
+  const { slug } = useParams<{ slug?: string }>();
   const [blog, setBlog] = useState<Blog | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -45,7 +45,6 @@ const BlogDetail: React.FC = () => {
       }
 
       try {
-        // ✅ Query Firestore to find a blog where "slug" field matches the given slug
         const blogsRef = collection(db, "blogs");
         const q = query(blogsRef, where("slug", "==", slug));
         const querySnapshot = await getDocs(q);
@@ -85,7 +84,7 @@ const BlogDetail: React.FC = () => {
   return (
     <>
       <PageHeader
-        title=""
+        title={blog?.metaTitle || ""}
         imageUrl="https://images.pexels.com/photos/46798/the-ball-stadion-football-the-pitch-46798.jpeg?auto=compress&cs=tinysrgb&w=1200"
       />
       <Container maxW="container.md" py={20}>
@@ -130,13 +129,13 @@ const BlogDetail: React.FC = () => {
             ))}
           </HStack>
 
-          {/* Blog Content */}
-          <Box
+          <MarkdownRenderer content={blog?.content || ""} />
+          {/* <Box
             mt={4}
             dangerouslySetInnerHTML={{
               __html: blog?.content?.replace(/style="[^"]*"/g, "") || "", // Remove inline styles
             }}
-          />
+          /> */}
         </VStack>
       </Container>
     </>

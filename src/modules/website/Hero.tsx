@@ -7,7 +7,7 @@ export default function Hero() {
       id="hero"
       position="relative"
       minHeight="100vh"
-      bgImage="url('/images/hero-image.jpg')"
+      bgImage="url('/images/hero-image.webp')"
       bgSize="cover"
       bgPosition="center center"
       bgRepeat="no-repeat"
@@ -23,7 +23,7 @@ export default function Hero() {
         left: 0,
         right: 0,
         bottom: 0,
-        bg: "blackAlpha.700",
+        bg: "blackAlpha.600",
       }}>
       {/* Overlay Content */}
       <Box position="relative" zIndex={1} maxW="xl" px={6}>
