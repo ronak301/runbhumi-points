@@ -12,10 +12,16 @@ import { FaMapMarkerAlt } from "react-icons/fa";
 import { useParams } from "react-router-dom";
 import { projects } from "./constants";
 import PageHeader from "../PageHeader";
+import { useEffect } from "react";
 
 const ProjectDetail = () => {
   const { slug } = useParams();
   const project = projects.find((p) => p.slug === slug);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  });
+
   if (!project) return <Text>Project not found</Text>;
 
   return (

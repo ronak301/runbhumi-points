@@ -69,16 +69,16 @@ const Navbar = () => {
                 Products
               </MenuButton>
               <MenuList bg="white">
-                <Link href="/products/cricket-turf">
+                <Link href="/cricket-turf">
                   <MenuItem>Cricket Turf</MenuItem>
                 </Link>
-                <Link href="/products/football-turf">
+                <Link href="/football-turf">
                   <MenuItem>Football Turf</MenuItem>
                 </Link>
-                <Link href="/products/pickleball-court">
+                <Link href="/pickleball-court">
                   <MenuItem>PickleBall Court</MenuItem>
                 </Link>
-                <Link href="/products/badminton-court">
+                <Link href="/badminton-court">
                   <MenuItem>Badminton Court</MenuItem>
                 </Link>
               </MenuList>

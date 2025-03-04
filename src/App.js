@@ -80,20 +80,7 @@ const AppContent = ({ isAuthenticated, onLogout, onLogin }) => {
       {/* Main Content Area */}
       <Box flex="1" as="main" d="flex">
         <Routes>
-          <Route
-            path="/"
-            element={
-              isAuthenticated ? (
-                <Navigate
-                  to={`/home/property/${
-                    JSON.parse(localStorage.getItem("user")).propertyId
-                  }`}
-                />
-              ) : (
-                <Website />
-              )
-            }
-          />
+          <Route path="/" element={<Website />} />
 
           <Route path="/cricket-turf" element={<CricketTurf />} />
           <Route path="/football-turf" element={<FootballTurf />} />

@@ -17,7 +17,7 @@ import {
 
 const footerConfig = {
   logo: "Turfwale",
-  quickLinks: ["Home", "About Us", "Why Us", "Projects", "Blog"],
+  quickLinks: ["Home", "About Us", "Why Us", "Projects", "Blog", "Login"],
   locations: ["Udaipur - India"],
   contact: {
     address: "27-28 Sevashram Chouraha, Udaipur",
@@ -52,7 +52,7 @@ const Footer = () => {
             {footerConfig.quickLinks.map((link, index) => (
               <Link
                 key={index}
-                href="#"
+                href={link === "Login" ? "/login" : "#"}
                 _hover={{ textDecoration: "underline" }}>
                 {link}
               </Link>

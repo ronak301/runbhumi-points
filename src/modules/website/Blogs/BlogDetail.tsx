@@ -80,11 +80,12 @@ const BlogDetail: React.FC = () => {
       </Container>
     );
   }
+  console.log("blog", blog);
 
   return (
     <>
       <PageHeader
-        title={blog?.metaTitle || ""}
+        title={blog?.title || ""}
         imageUrl="https://images.pexels.com/photos/46798/the-ball-stadion-football-the-pitch-46798.jpeg?auto=compress&cs=tinysrgb&w=1200"
       />
       <Container maxW="container.md" py={20}>

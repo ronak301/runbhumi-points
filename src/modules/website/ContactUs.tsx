@@ -62,7 +62,7 @@ export default function ContactUs({
         spacing={8}
         textAlign="center"
         bg="white"
-        py={16}
+        py={{ lg: 16 }}
         justify="center" // Ensures content is centered vertically
         align="center" // Ensures content is centered horizontally
         minHeight="100vh" // Make sure it takes up full height for vertical centering
@@ -103,7 +103,7 @@ export default function ContactUs({
             shadow="2xl"
             h="auto" // Adjust the height to auto so it expands based on the content
             width="100%"
-            maxW={{ base: "100%", sm: "80%", md: "100%" }}
+            maxW={{ base: "100%", sm: "100%", md: "100%" }}
             id="contact-form"
             whileHover={{ scale: 1.02 }}
             transition={{ duration: 0.5 }}>

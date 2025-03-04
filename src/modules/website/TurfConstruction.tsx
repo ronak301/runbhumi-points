@@ -13,7 +13,7 @@ const TurfConstruction = () => {
         {/* Text Section */}
         <VStack align="start" spacing={4}>
           <Text fontSize="3xl" fontWeight="bold" color="gray.800">
-            Leading Turf Construction Experts in India
+            Why should you choose turfwale ?
           </Text>
           <Text color="gray.600" fontSize="lg">
             We specialize in designing and building high-quality sports turfs
