@@ -9,7 +9,11 @@ const FloatingButtons = () => {
         window.location.href = "tel:+6377478355"; // Replace with your phone number
         break;
       case "whatsapp":
-        window.location.href = "https://wa.me/6377478355"; // Replace with your WhatsApp number
+        const phoneNumber = "6377478355"; // Replace with your WhatsApp number
+        const message = encodeURIComponent(
+          "Hi, I would like to know more information about - Turf Construction - Turfwale - https://www.turfwale.com/"
+        );
+        window.location.href = `https://wa.me/${phoneNumber}?text=${message}`;
         break;
       case "instagram":
         window.location.href =

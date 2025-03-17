@@ -1157,10 +1157,10 @@
   resolved "https://registry.npmjs.org/@chakra-ui/anatomy/-/anatomy-2.2.2.tgz"
   integrity sha512-MV6D4VLRIHr4PkW4zMyqfrNS1mPlCTiCXwvYGtDFQYr+xHFfonhAuf9WjsSc0nyp2m0OdkSLnzmVKkZFLo25Tg==
 
-"@chakra-ui/anatomy@2.3.5":
-  version "2.3.5"
-  resolved "https://registry.npmjs.org/@chakra-ui/anatomy/-/anatomy-2.3.5.tgz"
-  integrity sha512-3im33cUOxCbISjaBlINE2u8BOwJSCdzpjCX0H+0JxK2xz26UaVA5xeI3NYHUoxDnr/QIrgfrllGxS0szYwOcyg==
+"@chakra-ui/anatomy@2.3.6":
+  version "2.3.6"
+  resolved "https://registry.npmjs.org/@chakra-ui/anatomy/-/anatomy-2.3.6.tgz"
+  integrity sha512-TjmjyQouIZzha/l8JxdBZN1pKZTj7sLpJ0YkFnQFyqHcbfWggW9jKWzY1E0VBnhtFz/xF3KC6UAVuZVSJx+y0g==
 
 "@chakra-ui/color-mode@2.2.0":
   version "2.2.0"
@@ -1169,12 +1169,12 @@
   dependencies:
     "@chakra-ui/react-use-safe-layout-effect" "2.1.0"
 
-"@chakra-ui/hooks@2.4.3":
-  version "2.4.3"
-  resolved "https://registry.npmjs.org/@chakra-ui/hooks/-/hooks-2.4.3.tgz"
-  integrity sha512-Sr2zsoTZw3p7HbrUy4aLpTIkE2XXUelAUgg3NGwMzrmx75bE0qVyiuuTFOuyEzGxYVV2Fe8QtcKKilm6RwzTGg==
+"@chakra-ui/hooks@2.4.4":
+  version "2.4.4"
+  resolved "https://registry.npmjs.org/@chakra-ui/hooks/-/hooks-2.4.4.tgz"
+  integrity sha512-+gMwLIkabtddIL/GICU7JmnYtvfONP+fNiTfdYLV9/I1eyCz8igKgLmFJOGM6F+BpUev6hh+/+DX5ezGQ9VTbQ==
   dependencies:
-    "@chakra-ui/utils" "2.2.3"
+    "@chakra-ui/utils" "2.2.4"
     "@zag-js/element-size" "0.31.1"
     copy-to-clipboard "3.3.3"
     framesync "6.1.2"
@@ -1210,15 +1210,15 @@
   dependencies:
     "@chakra-ui/utils" "2.0.15"
 
-"@chakra-ui/react@^2.10.5":
-  version "2.10.5"
-  resolved "https://registry.npmjs.org/@chakra-ui/react/-/react-2.10.5.tgz"
-  integrity sha512-wCetfxT1iXWNmAwSLF1d0zyTQOQYswA3YJcw05grY1XEngO6956PScRB0Or5ZQJ6rGMcz5pcUhVgrb3q7AE+gQ==
+"@chakra-ui/react@^2.10.6":
+  version "2.10.6"
+  resolved "https://registry.npmjs.org/@chakra-ui/react/-/react-2.10.6.tgz"
+  integrity sha512-9cdzcUR3LV3E2as0QhZhHAH5qjbyspV12kU1E1Ibcv6/uKUi6bIfPfMSC6R/Tw8Beqhn2ClJFPqjtXzL+C0knQ==
   dependencies:
-    "@chakra-ui/hooks" "2.4.3"
-    "@chakra-ui/styled-system" "2.12.1"
-    "@chakra-ui/theme" "3.4.7"
-    "@chakra-ui/utils" "2.2.3"
+    "@chakra-ui/hooks" "2.4.4"
+    "@chakra-ui/styled-system" "2.12.2"
+    "@chakra-ui/theme" "3.4.8"
+    "@chakra-ui/utils" "2.2.4"
     "@popperjs/core" "^2.11.8"
     "@zag-js/focus-visible" "^0.31.1"
     aria-hidden "^1.2.3"
@@ -1231,12 +1231,12 @@
   resolved "https://registry.npmjs.org/@chakra-ui/shared-utils/-/shared-utils-2.0.5.tgz"
   integrity sha512-4/Wur0FqDov7Y0nCXl7HbHzCg4aq86h+SXdoUeuCMD3dSj7dpsVnStLYhng1vxvlbUnLpdF4oz5Myt3i/a7N3Q==
 
-"@chakra-ui/styled-system@2.12.1":
-  version "2.12.1"
-  resolved "https://registry.npmjs.org/@chakra-ui/styled-system/-/styled-system-2.12.1.tgz"
-  integrity sha512-DQph1nDiCPtgze7nDe0a36530ByXb5VpPosKGyWMvKocVeZJcDtYG6XM0+V5a0wKuFBXsViBBRIFUTiUesJAcg==
+"@chakra-ui/styled-system@2.12.2":
+  version "2.12.2"
+  resolved "https://registry.npmjs.org/@chakra-ui/styled-system/-/styled-system-2.12.2.tgz"
+  integrity sha512-BlQ7i3+GYC0S0c72B+paa0sYo+QeNSMfz6fwQRFsc8A5Aax9i9lSdRL+vwJVC+k6r/0HWfRwk016R2RD2ihEwQ==
   dependencies:
-    "@chakra-ui/utils" "2.2.3"
+    "@chakra-ui/utils" "2.2.4"
     csstype "^3.1.2"
 
 "@chakra-ui/styled-system@2.9.2":
@@ -1270,13 +1270,13 @@
     "@chakra-ui/shared-utils" "2.0.5"
     color2k "^2.0.2"
 
-"@chakra-ui/theme-tools@2.2.7":
-  version "2.2.7"
-  resolved "https://registry.npmjs.org/@chakra-ui/theme-tools/-/theme-tools-2.2.7.tgz"
-  integrity sha512-K/VJd0QcnKik7m+qZTkggqNLep6+MPUu8IP5TUpHsnSM5R/RVjsJIR7gO8IZVAIMIGLLTIhGshHxeMekqv6LcQ==
+"@chakra-ui/theme-tools@2.2.8":
+  version "2.2.8"
+  resolved "https://registry.npmjs.org/@chakra-ui/theme-tools/-/theme-tools-2.2.8.tgz"
+  integrity sha512-X2i2qgkG+k3DQfh/adn3zzM4Ty8QrGobVPjMl9rMrEYq3ac+pur6KVdVHy/SwwoPvB6S4i84uq7y35+KbJan9g==
   dependencies:
-    "@chakra-ui/anatomy" "2.3.5"
-    "@chakra-ui/utils" "2.2.3"
+    "@chakra-ui/anatomy" "2.3.6"
+    "@chakra-ui/utils" "2.2.4"
     color2k "^2.0.2"
 
 "@chakra-ui/theme-utils@2.0.21":
@@ -1298,14 +1298,14 @@
     "@chakra-ui/shared-utils" "2.0.5"
     "@chakra-ui/theme-tools" "2.1.2"
 
-"@chakra-ui/theme@3.4.7":
-  version "3.4.7"
-  resolved "https://registry.npmjs.org/@chakra-ui/theme/-/theme-3.4.7.tgz"
-  integrity sha512-pfewthgZTFNUYeUwGvhPQO/FTIyf375cFV1AT8N1y0aJiw4KDe7YTGm7p0aFy4AwAjH2ydMgeEx/lua4tx8qyQ==
+"@chakra-ui/theme@3.4.8":
+  version "3.4.8"
+  resolved "https://registry.npmjs.org/@chakra-ui/theme/-/theme-3.4.8.tgz"
+  integrity sha512-ZLMP2Gek38ZTIlj+sMZLsd1TW27yVdmUKMfBmjsr1psAeOa5bDBLKDszICjhEqk7gAbiWB7jr1/HzBXid4kduQ==
   dependencies:
-    "@chakra-ui/anatomy" "2.3.5"
-    "@chakra-ui/theme-tools" "2.2.7"
-    "@chakra-ui/utils" "2.2.3"
+    "@chakra-ui/anatomy" "2.3.6"
+    "@chakra-ui/theme-tools" "2.2.8"
+    "@chakra-ui/utils" "2.2.4"
 
 "@chakra-ui/utils@2.0.15":
   version "2.0.15"
@@ -1317,10 +1317,10 @@
     framesync "6.1.2"
     lodash.mergewith "4.6.2"
 
-"@chakra-ui/utils@2.2.3":
-  version "2.2.3"
-  resolved "https://registry.npmjs.org/@chakra-ui/utils/-/utils-2.2.3.tgz"
-  integrity sha512-cldoCQuexZ6e07/9hWHKD4l1QXXlM1Nax9tuQOBvVf/EgwNZt3nZu8zZRDFlhAOKCTQDkmpLTTu+eXXjChNQOw==
+"@chakra-ui/utils@2.2.4":
+  version "2.2.4"
+  resolved "https://registry.npmjs.org/@chakra-ui/utils/-/utils-2.2.4.tgz"
+  integrity sha512-nRpR9SnX7aLcJx7lKu8kgQWxdJso1oR/78HcBI+mzidvWdTykbTGdm5Q2R7S0PVH1IFBzBTgi6TiAjHvu96auA==
   dependencies:
     "@types/lodash.mergewith" "4.6.9"
     lodash.mergewith "4.6.2"
@@ -2943,6 +2943,13 @@
   version "19.0.3"
   resolved "https://registry.npmjs.org/@types/react-dom/-/react-dom-19.0.3.tgz"
   integrity sha512-0Knk+HJiMP/qOZgMyNFamlIjw9OFCsyC2ZbigmEEyXXixgre6IQpm/4V+r3qH4GC1JPvRJKInw+on2rV6YZLeA==
+
+"@types/react-google-recaptcha@^2.1.9":
+  version "2.1.9"
+  resolved "https://registry.npmjs.org/@types/react-google-recaptcha/-/react-google-recaptcha-2.1.9.tgz"
+  integrity sha512-nT31LrBDuoSZJN4QuwtQSF3O89FVHC4jLhM+NtKEmVF5R1e8OY0Jo4//x2Yapn2aNHguwgX5doAq8Zo+Ehd0ug==
+  dependencies:
+    "@types/react" "*"
 
 "@types/react-helmet@^6.1.11":
   version "6.1.11"
@@ -6181,7 +6188,7 @@ he@^1.2.0:
   resolved "https://registry.npmjs.org/he/-/he-1.2.0.tgz"
   integrity sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==
 
-hoist-non-react-statics@^3.3.1:
+hoist-non-react-statics@^3.3.0, hoist-non-react-statics@^3.3.1:
   version "3.3.2"
   resolved "https://registry.npmjs.org/hoist-non-react-statics/-/hoist-non-react-statics-3.3.2.tgz"
   integrity sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==
@@ -9387,7 +9394,7 @@ prompts@^2.0.1, prompts@^2.4.2:
     kleur "^3.0.3"
     sisteransi "^1.0.5"
 
-prop-types@^15.6.2, prop-types@^15.7.2, prop-types@^15.8.1:
+prop-types@^15.5.0, prop-types@^15.6.2, prop-types@^15.7.2, prop-types@^15.8.1:
   version "15.8.1"
   resolved "https://registry.npmjs.org/prop-types/-/prop-types-15.8.1.tgz"
   integrity sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==
@@ -9505,6 +9512,14 @@ react-app-polyfill@^3.0.0:
     regenerator-runtime "^0.13.9"
     whatwg-fetch "^3.6.2"
 
+react-async-script@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.npmjs.org/react-async-script/-/react-async-script-1.2.0.tgz"
+  integrity sha512-bCpkbm9JiAuMGhkqoAiC0lLkb40DJ0HOEJIku+9JDjxX3Rcs+ztEOG13wbrOskt3n2DTrjshhaQ/iay+SnGg5Q==
+  dependencies:
+    hoist-non-react-statics "^3.3.0"
+    prop-types "^15.5.0"
+
 react-clientside-effect@^1.2.6:
   version "1.2.7"
   resolved "https://registry.npmjs.org/react-clientside-effect/-/react-clientside-effect-1.2.7.tgz"
@@ -9572,6 +9587,14 @@ react-focus-lock@^2.9.6:
     use-callback-ref "^1.3.2"
     use-sidecar "^1.1.2"
 
+react-google-recaptcha@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.npmjs.org/react-google-recaptcha/-/react-google-recaptcha-3.1.0.tgz"
+  integrity sha512-cYW2/DWas8nEKZGD7SCu9BSuVz8iOcOLHChHyi7upUuVhkpkhYG/6N3KDiTQ3XAiZ2UAZkfvYKMfAHOzBOcGEg==
+  dependencies:
+    prop-types "^15.5.0"
+    react-async-script "^1.2.0"
+
 react-helmet@^6.1.0:
   version "6.1.0"
   resolved "https://registry.npmjs.org/react-helmet/-/react-helmet-6.1.0.tgz"
@@ -9623,6 +9646,11 @@ react-mobile-share@^1.0.30:
   version "1.0.30"
   resolved "https://registry.npmjs.org/react-mobile-share/-/react-mobile-share-1.0.30.tgz"
   integrity sha512-mP5UxJ1m3cRSbmidR0sB/y470sBSeX9Wuf9uL6cFrFypWQt+zca00IT6j1s9UQ9FzPqCTZSkYGVS3EsOwrGTCQ==
+
+react-parallax@^3.5.1:
+  version "3.5.1"
+  resolved "https://registry.npmjs.org/react-parallax/-/react-parallax-3.5.1.tgz"
+  integrity sha512-p5zPsPsqELlIOGaPS01O0IRx8R2bxcBAtrdF/RHf9nIxxk5hijbM2y89tk4rJQBcNH6ESSLe7J2NV4/ms7FLFw==
 
 react-refresh@^0.11.0:
   version "0.11.0"
