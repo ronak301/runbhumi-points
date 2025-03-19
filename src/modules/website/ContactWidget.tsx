@@ -18,26 +18,38 @@ export default function ContactWidget() {
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
-    if (!captchaValue) {
-      setFormStatus("Please verify the CAPTCHA");
-      return;
-    }
+    // if (!captchaValue) {
+    //   setFormStatus("Please verify the CAPTCHA");
+    //   return;
+    // }
 
     setIsSubmitting(true);
     setFormStatus("");
 
-    const formData = new FormData(event.target);
+    const formData = new FormData(event.currentTarget);
+    const jsonData: Record<string, string> = {};
+    formData.forEach((value, key) => {
+      jsonData[key] = value as string;
+    });
+
+    console.log("jsonData", jsonData);
 
     try {
-      await fetch("https://formspree.io/f/mzzzlydl", {
+      const res = await fetch("https://formspree.io/f/mzzzlydl", {
         method: "POST",
-        body: formData,
+        body: JSON.stringify({
+          ...jsonData,
+        }),
         headers: { "Content-Type": "application/json" },
       });
 
-      setFormStatus("Thank you! Your message has been submitted.");
-      event.target.reset();
-      setCaptchaValue(null);
+      if (res.ok) {
+        setFormStatus("Thank you! Your message has been submitted.");
+        event.target.reset();
+        setCaptchaValue(null);
+      } else {
+        setFormStatus("Submission failed. Please try again.");
+      }
     } catch (error) {
       setFormStatus("Network error. Please try again later.");
     } finally {
@@ -47,14 +59,14 @@ export default function ContactWidget() {
   };
 
   // Responsive font sizes
-  const headingSize = useBreakpointValue({ base: "lg", md: "lg" });
+  const headingSize = useBreakpointValue({ base: "md", md: "md" });
   const textSize = useBreakpointValue({ base: "sm", md: "md" });
 
   return (
     <Container
-      maxW={{ base: "90%", md: "md" }}
+      maxW={{ base: "100%", md: "md" }}
       bg="white"
-      p={{ base: 4, md: 6 }}
+      p={{ base: 3, md: 6 }}
       boxShadow="xl"
       borderRadius="lg">
       <Heading
@@ -63,9 +75,9 @@ export default function ContactWidget() {
         textAlign="center"
         bg="green.500"
         color="white"
-        p={{ base: 3, md: 4 }}
-        borderRadius="md">
-        PLANNING TO MAKE A SPORTS INFRASTRUCTURE?
+        borderRadius={"sm"}
+        p={{ base: 4, md: 4 }}>
+        Planning to make a Sports Infrastructure?
       </Heading>
       <Text
         textAlign="center"
@@ -73,7 +85,7 @@ export default function ContactWidget() {
         fontStyle="italic"
         color="gray.600"
         fontSize={textSize}>
-        CONNECT WITH US FOR MORE DETAILS
+        Connect with us for more details
       </Text>
       <form onSubmit={handleSubmit}>
         <VStack spacing={{ base: 3, md: 4 }} mt={4}>
@@ -100,19 +112,20 @@ export default function ContactWidget() {
             required
             color="black"
           />
-          <Box transform="scale(0.9)">
+          {/* <Box transform="scale(0.9)">
             <ReCAPTCHA
               sitekey="6LdVOvkqAAAAAJV7bA7rPDgbVLKpoeoRkSo5QxoR"
               onChange={setCaptchaValue}
             />
-          </Box>
+          </Box> */}
           <Button
             type="submit"
             colorScheme="green"
             isLoading={isSubmitting}
             w="full"
             fontSize={textSize}
-            py={{ base: 3, md: 4 }}>
+            mt={4}
+            py={{ base: 6, md: 6 }}>
             Submit
           </Button>
           {formStatus && (

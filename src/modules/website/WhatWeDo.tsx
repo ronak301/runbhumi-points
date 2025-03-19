@@ -8,12 +8,12 @@ import {
 } from "react-icons/fa";
 
 const services = [
-  { title: "CRICKET TURF", image: "/images/cricket_turf.jpeg" },
+  { title: "CRICKET TURF", image: "/images/cricket_turf.webp" },
   { title: "PICKLE BALL COURT", image: "/images/pickleball.jpg" },
-  { title: "FOOTBALL TURF", image: "/images/football_turf.png" },
+  { title: "FOOTBALL TURF", image: "/images/football_turf.webp" },
   { title: "BADMINTON COURT", image: "/images/badminton_court.webp" },
   { title: "MULTISPORT TURF", image: "/images/multisport_turf.jpeg" },
-  { title: "TURF MAINTENANCE", image: "/images/turf_maintenance.png" },
+  { title: "TURF MAINTENANCE", image: "/images/turf_maintenance.webp" },
 ];
 
 const qualities = [

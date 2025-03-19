@@ -111,7 +111,7 @@ const Navbar = () => {
             borderRadius={"md"}
             spacing={4}
             align="stretch"
-            backgroundColor="rgba(0,0,0,0.5)"
+            backgroundColor="rgba(0,0,0,0.9)"
             py={4}>
             <Link href="/" _hover={{ textDecoration: "none" }}>
               <Button w="full" variant="ghost" color="white">

@@ -1,5 +1,6 @@
 import { Box, Grid, Text, VStack, Button, Image } from "@chakra-ui/react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 const MotionImage = motion(Image);
 
@@ -26,9 +27,11 @@ const TurfConstruction = () => {
             precise engineering, and expert maintenance services to keep your
             turf in top condition year-round.
           </Text>
-          <Button colorScheme="green" size="lg">
-            Explore Our Work
-          </Button>
+          <Link to="/projects">
+            <Button colorScheme="green" size="lg">
+              Explore Our Work
+            </Button>
+          </Link>
         </VStack>
 
         {/* Image Section with Animation */}

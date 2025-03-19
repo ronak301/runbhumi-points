@@ -7,6 +7,7 @@ import {
 } from "@chakra-ui/react";
 import { Link } from "react-scroll";
 import ContactWidget from "./ContactWidget";
+import React from "react";
 
 export default function Hero() {
   // Select the video source based on screen size
@@ -17,6 +18,12 @@ export default function Hero() {
 
   // Check if it's mobile view
   const isMobile = useBreakpointValue({ base: true, md: false });
+
+  const [videoLoaded, setVideoLoaded] = React.useState(false);
+
+  React.useEffect(() => {
+    setTimeout(() => setVideoLoaded(true), 100); // Delay by 2 sec
+  }, []);
 
   return (
     <Box
@@ -29,24 +36,26 @@ export default function Hero() {
       textAlign="center"
       color="white"
       overflow="hidden">
-      {/* Background Video */}
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          zIndex: -1,
-        }}>
-        <source src={videoSrc} type="video/mp4" />
-        Your browser does not support the video tag.
-      </video>
+      {videoLoaded ? (
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          poster="/images/cricket_turf.webp" // Add a lightweight static image
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            zIndex: -1,
+          }}>
+          <source src={videoSrc} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      ) : null}
 
       {/* Overlay */}
       <Box
@@ -61,15 +70,15 @@ export default function Hero() {
 
       {/* Mobile View: SEO Optimized Text & Contact Widget */}
       {isMobile ? (
-        <Box position="relative" zIndex={2} px={6} textAlign="center" pb={32}>
+        <Box position="relative" zIndex={2} px={4} textAlign="center" pb={32}>
           <Heading
             as="h1"
             color="white"
-            fontSize="2xl"
+            fontSize={{ base: "3xl", md: "5xl" }}
             fontWeight="bold"
-            mb={4}
-            style={{ fontFamily: "Sora, sans-serif" }}>
-            India's Leading Cricket Turf Construction Experts!
+            mt={12}
+            mb={12}>
+            India's Leading Sports Infra Construction Experts!
           </Heading>
           <ContactWidget />
         </Box>

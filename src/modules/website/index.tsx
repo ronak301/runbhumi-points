@@ -1,27 +1,28 @@
 import { Box, ChakraProvider } from "@chakra-ui/react";
-
-import About from "./About";
-import ContactUs from "./ContactUs";
-import Features from "./Features";
-import Gallery from "./Gallery";
-import Hero from "./Hero";
-import Testimonials from "./Testimonials";
-import Faq from "./Faq";
-import WhatWeDo from "./WhatWeDo";
-import TurfConstruction from "./TurfConstruction";
+import { lazy, Suspense } from "react";
+import Hero from "./Hero"; // Load Hero immediately
+const WhatWeDo = lazy(() => import("./WhatWeDo"));
+const TurfConstruction = lazy(() => import("./TurfConstruction"));
+const Gallery = lazy(() => import("./Gallery"));
+const Testimonials = lazy(() => import("./Testimonials"));
+const Faq = lazy(() => import("./Faq"));
+const ContactUs = lazy(() => import("./ContactUs"));
 
 const Website = () => {
   return (
     <Box>
+      {/* Hero section loads immediately */}
       <Hero />
-      <WhatWeDo />
-      {/* <About /> */}
-      {/* <Features /> */}
-      <TurfConstruction />
-      <Gallery />
-      <Testimonials />
-      <Faq />
-      <ContactUs />
+
+      {/* Lazy load the rest */}
+      <Suspense fallback={<div>Loading...</div>}>
+        <WhatWeDo />
+        <TurfConstruction />
+        <Gallery />
+        <Testimonials />
+        <Faq />
+        <ContactUs />
+      </Suspense>
     </Box>
   );
 };
