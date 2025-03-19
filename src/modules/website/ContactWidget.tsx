@@ -6,6 +6,7 @@ import {
   Text,
   VStack,
   Container,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
@@ -45,15 +46,24 @@ export default function ContactWidget() {
     }
   };
 
+  // Responsive font sizes
+  const headingSize = useBreakpointValue({ base: "lg", md: "lg" });
+  const textSize = useBreakpointValue({ base: "sm", md: "md" });
+
   return (
-    <Container maxW="md" bg="white" p={6} boxShadow="xl" borderRadius="lg">
+    <Container
+      maxW={{ base: "90%", md: "md" }}
+      bg="white"
+      p={{ base: 4, md: 6 }}
+      boxShadow="xl"
+      borderRadius="lg">
       <Heading
         as="h3"
-        size="md"
+        size={headingSize}
         textAlign="center"
         bg="green.500"
         color="white"
-        p={4}
+        p={{ base: 3, md: 4 }}
         borderRadius="md">
         PLANNING TO MAKE A SPORTS INFRASTRUCTURE?
       </Heading>
@@ -61,14 +71,21 @@ export default function ContactWidget() {
         textAlign="center"
         mt={2}
         fontStyle="italic"
-        color="grey"
-        fontSize={16}>
+        color="gray.600"
+        fontSize={textSize}>
         CONNECT WITH US FOR MORE DETAILS
       </Text>
       <form onSubmit={handleSubmit}>
-        <VStack spacing={4} mt={4}>
-          <Input color="black" placeholder="Name" name="name" required />
+        <VStack spacing={{ base: 3, md: 4 }} mt={4}>
           <Input
+            fontSize={textSize}
+            color="black"
+            placeholder="Name"
+            name="name"
+            required
+          />
+          <Input
+            fontSize={textSize}
             placeholder="Phone"
             name="phone"
             type="tel"
@@ -77,24 +94,30 @@ export default function ContactWidget() {
             color="black"
           />
           <Input
+            fontSize={textSize}
             placeholder="Enter state and country"
             name="location"
             required
             color="black"
           />
-          <ReCAPTCHA
-            sitekey="6LdXUfYqAAAAADXwyQTRcLIZ-FTU4JMiUlpsKbuD"
-            onChange={setCaptchaValue}
-          />
+          <Box transform="scale(0.9)">
+            <ReCAPTCHA
+              sitekey="6LdVOvkqAAAAAJV7bA7rPDgbVLKpoeoRkSo5QxoR"
+              onChange={setCaptchaValue}
+            />
+          </Box>
           <Button
             type="submit"
             colorScheme="green"
             isLoading={isSubmitting}
-            w="full">
+            w="full"
+            fontSize={textSize}
+            py={{ base: 3, md: 4 }}>
             Submit
           </Button>
           {formStatus && (
             <Text
+              fontSize={textSize}
               color={formStatus.includes("error") ? "red.500" : "green.500"}>
               {formStatus}
             </Text>

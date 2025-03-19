@@ -55,13 +55,13 @@ export default function Hero() {
         left={0}
         right={0}
         bottom={0}
-        bg="blackAlpha.800" // Dark overlay for readability
+        bg="blackAlpha.700" // Dark overlay for readability
         zIndex={1}
       />
 
       {/* Mobile View: SEO Optimized Text & Contact Widget */}
       {isMobile ? (
-        <Box position="relative" zIndex={2} px={6} textAlign="center">
+        <Box position="relative" zIndex={2} px={6} textAlign="center" pb={32}>
           <Heading
             as="h1"
             color="white"
@@ -75,7 +75,12 @@ export default function Hero() {
         </Box>
       ) : (
         // Desktop View: Full Content
-        <Box display="flex" flexDirection="row" position="relative" zIndex={2}>
+        <Box
+          display="flex"
+          flexDirection="row"
+          position="relative"
+          zIndex={2}
+          alignItems={"center"}>
           <Box position="relative" zIndex={2} maxW="xl" px={6}>
             <Heading
               as="h1"
@@ -99,7 +104,7 @@ export default function Hero() {
               construction, delivering custom-built sports fields with top-notch
               quality.
             </Text>
-            <Link to="contact-form" smooth={true} duration={800} offset={-70}>
+            {/* <Link to="contact-form" smooth={true} duration={800} offset={-70}>
               <Button
                 mt={6}
                 size="lg"
@@ -110,7 +115,7 @@ export default function Hero() {
                 _hover={{ bg: "green.600" }}>
                 Get a Quote
               </Button>
-            </Link>
+            </Link> */}
           </Box>
           <Box position="relative" zIndex={2} ml={{ base: 0, md: 40 }}>
             <ContactWidget />
