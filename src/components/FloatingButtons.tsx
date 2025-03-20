@@ -35,6 +35,7 @@ const FloatingButtons = () => {
       zIndex="9999">
       <Tooltip label="https://wa.me/6377478355" placement="left">
         <IconButton
+          id="whatsapp-btn"
           aria-label="WhatsApp"
           icon={<FaWhatsapp />}
           onClick={() => handlePress("whatsapp")}
@@ -51,6 +52,7 @@ const FloatingButtons = () => {
 
       <Tooltip label="tel:+6377478355" placement="left">
         <IconButton
+          id="call-btn"
           aria-label="Call"
           icon={<FaPhone />}
           onClick={() => handlePress("call")}
@@ -67,6 +69,7 @@ const FloatingButtons = () => {
 
       <Tooltip label="https://www.instagram.com/turfwale/" placement="left">
         <IconButton
+          id="insta-btn"
           aria-label="Instagram"
           icon={<FaInstagram />}
           onClick={() => handlePress("instagram")}
