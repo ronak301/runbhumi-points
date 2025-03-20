@@ -35,6 +35,7 @@ const FloatingButtons = () => {
       zIndex="9999">
       <Tooltip label="https://wa.me/6377478355" placement="left">
         <IconButton
+          data-gtm-id="whatsapp-btn"
           id="whatsapp-btn"
           aria-label="WhatsApp"
           icon={<FaWhatsapp />}
@@ -52,6 +53,7 @@ const FloatingButtons = () => {
 
       <Tooltip label="tel:+6377478355" placement="left">
         <IconButton
+          data-gtm-id="call-btn"
           id="call-btn"
           aria-label="Call"
           icon={<FaPhone />}
