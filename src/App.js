@@ -23,6 +23,13 @@ import AllBlogs from "./modules/website/Blogs/AllBlogs";
 import BlogDetail from "./modules/website/Blogs/BlogDetail";
 import CricketTurf from "./modules/website/Products/CricketTurf";
 import FootballTurf from "./modules/website/Products/FootballTurf";
+import TagManager from "react-gtm-module";
+
+const tagManagerArgs = {
+  gtmId: "GTM-5QZCQT5J",
+};
+
+TagManager.initialize(tagManagerArgs);
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);

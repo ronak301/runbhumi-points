@@ -54,7 +54,7 @@ export default function ContactWidget() {
       setFormStatus("Network error. Please try again later.");
     } finally {
       setIsSubmitting(false);
-      setTimeout(() => setFormStatus(""), 5000);
+      setTimeout(() => setFormStatus(""), 60000);
     }
   };
 
