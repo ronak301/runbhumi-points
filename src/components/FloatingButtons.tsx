@@ -9,12 +9,15 @@ declare global {
 }
 
 const FloatingButtons = () => {
-  const handlePress = (type: string) => {
-    // Push custom event with the intended id
+  const handlePress = (type: string, event: React.MouseEvent) => {
+    const target = event.currentTarget as HTMLElement; // Ensures we get the button itself
+
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({
       event: "customButtonClick",
-      buttonId: type,
+      buttonId: target.id || type, // Capturing the ID or type
+      buttonLabel: target.getAttribute("aria-label"), // Capturing the aria-label
+      buttonClass: target.className, // Capturing button classes
     });
 
     switch (type) {
