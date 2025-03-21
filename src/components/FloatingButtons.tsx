@@ -2,14 +2,27 @@ import React from "react";
 import { Box, IconButton, Tooltip } from "@chakra-ui/react";
 import { FaWhatsapp, FaPhone, FaInstagram } from "react-icons/fa";
 
+declare global {
+  interface Window {
+    dataLayer: any[];
+  }
+}
+
 const FloatingButtons = () => {
   const handlePress = (type: string) => {
+    // Push custom event with the intended id
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: "customButtonClick",
+      buttonId: type,
+    });
+
     switch (type) {
       case "call":
-        window.location.href = "tel:+6377478355"; // Replace with your phone number
+        window.location.href = "tel:+6377478355";
         break;
       case "whatsapp":
-        const phoneNumber = "6377478355"; // Replace with your WhatsApp number
+        const phoneNumber = "6377478355";
         const message = encodeURIComponent(
           "Hi, I would like to know more information about - Turf Construction - Turfwale - https://www.turfwale.com/"
         );
@@ -35,7 +48,6 @@ const FloatingButtons = () => {
       zIndex="9999">
       <Tooltip label="https://wa.me/6377478355" placement="left">
         <IconButton
-          data-gtm-id="whatsapp-btn"
           id="whatsapp-btn"
           aria-label="WhatsApp"
           icon={<FaWhatsapp />}
@@ -53,7 +65,6 @@ const FloatingButtons = () => {
 
       <Tooltip label="tel:+6377478355" placement="left">
         <IconButton
-          data-gtm-id="call-btn"
           id="call-btn"
           aria-label="Call"
           icon={<FaPhone />}
