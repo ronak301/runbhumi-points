@@ -78,7 +78,7 @@ export default function Hero() {
             fontWeight="bold"
             mt={12}
             mb={12}>
-            Indias Leading Sports Infra Construction Experts!
+            India's Leading Sports Infra Construction Experts!
           </Heading>
           <ContactWidget />
         </Box>
