@@ -9,19 +9,19 @@ import {
   useBreakpointValue,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import ReCAPTCHA from "react-google-recaptcha";
+
+declare global {
+  interface Window {
+    dataLayer: any[];
+  }
+}
 
 export default function ContactWidget() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formStatus, setFormStatus] = useState("");
-  const [captchaValue, setCaptchaValue] = useState<any>(null);
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
-    // if (!captchaValue) {
-    //   setFormStatus("Please verify the CAPTCHA");
-    //   return;
-    // }
 
     setIsSubmitting(true);
     setFormStatus("");
@@ -32,21 +32,26 @@ export default function ContactWidget() {
       jsonData[key] = value as string;
     });
 
+    // ✅ Send event to Google Tag Manager
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: "form_submit",
+      formId: "contact-form",
+      formData: jsonData, // Sends all input values to GTM
+    });
+
     console.log("jsonData", jsonData);
 
     try {
       const res = await fetch("https://formspree.io/f/mzzzlydl", {
         method: "POST",
-        body: JSON.stringify({
-          ...jsonData,
-        }),
+        body: JSON.stringify(jsonData),
         headers: { "Content-Type": "application/json" },
       });
 
       if (res.ok) {
         setFormStatus("Thank you! Your message has been submitted.");
-        event.target.reset();
-        setCaptchaValue(null);
+        event.target.reset(); // Reset form after submission
       } else {
         setFormStatus("Submission failed. Please try again.");
       }
@@ -58,7 +63,6 @@ export default function ContactWidget() {
     }
   };
 
-  // Responsive font sizes
   const headingSize = useBreakpointValue({ base: "md", md: "md" });
   const textSize = useBreakpointValue({ base: "sm", md: "md" });
 
@@ -87,7 +91,7 @@ export default function ContactWidget() {
         fontSize={textSize}>
         Connect with us for more details
       </Text>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} data-gtm-id="contact-form">
         <VStack spacing={{ base: 3, md: 4 }} mt={4}>
           <Input
             fontSize={textSize}
@@ -112,12 +116,6 @@ export default function ContactWidget() {
             required
             color="black"
           />
-          {/* <Box transform="scale(0.9)">
-            <ReCAPTCHA
-              sitekey="6LdVOvkqAAAAAJV7bA7rPDgbVLKpoeoRkSo5QxoR"
-              onChange={setCaptchaValue}
-            />
-          </Box> */}
           <Button
             type="submit"
             colorScheme="green"
@@ -125,7 +123,8 @@ export default function ContactWidget() {
             w="full"
             fontSize={textSize}
             mt={4}
-            py={{ base: 6, md: 6 }}>
+            py={{ base: 6, md: 6 }}
+            data-gtm-id="form-submit-btn">
             Submit
           </Button>
           {formStatus && (
