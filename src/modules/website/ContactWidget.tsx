@@ -50,7 +50,7 @@ export default function ContactWidget() {
       });
 
       if (res.ok) {
-        setFormStatus("Thank you! Your message has been submitted.");
+        setFormStatus("Thank you!! Your message has been submitted.");
         event.target.reset(); // Reset form after submission
       } else {
         setFormStatus("Submission failed. Please try again.");
