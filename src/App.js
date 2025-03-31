@@ -24,6 +24,7 @@ import BlogDetail from "./modules/website/Blogs/BlogDetail";
 import CricketTurf from "./modules/website/Products/CricketTurf";
 import FootballTurf from "./modules/website/Products/FootballTurf";
 import TagManager from "react-gtm-module";
+import CookieConsent from "./modules/website/CookieConsent";
 
 const tagManagerArgs = {
   gtmId: "GTM-5QZCQT5J",
@@ -55,6 +56,7 @@ const App = () => {
     <ChakraProvider theme={theme}>
       <AlertProvider>
         <Router>
+          <CookieConsent />
           <AppContent
             isAuthenticated={isAuthenticated}
             onLogout={onLogout}

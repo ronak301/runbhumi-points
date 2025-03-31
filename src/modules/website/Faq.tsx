@@ -18,23 +18,23 @@ const faqsConfig = [
   {
     question: "Is the turf business profitable?",
     answer:
-      "Yes, the turf business is highly profitable due to the increasing demand for sports infrastructure. ROI within 18-24 months if managed properly. Average revenue per hour: ₹2,500-₹5,000. Extra revenue from tournaments, coaching, sponsorships, and renting to corporates.",
+      "Yes, the turf business is highly profitable due to the increasing demand for sports infrastructure. ROI within 18-24 months if managed properly. Average revenue per hour: ₹1,000-₹2,000. Extra revenue from tournaments, coaching, sponsorships, and renting to corporates.",
   },
   {
     question: "How much investment is needed for a turf business?",
     answer:
-      "Investment depends on land ownership, turf size, and location. Approximate costs range from ₹20-50 lakh including artificial grass, base preparation, lighting, fencing, and branding.",
+      "Investment depends on land ownership, turf size, and location. Approximate costs range from ₹15-20 lakh including artificial grass, base preparation, lighting, fencing, and branding.",
   },
   {
     question:
       "What is the ROI (Return on Investment) for a sports turf business?",
     answer:
-      "The ROI on a sports turf is 18-24 months. Example: Investment ₹25 lakh, daily bookings: 6 hours/day @ ₹2,500/hr, Monthly Revenue: ₹4.5 lakh, ROI in ~1.5 years.",
+      "The ROI on a sports turf is 18-24 months. Example: Investment ₹15 lakh, daily bookings: 4 hours/day @ ₹1000/hr, Monthly Revenue: ₹1.2 lakh, ROI in ~1.5 years.",
   },
   {
     question: "Which games can be played on artificial turf?",
     answer:
-      "Most popular sports: Football, Cricket, Hockey, Tennis, Badminton, Rugby, Kabaddi, Golf, and Multi-sport training zones.",
+      "Most popular sports: Football, Cricket, Volleyball, Kabaddi and Multi-sport training zones.",
   },
   {
     question: "What is DTEX in artificial turf?",
@@ -54,7 +54,7 @@ const faqsConfig = [
   {
     question: "How can I earn money referring high-end turf clients?",
     answer:
-      "Turfwale offers a Referral Program! Earn ₹X per successful client referral. Higher payouts for stadiums, sports academies & school projects.",
+      "Turfwale offers a Referral Program! Earn ₹20K per successful client referral. Higher payouts for stadiums, sports academies & school projects.",
   },
 ];
 
