@@ -20,9 +20,9 @@ export default function ContactWidget() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formStatus, setFormStatus] = useState("");
 
-  React.useEffect(() => {
-    setFormStatus("Thank you!! Your message has been submitted.");
-  }, []);
+  // React.useEffect(() => {
+  //   setFormStatus("Thank you!! Your message has been submitted.");
+  // }, []);
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
