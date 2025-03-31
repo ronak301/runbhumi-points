@@ -89,7 +89,7 @@ export default function ContactWidget() {
         fontStyle="italic"
         color="gray.600"
         fontSize={textSize}>
-        Connect with us for more details
+        Connect! with us for more details
       </Text>
       <form onSubmit={handleSubmit} data-gtm-id="contact-form">
         <VStack spacing={{ base: 3, md: 4 }} mt={4}>
