@@ -8,7 +8,7 @@ import {
   Container,
   useBreakpointValue,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import React, { useState } from "react";
 
 declare global {
   interface Window {
@@ -19,6 +19,10 @@ declare global {
 export default function ContactWidget() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formStatus, setFormStatus] = useState("");
+
+  React.useEffect(() => {
+    setFormStatus("Thank you!! Your message has been submitted.");
+  }, []);
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
