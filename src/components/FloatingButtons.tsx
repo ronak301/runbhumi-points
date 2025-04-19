@@ -20,6 +20,8 @@ const FloatingButtons = () => {
           rel="noopener noreferrer">
           <Box
             as="button"
+            borderWidth={4}
+            borderColor={"white"}
             borderRadius="full"
             p="12px"
             bg="green.500"
@@ -41,6 +43,8 @@ const FloatingButtons = () => {
             p="12px"
             bg="blue.500"
             color="white"
+            borderWidth={4}
+            borderColor={"white"}
             boxShadow="0px 4px 10px rgba(0, 0, 255, 0.2)"
             _hover={{ bg: "blue.600", transform: "scale(1.2)" }}
             _active={{ bg: "blue.700", transform: "scale(1)" }}>
@@ -61,6 +65,8 @@ const FloatingButtons = () => {
             p="12px"
             bg="red.500"
             color="white"
+            borderWidth={4}
+            borderColor={"white"}
             boxShadow="0px 4px 10px rgba(255, 0, 0, 0.2)"
             _hover={{ bg: "red.600", transform: "scale(1.2)" }}
             _active={{ bg: "red.700", transform: "scale(1)" }}>

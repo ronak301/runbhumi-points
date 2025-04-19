@@ -58,7 +58,7 @@ export default function ContactWidget() {
       const responseText = await res.text();
 
       if (res.ok) {
-        setFormStatus("Thank you!! Your message has been submitted.");
+        setFormStatus("Thank you!! Your request has been submitted.");
         event.target.reset(); // Reset form after submission
       } else {
         setFormStatus(
@@ -135,7 +135,7 @@ export default function ContactWidget() {
             mt={4}
             py={{ base: 6, md: 6 }}
             data-gtm-id="form-submit-btn">
-            Submit
+            Get Free Consultation
           </Button>
           {formStatus && (
             <Text
