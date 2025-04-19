@@ -20,20 +20,21 @@ export default function ContactWidget() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formStatus, setFormStatus] = useState("");
 
-  // React.useEffect(() => {
-  //   setFormStatus("Thank you!! Your message has been submitted.");
-  // }, []);
+  const [formStarted, setFormStarted] = useState(false);
+  const [phoneCompleted, setPhoneCompleted] = useState(false);
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
+    event.stopPropagation(); // Prevent other event propagation
 
     setIsSubmitting(true);
     setFormStatus("");
 
     const formData = new FormData(event.currentTarget);
-    const jsonData: Record<string, string> = {};
+    const urlEncodedData = new URLSearchParams();
+
     formData.forEach((value, key) => {
-      jsonData[key] = value as string;
+      urlEncodedData.append(key, value as string);
     });
 
     // ✅ Send event to Google Tag Manager
@@ -41,29 +42,34 @@ export default function ContactWidget() {
     window.dataLayer.push({
       event: "form_submit",
       formId: "contact-form",
-      formData: jsonData, // Sends all input values to GTM
+      formData: Object.fromEntries(formData as any), // Better way for GTM
     });
 
-    console.log("jsonData", jsonData);
-
     try {
-      const res = await fetch("https://formspree.io/f/mzzzlydl", {
-        method: "POST",
-        body: JSON.stringify(jsonData),
-        headers: { "Content-Type": "application/json" },
-      });
+      const res = await fetch(
+        "https://script.google.com/macros/s/AKfycby8C6SbJ3-gY61zD_bBwP82cAj1MRKJsYduRHkKj65e5aQVXyZrVTSM6NRTTAl19MCfRw/exec",
+        {
+          method: "POST",
+          body: urlEncodedData.toString(),
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        }
+      );
+
+      const responseText = await res.text();
 
       if (res.ok) {
         setFormStatus("Thank you!! Your message has been submitted.");
         event.target.reset(); // Reset form after submission
       } else {
-        setFormStatus("Submission failed. Please try again.");
+        setFormStatus(
+          `Submission failed. Please try again. (Error: ${res.status})`
+        );
       }
     } catch (error) {
+      console.error("Form submission error:", error);
       setFormStatus("Network error. Please try again later.");
     } finally {
       setIsSubmitting(false);
-      // setTimeout(() => setFormStatus(""), 60000);
     }
   };
 

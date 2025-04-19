@@ -17,6 +17,7 @@ import { collection, query, where, getDocs } from "firebase/firestore";
 import PageHeader from "../PageHeader";
 import { db } from "../../../firebase";
 import MarkdownRenderer from "../../../MarkdownRenderer";
+import HtmlRenderer from "./HtmlRenderer";
 
 interface Blog {
   title: string;
@@ -130,6 +131,7 @@ const BlogDetail: React.FC = () => {
             ))}
           </HStack>
 
+          {/* <HtmlRenderer content={blog?.content || ""} /> */}
           <MarkdownRenderer content={blog?.content || ""} />
           {/* <Box
             mt={4}
