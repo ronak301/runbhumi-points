@@ -47,7 +47,7 @@ export default function ContactWidget() {
 
     try {
       const res = await fetch(
-        "https://script.google.com/macros/s/AKfycby8C6SbJ3-gY61zD_bBwP82cAj1MRKJsYduRHkKj65e5aQVXyZrVTSM6NRTTAl19MCfRw/exec",
+        "https://script.google.com/macros/s/AKfycbzgQOamF3xXjms-v1edcL_74cyqOTnD970EytRhjPjE5e9alGDmE40JIvcP8lU7SmZ4wg/exec",
         {
           method: "POST",
           body: urlEncodedData.toString(),
