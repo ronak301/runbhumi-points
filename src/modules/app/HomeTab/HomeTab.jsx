@@ -8,6 +8,7 @@ import {
   TabPanels,
   TabPanel,
   Icon,
+  Image,
 } from "@chakra-ui/react"; // Full import from Chakra UI
 import { useNavigate, useParams } from "react-router-dom";
 import { FaCalendarAlt, FaStar, FaUser } from "react-icons/fa";
@@ -45,6 +46,8 @@ export default function HomeTab({ onLogout }) {
     setActiveTabIndex(index); // Update active tab index when a tab is clicked
   };
 
+  const src = propertyId === "D5FfylDnU6NXlmTtPtoj" ? "/logo_3.png" : null;
+
   return (
     <Box height="100vh" display="flex" flexDirection="column">
       {/* Header */}
@@ -56,10 +59,23 @@ export default function HomeTab({ onLogout }) {
         justifyContent="space-between"
         px={6}
         boxShadow="sm">
-        <Text fontSize="lg" color="white" fontWeight="bold">
-          {property?.property?.title || "Loading..."}{" "}
-          {/* Safely access user title */}
+        {/* Logo */}
+        {src ? (
+          <Image src={src} alt="Logo" height="40px" borderRadius={999} />
+        ) : null}
+
+        {/* Title */}
+        <Text
+          fontSize="lg"
+          color="white"
+          fontWeight="bold"
+          flex="1"
+          textAlign="center">
+          {property?.property?.title || "Loading..."}
         </Text>
+
+        {/* Placeholder for spacing on the right */}
+        <Box width="40px" />
       </Box>
 
       {/* Main Content */}

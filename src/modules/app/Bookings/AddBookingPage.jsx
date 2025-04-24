@@ -16,7 +16,6 @@ import { useNavigate } from "react-router-dom";
 import SlotSelector from "./SlotSelector";
 import moment from "moment";
 import { isEmpty, map } from "lodash";
-import { getTitleFromId } from "../../../utils/utils";
 import useBookingsManager from "../hooks/useBookingsManager";
 import useCurrentProperty from "../hooks/useCurrentProperty";
 import { collection, getDocs } from "firebase/firestore";
@@ -37,7 +36,7 @@ const getBookedSlotsForDateAndPlayground = async (date, propertyId) => {
 
 export default function AddBookingPage() {
   const navigate = useNavigate();
-  const { propertyId, setInput, input } = useCurrentProperty();
+  const { propertyId, setInput, input, property } = useCurrentProperty();
   const [bookedSlots, setBookedSlots] = useState([]);
   const [slotLoading, setSlotLoading] = React.useState(true);
   const [selectedSlots, setSelectedSlots] = useState([]);
@@ -102,7 +101,7 @@ export default function AddBookingPage() {
         number: input?.number,
       },
       propertyId,
-      property: { id: propertyId, title: getTitleFromId(propertyId) },
+      property: { id: propertyId, title: property?.property?.title },
       slots: selectedSlots,
       timestamp: moment().format(),
     };

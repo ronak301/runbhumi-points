@@ -31,22 +31,32 @@ const BookingCard = ({ onComplete, booking, title, usersWithPoints }) => {
       num?.replace(/\s/g, "").slice(-10)
   );
 
+  const getFormattedTime = (time) => {
+    let [hours, minutes] = time.split(":").map(Number);
+    const suffix = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12 || 12;
+    return minutes === 0
+      ? `${hours}`
+      : `${hours}:${minutes.toString().padStart(2, "0")}`;
+  };
+
   const getSlotsInfo = (booking) => {
     const slots = booking?.slots;
-    const slotsInfo = slots.map((slot) => {
-      return slot.title;
-    });
-    const info = slotsInfo.join(", ");
+    if (!slots || slots.length === 0) return "";
 
-    const matches = [...info.matchAll(/-/g)];
-    const indexes = matches.map((match) => match.index);
-    if (indexes.length === 1) {
-      return info;
-    } else {
-      const start = indexes[0];
-      const end = indexes[indexes.length - 1];
-      return info.slice(0, start) + info.slice(end);
-    }
+    const titles = slots.map((slot) => slot.title);
+
+    // Get first and last time from all slots
+    const firstSlot = titles[0];
+    const lastSlot = titles[titles.length - 1];
+    const startTime = firstSlot.split(" - ")[0];
+    const endTime = lastSlot.split(" - ")[1];
+
+    const suffix = Number(startTime.split(":")[0]) >= 12 ? "PM" : "AM";
+
+    return `${getFormattedTime(startTime)} - ${getFormattedTime(
+      endTime
+    )} ${suffix}`;
   };
 
   const pointsAvailable = isValidPoints(linkedUser)
