@@ -33,7 +33,9 @@ export default function ContactWidget() {
     const formData = new FormData(event.currentTarget);
     const urlEncodedData = new URLSearchParams();
 
+    console.log("formData", formData);
     formData.forEach((value, key) => {
+      console.log("value", value, key);
       urlEncodedData.append(key, value as string);
     });
 
@@ -46,8 +48,9 @@ export default function ContactWidget() {
     });
 
     try {
+      console.log("urlEncodedData", urlEncodedData);
       const res = await fetch(
-        "https://script.google.com/macros/s/AKfycbybVt1lz3Fs96c-et4p7lrIImSOhKTvnIUrXRF7CndqzI5y0g5eDOX8ubSASGHt-ADC8g/exec",
+        "https://script.google.com/macros/s/AKfycbzDoPT_M9NeeY0ETAT0kmrk3csSLvAGrG-O_a7OnVk0q7WZDioU2kiTsvEEG-GAu6D0WQ/exec",
         {
           method: "POST",
           body: urlEncodedData.toString(),

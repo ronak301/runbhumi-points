@@ -13,6 +13,7 @@ function SlotSelector({
   const { property } = useCurrentProperty();
   console.log("great3", property);
   const slots = property?.slots || property?.property?.slots;
+  console.log("slots", slots);
 
   React.useEffect(() => {
     console.log("Updated bookedSlots:", bookedSlots);

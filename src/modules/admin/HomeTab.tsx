@@ -65,6 +65,8 @@ const HomeTab: React.FC = () => {
     fetchProperties();
   };
 
+  console.log("properties", properties);
+
   return (
     <Box p={6}>
       <Stack direction="row" justify="space-between" align="center" mb={4}>

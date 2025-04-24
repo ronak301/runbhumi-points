@@ -76,6 +76,7 @@ const AddPropertyForm: React.FC<any> = ({
       });
 
       // Add slots as sub-collection for this property
+      console.log("slots", slots);
       const slotsRef = collection(db, "properties", propertyRef.id, "slots");
       for (let slot of slots) {
         await addDoc(slotsRef, slot);
@@ -149,7 +150,7 @@ const AddPropertyForm: React.FC<any> = ({
           <Button colorScheme="teal" onClick={handleSubmit}>
             Add Property
           </Button>
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} ml={4}>
             Cancel
           </Button>
         </ModalFooter>

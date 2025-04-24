@@ -9,6 +9,11 @@ const featureConfig = {
     bookings: true,
     profile: true,
   },
+  D5FfylDnU6NXlmTtPtoj: {
+    points: false,
+    bookings: true,
+    profile: true,
+  },
 };
 
 export default featureConfig;

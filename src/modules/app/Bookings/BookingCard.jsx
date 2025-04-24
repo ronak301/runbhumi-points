@@ -81,6 +81,20 @@ Time Slots: ${getSlotsInfo(booking)}
 *Total Amount: Rs. ${booking?.amountSumary?.total}*
 ${advancedAmountString}
               `;
+
+      case "D5FfylDnU6NXlmTtPtoj":
+        return `
+*🏏 Booking Confirmation 🏏*
+* Satyam Sports Arena *
+Name: ${name}
+Mobile: ${num}
+Location: Gopal mill, near railway underpass
+Map: https://maps.app.goo.gl/AFJKxreJgYkEpZU57
+Date of Booking: ${moment(booking?.bookingDate).format("DD-MM-YYYY")}
+Time Slots: ${getSlotsInfo(booking)}
+*Total Amount: Rs. ${booking?.amountSumary?.total}*
+${advancedAmountString}
+              `;
       default:
         return null;
     }
