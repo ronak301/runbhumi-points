@@ -51,7 +51,7 @@ const Login = ({ onLogin }) => {
       propertyId: "D5FfylDnU6NXlmTtPtoj",
       title: "Satyam Sports Arena",
       owner: {
-        firstName: "Saurmya",
+        firstName: "Suramya",
         lastName: "Agrawal",
       },
     },
