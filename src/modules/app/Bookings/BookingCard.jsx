@@ -108,11 +108,10 @@ Time Slots: ${getSlotsInfo(booking)}
 *Total Amount: Rs. ${booking?.amountSumary?.total}*
 ${advancedAmountString}
               `;
-
       case "D5FfylDnU6NXlmTtPtoj":
         return `
 *🏏 Booking Confirmation 🏏*
-* Satyam Sports Arena *
+*Satyam Sports Arena*
 Name: ${name}
 Mobile: ${num}
 Location: Gopal mill, near railway underpass
