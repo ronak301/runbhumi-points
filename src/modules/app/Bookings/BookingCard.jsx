@@ -41,6 +41,23 @@ const BookingCard = ({ onComplete, booking, title, usersWithPoints }) => {
   };
 
   const getSlotsInfo = (booking) => {
+    if (propertyId === "iNANAwfMb6EXNtp7MRwJ") {
+      const slots = booking?.slots;
+      const slotsInfo = slots.map((slot) => {
+        return slot.title;
+      });
+      const info = slotsInfo.join(", ");
+
+      const matches = [...info.matchAll(/-/g)];
+      const indexes = matches.map((match) => match.index);
+      if (indexes.length === 1) {
+        return info;
+      } else {
+        const start = indexes[0];
+        const end = indexes[indexes.length - 1];
+        return info.slice(0, start) + info.slice(end);
+      }
+    }
     const slots = booking?.slots;
     if (!slots || slots.length === 0) return "";
 
