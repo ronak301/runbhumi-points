@@ -50,7 +50,7 @@ export default function ContactWidget() {
     try {
       console.log("urlEncodedData", urlEncodedData);
       const res = await fetch(
-        "https://script.google.com/macros/s/AKfycbzDoPT_M9NeeY0ETAT0kmrk3csSLvAGrG-O_a7OnVk0q7WZDioU2kiTsvEEG-GAu6D0WQ/exec",
+        "https://script.google.com/macros/s/AKfycbzKKrwOWU0WjQkQPUDE6pE3zGLDnKm1wAIPqo5lBmdDUS45EUBF3Ti_7GGI-Zsqa1NORQ/exec",
         {
           method: "POST",
           body: urlEncodedData.toString(),

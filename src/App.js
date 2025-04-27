@@ -56,7 +56,7 @@ const App = () => {
     <ChakraProvider theme={theme}>
       <AlertProvider>
         <Router>
-          <CookieConsent />
+          {/* <CookieConsent /> */}
           <AppContent
             isAuthenticated={isAuthenticated}
             onLogout={onLogout}
