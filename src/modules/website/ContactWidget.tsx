@@ -8,7 +8,7 @@ import {
   Container,
   useBreakpointValue,
 } from "@chakra-ui/react";
-import React, { useState } from "react";
+import { useState } from "react";
 
 declare global {
   interface Window {
@@ -20,23 +20,16 @@ export default function ContactWidget() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formStatus, setFormStatus] = useState("");
 
-  const [formStarted, setFormStarted] = useState(false);
-  const [phoneCompleted, setPhoneCompleted] = useState(false);
-
   const handleSubmit = async (event: any) => {
     event.preventDefault();
-    event.stopPropagation(); // Prevent other event propagation
 
     setIsSubmitting(true);
     setFormStatus("");
 
     const formData = new FormData(event.currentTarget);
-    const urlEncodedData = new URLSearchParams();
-
-    console.log("formData", formData);
+    const jsonData: Record<string, string> = {};
     formData.forEach((value, key) => {
-      console.log("value", value, key);
-      urlEncodedData.append(key, value as string);
+      jsonData[key] = value as string;
     });
 
     // ✅ Send event to Google Tag Manager
@@ -44,35 +37,29 @@ export default function ContactWidget() {
     window.dataLayer.push({
       event: "form_submit",
       formId: "contact-form",
-      formData: Object.fromEntries(formData as any), // Better way for GTM
+      formData: jsonData, // Sends all input values to GTM
     });
 
-    try {
-      console.log("urlEncodedData", urlEncodedData);
-      const res = await fetch(
-        "https://script.google.com/macros/s/AKfycbzKKrwOWU0WjQkQPUDE6pE3zGLDnKm1wAIPqo5lBmdDUS45EUBF3Ti_7GGI-Zsqa1NORQ/exec",
-        {
-          method: "POST",
-          body: urlEncodedData.toString(),
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        }
-      );
+    console.log("jsonData", jsonData);
 
-      const responseText = await res.text();
+    try {
+      const res = await fetch("https://formspree.io/f/mzzzlydl", {
+        method: "POST",
+        body: JSON.stringify(jsonData),
+        headers: { "Content-Type": "application/json" },
+      });
 
       if (res.ok) {
-        setFormStatus("Thank you! Your request has been submitted.");
+        setFormStatus("Thank you!! Your message has been submitted.");
         event.target.reset(); // Reset form after submission
       } else {
-        setFormStatus(
-          `Submission failed. Please try again. (Error: ${res.status})`
-        );
+        setFormStatus("Submission failed. Please try again.");
       }
     } catch (error) {
-      console.error("Form submission error:", error);
       setFormStatus("Network error. Please try again later.");
     } finally {
       setIsSubmitting(false);
+      // setTimeout(() => setFormStatus(""), 60000);
     }
   };
 
@@ -138,7 +125,7 @@ export default function ContactWidget() {
             mt={4}
             py={{ base: 6, md: 6 }}
             data-gtm-id="form-submit-btn">
-            Get Free Consultation!
+            Submit
           </Button>
           {formStatus && (
             <Text
