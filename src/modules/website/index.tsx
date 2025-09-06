@@ -21,7 +21,7 @@ const Website = () => {
         <Gallery />
         <Testimonials />
         <Faq />
-        <ContactUs />
+        {/* <ContactUs /> */}
       </Suspense>
     </Box>
   );
