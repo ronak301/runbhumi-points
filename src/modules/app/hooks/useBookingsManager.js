@@ -27,15 +27,17 @@ const useBookingsManager = () => {
   const [lastVisible, setLastVisible] = useState(null);
   const [busy, setBusy] = useState(false); // State to track if an API call is in progress
 
+  // Soonest booking first (by date asc, then by first slot time)
   const sortDataBySlots = (data) => {
     return data?.sort((a, b) => {
-      if (a?.bookingDate === b?.bookingDate) {
-        const slotA = a?.slots?.[0];
-        const slotB = b?.slots?.[0];
-        return slotA.sort - slotB?.sort;
-      } else {
-        return new Date(b?.bookingDate) - new Date(a?.bookingDate);
+      const dateA = new Date(a?.bookingDate);
+      const dateB = new Date(b?.bookingDate);
+      if (dateA.getTime() !== dateB.getTime()) {
+        return dateA - dateB;
       }
+      const slotA = a?.slots?.[0]?.sort ?? 0;
+      const slotB = b?.slots?.[0]?.sort ?? 0;
+      return slotA - slotB;
     });
   };
 
@@ -52,8 +54,8 @@ const useBookingsManager = () => {
 
       if (cacheAge < twentyFourHours) {
         console.log("Loaded bookings from cache");
-        setBookings(JSON.parse(cachedData)); // Load cached bookings if within 24 hours
-        return true; // Cache is valid, skip fetching from Firestore
+        setBookings(sortDataBySlots(JSON.parse(cachedData)));
+        return true;
       }
     }
 
@@ -102,10 +104,9 @@ const useBookingsManager = () => {
           Date.now() - cachedTimestamp < CACHE_EXPIRY_TIME;
 
         if (isCacheValid && !nextPage) {
-          // If cache is valid and it's not a pagination request, use the cache
           console.log("Serving bookings from cache");
-          setBookings(cachedBookings); // Set the state from cached data
-          setLoading(false); // Hide page loader
+          setBookings(sortDataBySlots(cachedBookings));
+          setLoading(false);
           setBusy(false);
           return;
         }
@@ -115,7 +116,7 @@ const useBookingsManager = () => {
       let bookingsQuery = query(
         collection(db, "bookings"),
         where("property.id", "==", propertyId),
-        orderBy("bookingDate", "desc"),
+        orderBy("bookingDate", "asc"),
         limit(LIMIT)
       );
 
@@ -145,12 +146,11 @@ const useBookingsManager = () => {
           return sortDataBySlots(updatedBookings); // Sort the updated list
         });
       } else {
-        // If it's the initial load, replace the bookings with the new data
-        setBookings(fetchedBookings); // Set new bookings
+        setBookings(sortDataBySlots(fetchedBookings));
       }
 
-      // Update the timestamp for cache expiry
-      localStorage.setItem("bookings", JSON.stringify(fetchedBookings)); // Cache the new data
+      const sorted = sortDataBySlots(fetchedBookings);
+      localStorage.setItem("bookings", JSON.stringify(sorted));
       localStorage.setItem("bookingsTimestamp", new Date().getTime());
 
       // Update the lastVisible document for pagination

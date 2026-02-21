@@ -31,6 +31,7 @@ export function DeleteBooking({ booking, onComplete }) {
     <>
       <Box>
         <IconButton
+          size="sm"
           onClick={() => {
             onOpen();
           }}

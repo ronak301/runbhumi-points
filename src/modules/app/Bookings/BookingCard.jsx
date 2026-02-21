@@ -155,41 +155,41 @@ ${advancedAmountString}
 
   return (
     <Box
-      boxShadow="lg"
+      boxShadow="md"
       backgroundColor={"white"}
       mt={2}
       mb={2}
-      pb={3}
-      pl={3}
-      pr={3}
+      pb={2}
+      pl={2}
+      pr={2}
+      pt={2}
       borderRadius={8}
-      pt={3}
       _hover={{
-        boxShadow: "2xl",
-        transform: "scale(1.02)",
+        boxShadow: "lg",
         transition: "all 0.2s ease",
       }}>
-      <Flex justifyContent={"space-between"} align="center">
-        <Text fontSize="lg" fontWeight="bold" color="teal.700">
+      <Flex justifyContent={"space-between"} align="center" flexWrap="wrap" gap={1}>
+        <Text fontSize="sm" fontWeight="bold" color="teal.700">
           {name}
         </Text>
-        <Flex>
-          <Text fontWeight="500" fontSize="md" px={2}>
+        <Flex flexWrap="wrap" gap={1} alignItems="center">
+          <Text fontWeight="500" fontSize="xs" px={1}>
             {getSlotsInfo(booking)}
           </Text>
-          <Text fontWeight="500" ml={2} fontSize="md" px={2}>
+          <Text fontWeight="500" fontSize="xs" px={1}>
             {moment(booking?.bookingDate).format("DD-MM-YYYY")}
           </Text>
         </Flex>
       </Flex>
-      <Text fontSize="sm" color="gray.600">
+      <Text fontSize="xs" color="gray.600">
         {num}
       </Text>
 
-      <Flex justifyContent={"space-between"} mt={4}>
+      <Flex justifyContent={"space-between"} align="center" mt={3}>
         <DeleteBooking booking={booking} onComplete={onComplete} />
         <Box>
           <IconButton
+            size="sm"
             onClick={() => {
               window.open(
                 `https://api.whatsapp.com/send/?phone=${updatedNumber}&text=${encodeURIComponent(
@@ -202,7 +202,7 @@ ${advancedAmountString}
             colorScheme="green"
             aria-label="Share"
             icon={<ExternalLinkIcon />}
-            mr={2}
+            mr={1}
           />
         </Box>
       </Flex>
