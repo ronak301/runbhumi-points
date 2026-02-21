@@ -1,7 +1,6 @@
 import React, { memo } from "react";
 import { filter, map } from "lodash";
-import { Button, Grid, Spinner, Text } from "@chakra-ui/react";
-import moment from "moment";
+import { Button, Grid, Spinner, Text, Tabs, TabList, Tab } from "@chakra-ui/react";
 import useCurrentProperty from "../hooks/useCurrentProperty";
 
 function SlotSelector({
@@ -9,10 +8,18 @@ function SlotSelector({
   selectedSlots,
   bookedSlots,
   slotLoading,
+  selectedCourt,
+  onCourtChange,
 }) {
   const { property } = useCurrentProperty();
-  console.log("great3", property);
-  const slots = property?.slots || property?.property?.slots;
+  const allSlots = property?.slots || property?.property?.slots || [];
+  const courts = property?.courts || ["court1"];
+  const isMultiCourt = courts.length > 1;
+
+  const slots = isMultiCourt
+    ? filter(allSlots, (s) => (s.courtId || "court1") === selectedCourt)
+    : allSlots;
+
   const t = property?.title || property?.property?.title;
 
   const getFormatted = (title) => {
@@ -35,32 +42,57 @@ function SlotSelector({
     }`;
   };
 
-  React.useEffect(() => {
-    console.log("Updated bookedSlots:", bookedSlots);
-  }, [bookedSlots]);
-
   const onClick = (slot) => {
     setSelectedSlots((prev) => {
-      const isSlotAlreadySelected = filter(prev, (s) => s.title === slot.title);
+      const matchSlot = (a, b) =>
+        a.title === b.title &&
+        (a.courtId || "court1") === (b.courtId || "court1");
+      const isSlotAlreadySelected = filter(prev, (s) => matchSlot(s, slot));
       if (isSlotAlreadySelected.length > 0) {
-        return filter(prev, (s) => s.title !== slot.title);
+        return filter(prev, (s) => !matchSlot(s, slot));
       } else {
         return [...prev, slot];
       }
     });
   };
 
+  const slotIsBooked = (slot, bookedSlotsList) => {
+    return filter(bookedSlotsList, (s) => {
+      const titleMatch = s.slot?.title === slot.title;
+      const courtMatch =
+        !s.courtId && !slot.courtId
+          ? true
+          : (s.courtId || "court1") === (slot.courtId || "court1");
+      return titleMatch && courtMatch;
+    });
+  };
+
   return slotLoading ? (
     <Spinner />
   ) : (
-    <Grid templateColumns="repeat(3, 1fr)" gap={4}>
-      {map(slots, (slot) => {
-        const bookedByArray = filter(
-          bookedSlots,
-          (s) => s.slot.title === slot.title
-        );
+    <>
+      {isMultiCourt && (
+        <Tabs
+          index={courts.indexOf(selectedCourt)}
+          onChange={(i) => onCourtChange?.(courts[i])}
+          mb={4}>
+          <TabList>
+            {map(courts, (courtId, i) => (
+              <Tab key={courtId}>Court {i + 1}</Tab>
+            ))}
+          </TabList>
+        </Tabs>
+      )}
+      <Grid templateColumns="repeat(3, 1fr)" gap={4}>
+        {map(slots, (slot) => {
+          const bookedByArray = slotIsBooked(slot, bookedSlots);
         const isSelected =
-          filter(selectedSlots, (s) => s.title === slot.title)?.length > 0;
+          filter(
+            selectedSlots,
+            (s) =>
+              s.title === slot.title &&
+              (s.courtId || "court1") === (slot.courtId || "court1")
+          )?.length > 0;
         const isBooked = bookedByArray?.length > 0;
         const backgroundColor = isBooked
           ? "#000"
@@ -96,7 +128,8 @@ function SlotSelector({
           </Button>
         );
       })}
-    </Grid>
+      </Grid>
+    </>
   );
 }
 

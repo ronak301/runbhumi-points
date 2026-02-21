@@ -1,4 +1,7 @@
-const featureConfig = {
+const featureConfig: Record<
+  string,
+  { points?: boolean; bookings?: boolean; profile?: boolean }
+> = {
   "4HJl3JYH5TzUeylFEHKj": {
     points: false,
     bookings: true,
@@ -10,6 +13,11 @@ const featureConfig = {
     profile: true,
   },
   D5FfylDnU6NXlmTtPtoj: {
+    points: false,
+    bookings: true,
+    profile: true,
+  },
+  "2H3Ld4uq17AeCtfXpuo0": {
     points: false,
     bookings: true,
     profile: true,

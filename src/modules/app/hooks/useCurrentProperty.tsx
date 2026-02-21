@@ -3,27 +3,6 @@ import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 import { db } from "../../../firebase";
 import moment from "moment";
 
-// Function to fetch booked slots for a given date and propertyId
-const getBookedSlotsForDateAndPlayground = async (
-  date: any,
-  propertyId: any
-) => {
-  let slots: any = [];
-
-  const slotsCollectionRef = collection(
-    db,
-    `properties/${propertyId}/bookings/${date}/bookedSlot`
-  );
-
-  const slotsQuerySnapshot = await getDocs(slotsCollectionRef);
-
-  slotsQuerySnapshot.forEach((slotDoc) => {
-    slots.push({ ...slotDoc.data(), id: slotDoc.id });
-  });
-
-  return slots;
-};
-
 const useCurrentProperty = () => {
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -86,18 +65,42 @@ const useCurrentProperty = () => {
           // Fetch the slots subcollection for this property
           const slotsRef = collection(propertyRef, "slots");
           const slotsSnapshot = await getDocs(slotsRef);
-          let slotsData = slotsSnapshot.docs.map((doc) => doc.data());
 
-          // Sort the slots by the `sort` field
-          slotsData = slotsData.sort((a, b) => a.sort - b.sort);
+          // Deduplicate slots by (courtId, title) to avoid duplicates
+          const uniqueSlotsMap = new Map<string, any>();
+          slotsSnapshot.docs.forEach((slotDoc) => {
+            const data = slotDoc.data();
+            const key = `${data.courtId || "court1"}|${data.title}`;
+            if (!uniqueSlotsMap.has(key)) {
+              uniqueSlotsMap.set(key, data);
+            }
+          });
+          let slotsData = Array.from(uniqueSlotsMap.values());
 
-          // Get the stored user data for the owner (assuming `storedUser` exists in your app)
+          // Sort by courtId then sort field
+          slotsData = slotsData.sort((a, b) => {
+            const courtA = a.courtId || "court1";
+            const courtB = b.courtId || "court1";
+            if (courtA !== courtB) return courtA.localeCompare(courtB);
+            return (a.sort || 0) - (b.sort || 0);
+          });
+
+          // Derive courts from slots (unique courtIds; empty = single court)
+          const courtIds = Array.from(
+            new Set(slotsData.map((s) => s.courtId).filter(Boolean))
+          ) as string[];
+          const courts =
+            courtIds.length > 0 ? courtIds : ["court1"];
+
+          // Get the stored user data for the owner
           const owner = storedUser.owner;
 
           // Combine property info and slots data into one object
           const fullPropertyData = {
             property: propertyData,
             owner: owner,
+            slots: slotsData,
+            courts,
           };
 
           // Cache the fetched data
@@ -106,6 +109,7 @@ const useCurrentProperty = () => {
             JSON.stringify({
               property: propertyData,
               slots: slotsData,
+              courts,
               owner: owner,
               timestamp: Date.now(),
             })

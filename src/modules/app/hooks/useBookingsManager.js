@@ -184,6 +184,7 @@ const useBookingsManager = () => {
             bookingId,
             bookingCancel: false,
             customer: booking.customer,
+            ...(slot.courtId && { courtId: slot.courtId }),
           };
 
           const propertiesRef = collection(db, "properties");

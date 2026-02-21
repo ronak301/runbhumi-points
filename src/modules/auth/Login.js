@@ -55,6 +55,16 @@ const Login = ({ onLogin }) => {
         lastName: "Agrawal",
       },
     },
+    // PickleX - 3 pickleball courts (change phone/password as needed)
+    9876543210: {
+      password: "picklex",
+      propertyId: "2H3Ld4uq17AeCtfXpuo0",
+      title: "PickleX",
+      owner: {
+        firstName: "PickleX",
+        lastName: "Admin",
+      },
+    },
   };
 
   const handleLogin = () => {

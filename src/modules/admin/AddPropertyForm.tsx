@@ -11,45 +11,55 @@ import {
   Stack,
   Box,
   Text,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
 } from "@chakra-ui/react";
 import { db } from "../../firebase"; // Firebase import
 import { addDoc, collection } from "firebase/firestore";
 
 // Function to generate 24 hours of slots, each with a 30-minute duration and increasing sort value
-const generateSlots = () => {
+// courtId optional - for multi-court properties, each court gets its own set of 48 slots
+const generateSlots = (numberOfCourts: number = 1) => {
   const slots: any[] = [];
-  let currentHour = 0; // Start from 12:00 AM (midnight)
-  let currentMinute = 0; // Start at 0 minutes
-  let sortValue = 1;
 
-  // Loop through 24 hours to create slots
-  for (let i = 0; i < 48; i++) {
-    // 48 slots (24 hours * 2 per hour)
-    const startHour = currentHour < 10 ? `0${currentHour}` : `${currentHour}`;
-    const startMinute =
-      currentMinute < 10 ? `0${currentMinute}` : `${currentMinute}`;
+  for (let courtIndex = 0; courtIndex < numberOfCourts; courtIndex++) {
+    const courtId =
+      numberOfCourts > 1 ? `court${courtIndex + 1}` : undefined;
+    let currentHour = 0;
+    let currentMinute = 0;
+    let sortValue = courtIndex * 48 + 1;
 
-    // Calculate the end time for the slot (30 minutes after start time)
-    const endMinute = currentMinute === 30 ? "00" : "30"; // Toggle between :00 and :30
-    const endHour = currentMinute === 30 ? currentHour + 1 : currentHour; // Increment hour after 30 minutes
+    for (let i = 0; i < 48; i++) {
+      const startHour = currentHour < 10 ? `0${currentHour}` : `${currentHour}`;
+      const startMinute =
+        currentMinute < 10 ? `0${currentMinute}` : `${currentMinute}`;
 
-    const slotTitle = `${startHour}:${startMinute} - ${
-      endHour < 10 ? `0${endHour}` : endHour
-    }:${endMinute}`;
+      const endMinute = currentMinute === 30 ? "00" : "30";
+      const endHour = currentMinute === 30 ? currentHour + 1 : currentHour;
 
-    slots.push({
-      title: slotTitle,
-      sort: sortValue,
-      price: 400, // Default price for each slot
-    });
+      const slotTitle = `${startHour}:${startMinute} - ${
+        endHour < 10 ? `0${endHour}` : endHour
+      }:${endMinute}`;
 
-    // Update time for next iteration
-    currentMinute = currentMinute === 0 ? 30 : 0; // Toggle between 00 and 30 minutes
-    if (currentMinute === 0) {
-      currentHour++;
+      // Default: ₹600 for 7 AM - 12 PM (peak / weekend), ₹300 for rest
+      const isPeakSlot = currentHour >= 7 && currentHour < 12;
+      const defaultPrice = isPeakSlot ? 600 : 300;
+
+      const slot: any = {
+        title: slotTitle,
+        sort: sortValue,
+        price: defaultPrice,
+      };
+      if (courtId) slot.courtId = courtId;
+      slots.push(slot);
+
+      currentMinute = currentMinute === 0 ? 30 : 0;
+      if (currentMinute === 0) currentHour++;
+      sortValue++;
     }
-
-    sortValue++; // Increment the sort value for each slot
   }
 
   return slots;
@@ -63,7 +73,14 @@ const AddPropertyForm: React.FC<any> = ({
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [imgUrl, setImgUrl] = useState("");
-  const [slots, setSlots] = useState(generateSlots()); // Call the generateSlots function to get slots
+  const [numberOfCourts, setNumberOfCourts] = useState(1);
+  const [slots, setSlots] = useState(generateSlots(1));
+
+  const handleCourtsChange = (n: number) => {
+    const num = Math.max(1, Math.min(10, n));
+    setNumberOfCourts(num);
+    setSlots(generateSlots(num));
+  };
 
   // Function to handle form submission
   const handleSubmit = async () => {
@@ -73,6 +90,7 @@ const AddPropertyForm: React.FC<any> = ({
         title,
         description,
         imgUrl,
+        numberOfCourts: numberOfCourts > 1 ? numberOfCourts : undefined,
       });
 
       // Add slots as sub-collection for this property
@@ -114,33 +132,97 @@ const AddPropertyForm: React.FC<any> = ({
               placeholder="Image URL"
             />
 
+            <Box>
+              <Text fontSize="sm" fontWeight="medium" mb={2}>
+                Number of Courts
+              </Text>
+              <NumberInput
+                min={1}
+                max={10}
+                value={numberOfCourts}
+                onChange={(_v, n) => handleCourtsChange(isNaN(n) ? 1 : n)}>
+                <NumberInputField placeholder="1" />
+                <NumberInputStepper>
+                  <NumberIncrementStepper />
+                  <NumberDecrementStepper />
+                </NumberInputStepper>
+              </NumberInput>
+              {numberOfCourts > 1 && (
+                <Text fontSize="xs" color="gray.500" mt={1}>
+                  {numberOfCourts} courts × 48 slots = {numberOfCourts * 48} total
+                  slots
+                </Text>
+              )}
+            </Box>
+
             {/* Slots Section */}
-            <Box mt={4}>
+            <Box mt={4} maxH="300px" overflowY="auto">
               <Text fontSize="lg" fontWeight="bold">
                 Slots
               </Text>
+              <Text fontSize="xs" color="gray.500" mb={2}>
+                Default: ₹600 (7AM–12PM), ₹300 (rest). Adjust per slot.
+              </Text>
               <Box mt={2}>
-                {slots.map((slot, index) => (
-                  <Box
-                    key={index}
-                    display="flex"
-                    justifyContent="space-between"
-                    mb={2}>
-                    <Text>{slot.title}</Text>
-                    <Input
-                      type="number"
-                      value={slot.price}
-                      onChange={(e) => {
-                        const updatedSlots = [...slots];
-                        updatedSlots[index].price = Number(e.target.value);
-                        console.log("updatedSlots", updatedSlots);
-                        setSlots(updatedSlots);
-                      }}
-                      placeholder="Price"
-                      width="100px"
-                    />
-                  </Box>
-                ))}
+                {numberOfCourts > 1
+                  ? Array.from({ length: numberOfCourts }, (_, i) => {
+                      const courtId = `court${i + 1}`;
+                      const courtSlots = slots.filter(
+                        (s) => (s.courtId || "court1") === courtId
+                      );
+                      return (
+                        <Box key={courtId} mb={4}>
+                          <Text fontWeight="medium" mb={2}>
+                            Court {i + 1}
+                          </Text>
+                          {courtSlots.map((slot, idx) => {
+                            const index = slots.indexOf(slot);
+                            return (
+                              <Box
+                                key={`${courtId}-${idx}`}
+                                display="flex"
+                                justifyContent="space-between"
+                                mb={2}>
+                                <Text>{slot.title}</Text>
+                                <Input
+                                  type="number"
+                                  value={slot.price}
+                                  onChange={(e) => {
+                                    const updatedSlots = [...slots];
+                                    updatedSlots[index].price = Number(
+                                      e.target.value
+                                    );
+                                    setSlots(updatedSlots);
+                                  }}
+                                  placeholder="Price"
+                                  width="100px"
+                                />
+                              </Box>
+                            );
+                          })}
+                        </Box>
+                      );
+                    })
+                  : slots.map((slot, index) => (
+                      <Box
+                        key={index}
+                        display="flex"
+                        justifyContent="space-between"
+                        mb={2}>
+                        <Text>{slot.title}</Text>
+                        <Input
+                          type="number"
+                          value={slot.price}
+                          onChange={(e) => {
+                            const updatedSlots = [...slots];
+                            updatedSlots[index].price = Number(e.target.value);
+                            setSlots(updatedSlots);
+                          }}
+                          placeholder="Price"
+                          width="100px"
+                        />
+                      </Box>
+                    ))}
               </Box>
             </Box>
           </Stack>

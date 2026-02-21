@@ -61,6 +61,11 @@ const BookingCard = ({ onComplete, booking, title, usersWithPoints }) => {
     const slots = booking?.slots;
     if (!slots || slots.length === 0) return "";
 
+    const courtId = slots[0]?.courtId;
+    const courtLabel = courtId
+      ? `Court ${courtId.replace("court", "")} • `
+      : "";
+
     const titles = slots.map((slot) => slot.title);
 
     // Get first and last time from all slots
@@ -71,7 +76,7 @@ const BookingCard = ({ onComplete, booking, title, usersWithPoints }) => {
 
     const suffix = Number(startTime.split(":")[0]) >= 12 ? "PM" : "AM";
 
-    return `${getFormattedTime(startTime)} - ${getFormattedTime(
+    return `${courtLabel}${getFormattedTime(startTime)} - ${getFormattedTime(
       endTime
     )} ${suffix}`;
   };
@@ -95,7 +100,6 @@ Time Slots: ${getSlotsInfo(booking)}
 ${advancedAmountString}
 Points Available: ${pointsAvailable}
               `;
-        break;
       case "4HJl3JYH5TzUeylFEHKj":
         return `
 *🏏${title} Booking Confirmation🏏*
@@ -121,8 +125,29 @@ Time Slots: ${getSlotsInfo(booking)}
 *Total Amount: Rs. ${booking?.amountSumary?.total}*
 ${advancedAmountString}
               `;
+      case "2H3Ld4uq17AeCtfXpuo0":
+        return `
+*🏏Booking Confirmation🏏*
+Name: ${name}
+Mobile: ${num}
+Location: 1, New Vidhya Nagar
+Near Samudayik Bhawan, BSNL Road
+Hiran Magri, Sector 4, Udaipur
+Date of Booking: ${moment(booking?.bookingDate).format("DD-MM-YYYY")}
+Time Slots: ${getSlotsInfo(booking)}
+*Total Amount: Rs. ${booking?.amountSumary?.total}*
+${advancedAmountString}
+              `;
       default:
-        return null;
+        return `
+*🏏${title} - Booking Confirmation🏏*
+Name: ${name}
+Mobile: ${num}
+Date of Booking: ${moment(booking?.bookingDate).format("DD-MM-YYYY")}
+Time Slots: ${getSlotsInfo(booking)}
+*Total Amount: Rs. ${booking?.amountSumary?.total}*
+${advancedAmountString}
+              `;
     }
   };
 

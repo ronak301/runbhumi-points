@@ -34,9 +34,26 @@ const getBookedSlotsForDateAndPlayground = async (date, propertyId) => {
   return slots;
 };
 
+// PickleX: Sat/Sun 7PM–12AM = ₹600 per half hour; else ₹300. Other properties use slot.price.
+const PICKLEX_PROPERTY_ID = "2H3Ld4uq17AeCtfXpuo0";
+const getSlotPriceForDate = (slot, dateStr, propertyId) => {
+  if (propertyId !== PICKLEX_PROPERTY_ID) {
+    return Number(slot?.price) || 300;
+  }
+  const day = new Date(dateStr).getDay();
+  const isWeekend = day === 0 || day === 6;
+  const match = (slot?.title || "").match(/^(\d{1,2}):/);
+  const hour = match ? parseInt(match[1], 10) : 0;
+  const isPeakTime = hour >= 19 && hour < 24;
+  return isWeekend && isPeakTime ? 600 : 300;
+};
+
 export default function AddBookingPage() {
   const navigate = useNavigate();
   const { propertyId, setInput, input, property } = useCurrentProperty();
+  const courts = property?.courts || ["court1"];
+  const isMultiCourt = courts.length > 1;
+  const [selectedCourt, setSelectedCourt] = useState(courts[0]);
   const [bookedSlots, setBookedSlots] = useState([]);
   const [slotLoading, setSlotLoading] = React.useState(true);
   const [selectedSlots, setSelectedSlots] = useState([]);
@@ -65,6 +82,16 @@ export default function AddBookingPage() {
     fetchBookedSlots();
   }, [input.date, propertyId]);
 
+  const filteredBookedSlots = isMultiCourt
+    ? bookedSlots.filter((s) => (s.courtId || "court1") === selectedCourt)
+    : bookedSlots;
+
+  useEffect(() => {
+    if (courts.length > 0 && !courts.includes(selectedCourt)) {
+      setSelectedCourt(courts[0]);
+    }
+  }, [courts]);
+
   useEffect(() => {
     const { name, number, date } = input;
     setIsAddBookingDisabled(
@@ -76,19 +103,23 @@ export default function AddBookingPage() {
     if (input?.totalAmount !== undefined) {
       setTotalAmount(input?.totalAmount);
     } else {
-      setTotalAmount(
-        isEmpty(selectedSlots)
-          ? 0
-          : map(selectedSlots, (slot) => slot?.price).reduce(
-              (acc, cur) => acc + cur,
-              0
-            )
-      );
+      const total = isEmpty(selectedSlots)
+        ? 0
+        : selectedSlots.reduce(
+            (acc, slot) =>
+              acc + getSlotPriceForDate(slot, input?.date || "", propertyId),
+            0
+          );
+      setTotalAmount(total);
     }
-  }, [selectedSlots, input?.totalAmount]);
+  }, [selectedSlots, input?.totalAmount, input?.date, propertyId]);
 
   const onAddBooking = async () => {
     setAdditionOrUpdationInProgress(true);
+    const slotsWithDatePrice = selectedSlots.map((slot) => ({
+      ...slot,
+      price: getSlotPriceForDate(slot, input?.date || "", propertyId),
+    }));
     const booking = {
       bookingDate: input?.date,
       amountSumary: {
@@ -102,10 +133,10 @@ export default function AddBookingPage() {
       },
       propertyId,
       property: { id: propertyId, title: property?.property?.title },
-      slots: selectedSlots,
+      slots: slotsWithDatePrice,
       timestamp: moment().format(),
     };
-    await addSlotBooking(booking, selectedSlots);
+    await addSlotBooking(booking, slotsWithDatePrice);
     setAdditionOrUpdationInProgress(false);
     navigate("/home");
   };
@@ -162,8 +193,10 @@ export default function AddBookingPage() {
             input={input}
             selectedSlots={selectedSlots}
             setSelectedSlots={setSelectedSlots}
-            bookedSlots={bookedSlots}
+            bookedSlots={filteredBookedSlots}
             slotLoading={slotLoading}
+            selectedCourt={selectedCourt}
+            onCourtChange={setSelectedCourt}
           />
 
           <FormLabel>Total Amount</FormLabel>

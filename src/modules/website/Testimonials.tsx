@@ -21,29 +21,6 @@ const testimonials = [
     image:
       "https://cdni.iconscout.com/illustration/premium/thumb/man-illustration-download-in-svg-png-gif-file-formats--portrait-beard-glasses-portraits-pack-people-illustrations-2790260.png",
   },
-  {
-    name: "Amit Sharma",
-    position: "Owner, Elite Sports Arena",
-    testimonial:
-      "Amazing experience with TurfWale. The turf quality and service were outstanding!",
-    image:
-      "https://cdn3.iconfinder.com/data/icons/business-avatar-1/512/4_avatar-512.png",
-  },
-  {
-    name: "Sneha Mehta",
-    position: "Manager, Pro Sports Hub",
-    testimonial:
-      "Highly satisfied with the professionalism and dedication of the TurfWale team.",
-    image:
-      "https://cdn3.iconfinder.com/data/icons/business-avatar-1/512/3_avatar-512.png",
-  },
-  {
-    name: "Rohan Verma",
-    position: "CEO, ActivePlay Arena",
-    testimonial:
-      "Great experience! The turf is durable and perfect for high-intensity sports.",
-    image: "https://cdn-icons-png.flaticon.com/512/147/147144.png",
-  },
 ];
 
 const Testimonials = () => {
