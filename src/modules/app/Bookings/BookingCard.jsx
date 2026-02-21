@@ -127,7 +127,7 @@ ${advancedAmountString}
               `;
       case "2H3Ld4uq17AeCtfXpuo0":
         return `
-*🏏Booking Confirmation🏏*
+*🏏${title} Booking Confirmation🏏*
 Name: ${name}
 Mobile: ${num}
 Location: 1, New Vidhya Nagar
@@ -168,7 +168,11 @@ ${advancedAmountString}
         boxShadow: "lg",
         transition: "all 0.2s ease",
       }}>
-      <Flex justifyContent={"space-between"} align="center" flexWrap="wrap" gap={1}>
+      <Flex
+        justifyContent={"space-between"}
+        align="center"
+        flexWrap="wrap"
+        gap={1}>
         <Text fontSize="sm" fontWeight="bold" color="teal.700">
           {name}
         </Text>
