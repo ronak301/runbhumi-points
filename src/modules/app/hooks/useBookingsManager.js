@@ -27,96 +27,55 @@ const useBookingsManager = () => {
   const [lastVisible, setLastVisible] = useState(null);
   const [busy, setBusy] = useState(false); // State to track if an API call is in progress
 
-  // Soonest booking first (by date asc, then by first slot time)
+  // Next/upcoming booking first: date desc (today & recent first), then earliest slot in day first.
   const sortDataBySlots = (data) => {
-    return data?.sort((a, b) => {
+    const list = Array.isArray(data) ? [...data] : [];
+    return list.sort((a, b) => {
       const dateA = new Date(a?.bookingDate);
       const dateB = new Date(b?.bookingDate);
       if (dateA.getTime() !== dateB.getTime()) {
-        return dateA - dateB;
+        return dateB - dateA; // newer date first (21 Feb before 7 Feb)
       }
       const slotA = a?.slots?.[0]?.sort ?? 0;
       const slotB = b?.slots?.[0]?.sort ?? 0;
-      return slotA - slotB;
+      return slotA - slotB; // same day: earlier slot first
     });
   };
 
-  // Function to load bookings from cache
-  const loadBookingsFromCache = () => {
-    const cachedData = localStorage.getItem("bookings");
-    const cachedTimestamp = localStorage.getItem("bookingsTimestamp");
-    const currentTime = new Date().getTime();
-
-    // Check if cache is available and is not older than 24 hours
-    if (cachedData && cachedTimestamp) {
-      const cacheAge = currentTime - cachedTimestamp;
-      const twentyFourHours = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-
-      if (cacheAge < twentyFourHours) {
-        console.log("Loaded bookings from cache");
-        setBookings(sortDataBySlots(JSON.parse(cachedData)));
-        return true;
-      }
-    }
-
-    console.log("Cache expired or not found, fetching from network...");
-    return false; // Cache expired or not available, need to fetch from Firestore
-  };
-
-  // Load initial bookings from cache or Firestore
+  // Always fetch fresh when propertyId is set or changes (e.g. different login)
   useEffect(() => {
-    // Try loading from cache first
-    const cacheLoaded = loadBookingsFromCache();
-
-    if (!cacheLoaded) {
-      fetchBookings(); // If cache expired or not present, fetch from Firestore
+    if (!propertyId) {
+      setBookings([]);
+      setLastVisible(null);
+      return;
     }
-  }, []);
+    setLastVisible(null);
+    fetchBookings();
+  }, [propertyId]);
 
-  const fetchBookings = async (nextPage = false, forceFetch = false) => {
-    if (busy) return; // Prevent any further calls if an API call is in progress
-    setBusy(true); // Set to true to indicate that a request is ongoing
+  const fetchBookings = async (nextPage = false) => {
+    if (busy) return;
+    setBusy(true);
 
-    // Differentiate between initial load and pagination
     if (!nextPage) {
-      setLoading(true); // Show page loader for the initial load
+      setLoading(true);
     } else {
-      setPaginationLoading(true); // Show pagination loader for additional data
+      setPaginationLoading(true);
     }
 
     setError(null);
-
-    const CACHE_EXPIRY_TIME = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
     try {
       if (!propertyId) {
         throw new Error("Property ID is required");
       }
 
-      // Skip cache and force data fetch if forceFetch is true
-      if (!forceFetch) {
-        // Check if cached data is available and if it's still valid (within 24 hours)
-        const cachedBookings = JSON.parse(localStorage.getItem("bookings"));
-        const cachedTimestamp = localStorage.getItem("bookingsTimestamp");
-        const isCacheValid =
-          cachedBookings &&
-          cachedTimestamp &&
-          Date.now() - cachedTimestamp < CACHE_EXPIRY_TIME;
-
-        if (isCacheValid && !nextPage) {
-          console.log("Serving bookings from cache");
-          setBookings(sortDataBySlots(cachedBookings));
-          setLoading(false);
-          setBusy(false);
-          return;
-        }
-      }
-
-      // Define the query to filter bookings by property id in the nested property object
+      // Query: property match + bookingDate desc (uses existing Firestore index)
+      // Use desc order to match existing Firestore index; we sort to asc (soonest first) in memory
       let bookingsQuery = query(
         collection(db, "bookings"),
         where("property.id", "==", propertyId),
-        orderBy("bookingDate", "asc"),
+        orderBy("bookingDate", "desc"),
         limit(LIMIT)
       );
 
@@ -149,11 +108,6 @@ const useBookingsManager = () => {
         setBookings(sortDataBySlots(fetchedBookings));
       }
 
-      const sorted = sortDataBySlots(fetchedBookings);
-      localStorage.setItem("bookings", JSON.stringify(sorted));
-      localStorage.setItem("bookingsTimestamp", new Date().getTime());
-
-      // Update the lastVisible document for pagination
       setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
     } catch (err) {
       console.log("Error fetching bookings:", err.message);
@@ -200,7 +154,7 @@ const useBookingsManager = () => {
           await addDoc(bookedSlotCollectionRef, slotInfo);
         })
       );
-      await fetchBookings(false, true); // Force fresh data (no cache)
+      await fetchBookings();
 
       console.log("Booking added successfully!");
       showAlert("Booking added successfully!!", "success");
