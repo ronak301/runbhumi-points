@@ -11,7 +11,11 @@ import useCurrentProperty from "../hooks/useCurrentProperty";
 // This component represents each individual booking's card
 const BookingCard = ({ onComplete, booking, title, usersWithPoints }) => {
   const num = String(booking?.customer?.number);
-  const updatedNumber = num?.startsWith("91") ? num : `91${num}`;
+  const updatedNumber = (() => {
+    const digits = num.replace(/\D/g, "");
+    const last10 = digits.slice(-10);
+    return `91${last10}`;
+  })();
   const name = booking?.customer?.name;
   const { propertyId } = useCurrentProperty();
   const advancedAmountString = booking?.amountSumary?.advanced
@@ -186,12 +190,10 @@ ${advancedAmountString}
           <IconButton
             size="sm"
             onClick={() => {
-              window.open(
-                `https://api.whatsapp.com/send/?phone=${updatedNumber}&text=${encodeURIComponent(
-                  message
-                )}`,
-                "_blank"
-              );
+              const url = `https://wa.me/${updatedNumber}?text=${encodeURIComponent(
+                message
+              )}`;
+              window.open(url, "_blank");
             }}
             isRound
             colorScheme="green"
