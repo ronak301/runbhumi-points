@@ -64,11 +64,17 @@ export default function AddBookingPage() {
   const { addSlotBooking } = useBookingsManager();
   const toast = useToast();
 
+  const supportsContactPicker =
+    typeof navigator !== "undefined" &&
+    navigator.contacts &&
+    typeof navigator.contacts.select === "function";
+
   const pickFromContacts = async () => {
-    if (!("contacts" in navigator) || !window.ContactsManager) {
+    if (!supportsContactPicker) {
       toast({
         title: "Not supported",
-        description: "Contact picker is not available on this device or browser.",
+        description:
+          "This browser/device does not support picking from phone contacts.",
         status: "info",
         duration: 4000,
         isClosable: true,
@@ -209,14 +215,16 @@ export default function AddBookingPage() {
         <VStack spacing={4} align="stretch">
           <Flex align="center" justify="space-between" wrap="wrap" gap={2}>
             <FormLabel mb={0}>Name</FormLabel>
-            <Button
-              size="sm"
-              leftIcon={<PhoneIcon />}
-              variant="outline"
-              colorScheme="teal"
-              onClick={pickFromContacts}>
-              From contacts
-            </Button>
+            {supportsContactPicker && (
+              <Button
+                size="sm"
+                leftIcon={<PhoneIcon />}
+                variant="outline"
+                colorScheme="teal"
+                onClick={pickFromContacts}>
+                From contacts
+              </Button>
+            )}
           </Flex>
           <Input
             value={input?.name}
