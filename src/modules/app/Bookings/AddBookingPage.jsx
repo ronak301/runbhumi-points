@@ -63,6 +63,7 @@ export default function AddBookingPage() {
   const [totalAmount, setTotalAmount] = useState(0);
   const { addSlotBooking } = useBookingsManager();
   const toast = useToast();
+  const [pickingContact, setPickingContact] = useState(false);
 
   const supportsContactPicker =
     typeof navigator !== "undefined" &&
@@ -82,6 +83,7 @@ export default function AddBookingPage() {
       return;
     }
     try {
+      setPickingContact(true);
       const props = ["name", "tel"];
       const opts = { multiple: false };
       const contacts = await navigator.contacts.select(props, opts);
@@ -106,6 +108,8 @@ export default function AddBookingPage() {
           isClosable: true,
         });
       }
+    } finally {
+      setPickingContact(false);
     }
   };
 
@@ -221,6 +225,7 @@ export default function AddBookingPage() {
                 leftIcon={<PhoneIcon />}
                 variant="outline"
                 colorScheme="teal"
+                isLoading={pickingContact}
                 onClick={pickFromContacts}>
                 From contacts
               </Button>
