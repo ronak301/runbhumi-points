@@ -19,8 +19,11 @@ const Profile = ({ onLogout }: any) => {
   // Handle navigate (if you want to implement navigation from the profile)
   const navigate = useNavigate();
 
-  const { monthlyCollectionTotal, lastMonthCollectionTotal } =
-    useBookingsManager();
+  const {
+    monthlyCollectionTotal,
+    lastMonthCollectionTotal,
+    financialYearCollectionTotal,
+  } = useBookingsManager();
 
   const now = new Date();
   const thisMonthLabel = now.toLocaleString("default", {
@@ -30,6 +33,14 @@ const Profile = ({ onLogout }: any) => {
   const lastMonthLabel = lastMonthDate.toLocaleString("default", {
     month: "short",
   });
+
+  const fyLabel = (() => {
+    const year = now.getFullYear();
+    const month = now.getMonth(); // 0-based
+    const fyStartYear = month >= 3 ? year : year - 1;
+    const fyEndYear = fyStartYear + 1;
+    return `FY ${String(fyStartYear).slice(-2)}-${String(fyEndYear).slice(-2)}`;
+  })();
 
   // If user data is not available, show a message
   if (!userData?.owner) {
@@ -90,6 +101,10 @@ const Profile = ({ onLogout }: any) => {
           <Text fontSize="sm" color="gray.600">
             {lastMonthLabel} Collection - ₹
             {(lastMonthCollectionTotal ?? 0).toLocaleString("en-IN")}
+          </Text>
+          <Text fontSize="sm" color="gray.600">
+            {fyLabel} Collection - ₹
+            {(financialYearCollectionTotal ?? 0).toLocaleString("en-IN")}
           </Text>
         </VStack>
 

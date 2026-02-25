@@ -42,7 +42,7 @@ const useBookingsManager = () => {
   const [lastVisible, setLastVisible] = useState(null);
   const [busy, setBusy] = useState(false);
 
-  // This month and last month totals from loaded bookings (no extra query)
+  // This month & last month totals from loaded bookings (no extra query)
   const monthlyCollectionTotal = useMemo(() => {
     const { start, end } = getMonthRange(0);
     return (bookings || []).reduce((sum, b) => {
@@ -63,6 +63,9 @@ const useBookingsManager = () => {
     }, 0);
   }, [bookings]);
 
+  const [financialYearCollectionTotal, setFinancialYearCollectionTotal] =
+    useState(0);
+
   // Next/upcoming booking first: date desc (today & recent first), then earliest slot in day first.
   const sortDataBySlots = (data) => {
     const list = Array.isArray(data) ? [...data] : [];
@@ -82,10 +85,45 @@ const useBookingsManager = () => {
     if (!propertyId) {
       setBookings([]);
       setLastVisible(null);
+      setFinancialYearCollectionTotal(0);
       return;
     }
     setLastVisible(null);
     fetchBookings();
+
+    // Also compute financial year total from all bookings for this property
+    const computeFy = async () => {
+      try {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth(); // 0-based
+        const fyStartYear = month >= 3 ? year : year - 1;
+        const fyEndYear = fyStartYear + 1;
+        const fyStart = `${fyStartYear}-04-01`;
+        const fyEnd = `${fyEndYear}-03-31`;
+
+        // Query all bookings in FY range, then filter by property in memory
+        const q = query(
+          collection(db, "bookings"),
+          where("bookingDate", ">=", fyStart),
+          where("bookingDate", "<=", fyEnd)
+        );
+        const snapshot = await getDocs(q);
+        let total = 0;
+        snapshot.forEach((d) => {
+          const data = d.data();
+          if (data?.property?.id !== propertyId) return;
+          const t = data?.amountSumary?.total;
+          total += typeof t === "number" ? t : Number(t) || 0;
+        });
+        setFinancialYearCollectionTotal(total);
+      } catch (e) {
+        console.warn("Failed to compute financial year total:", e?.message);
+        setFinancialYearCollectionTotal(0);
+      }
+    };
+
+    computeFy();
   }, [propertyId]);
 
   const fetchBookings = async (nextPage = false) => {
@@ -270,6 +308,7 @@ const useBookingsManager = () => {
     error,
     monthlyCollectionTotal,
     lastMonthCollectionTotal,
+    financialYearCollectionTotal,
     addSlotBooking,
     deleteSlotBooking,
     updateBooking,

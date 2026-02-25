@@ -76,7 +76,6 @@ export default function AddBookingPage() {
         title: "Not supported",
         description:
           "This browser/device does not support picking from phone contacts.",
-        status: "info",
         duration: 4000,
         isClosable: true,
       });
