@@ -5,13 +5,13 @@ import {
   FormLabel,
   Input,
   Box,
-  Heading,
   Text,
   Spinner,
   VStack,
   IconButton,
+  useToast,
 } from "@chakra-ui/react";
-import { ArrowBackIcon } from "@chakra-ui/icons";
+import { ArrowBackIcon, PhoneIcon } from "@chakra-ui/icons";
 import { useNavigate } from "react-router-dom";
 import SlotSelector from "./SlotSelector";
 import moment from "moment";
@@ -62,6 +62,46 @@ export default function AddBookingPage() {
     useState(false);
   const [totalAmount, setTotalAmount] = useState(0);
   const { addSlotBooking } = useBookingsManager();
+  const toast = useToast();
+
+  const pickFromContacts = async () => {
+    if (!("contacts" in navigator) || !window.ContactsManager) {
+      toast({
+        title: "Not supported",
+        description: "Contact picker is not available on this device or browser.",
+        status: "info",
+        duration: 4000,
+        isClosable: true,
+      });
+      return;
+    }
+    try {
+      const props = ["name", "tel"];
+      const opts = { multiple: false };
+      const contacts = await navigator.contacts.select(props, opts);
+      if (contacts?.length > 0) {
+        const c = contacts[0];
+        const name = c.name?.join?.(" ") || c.name || "";
+        const tel = (c.tel && (Array.isArray(c.tel) ? c.tel[0] : c.tel)) || "";
+        const number = String(tel).replace(/\D/g, "").slice(-10);
+        setInput((prev) => ({
+          ...prev,
+          name: name || prev.name,
+          number: number || prev.number,
+        }));
+      }
+    } catch (err) {
+      if (err.name !== "SecurityError" && err.name !== "AbortError") {
+        toast({
+          title: "Could not open contacts",
+          description: err?.message || "Try entering name and number manually.",
+          status: "warning",
+          duration: 4000,
+          isClosable: true,
+        });
+      }
+    }
+  };
 
   useEffect(() => {
     const fetchBookedSlots = async () => {
@@ -167,7 +207,17 @@ export default function AddBookingPage() {
       {/* Form Section */}
       <Box p={8}>
         <VStack spacing={4} align="stretch">
-          <FormLabel>Name</FormLabel>
+          <Flex align="center" justify="space-between" wrap="wrap" gap={2}>
+            <FormLabel mb={0}>Name</FormLabel>
+            <Button
+              size="sm"
+              leftIcon={<PhoneIcon />}
+              variant="outline"
+              colorScheme="teal"
+              onClick={pickFromContacts}>
+              From contacts
+            </Button>
+          </Flex>
           <Input
             value={input?.name}
             onChange={(e) => setInput({ ...input, name: e.target.value })}

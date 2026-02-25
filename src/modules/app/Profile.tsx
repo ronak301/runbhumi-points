@@ -9,6 +9,7 @@ import {
   Divider,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import useBookingsManager from "./hooks/useBookingsManager";
 
 // Define the Profile component to receive `onLogout` prop
 const Profile = ({ onLogout }: any) => {
@@ -17,6 +18,18 @@ const Profile = ({ onLogout }: any) => {
 
   // Handle navigate (if you want to implement navigation from the profile)
   const navigate = useNavigate();
+
+  const { monthlyCollectionTotal, lastMonthCollectionTotal } =
+    useBookingsManager();
+
+  const now = new Date();
+  const thisMonthLabel = now.toLocaleString("default", {
+    month: "short",
+  });
+  const lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const lastMonthLabel = lastMonthDate.toLocaleString("default", {
+    month: "short",
+  });
 
   // If user data is not available, show a message
   if (!userData?.owner) {
@@ -67,6 +80,17 @@ const Profile = ({ onLogout }: any) => {
             </Text>
             <Text fontSize="md">{mobileNo}</Text>
           </HStack>
+        </VStack>
+
+        <VStack align="flex-start" spacing={1} width="full">
+          <Text fontSize="sm" color="gray.600">
+            {thisMonthLabel} Collection - ₹
+            {(monthlyCollectionTotal ?? 0).toLocaleString("en-IN")}
+          </Text>
+          <Text fontSize="sm" color="gray.600">
+            {lastMonthLabel} Collection - ₹
+            {(lastMonthCollectionTotal ?? 0).toLocaleString("en-IN")}
+          </Text>
         </VStack>
 
         <Divider />

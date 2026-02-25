@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   collection,
   addDoc,
@@ -18,14 +18,50 @@ import useCurrentProperty from "./useCurrentProperty";
 
 export const LIMIT = 20;
 
+// offset = 0 → this month, -1 → last month, etc.
+function getMonthRange(offset = 0) {
+  const now = new Date();
+  const base = new Date(now.getFullYear(), now.getMonth() + offset, 1);
+  const y = base.getFullYear();
+  const mIndex = base.getMonth(); // 0-based
+  const mNum = mIndex + 1;
+  const mm = String(mNum).padStart(2, "0");
+  const lastDay = new Date(y, mIndex + 1, 0).getDate();
+  return {
+    start: `${y}-${mm}-01`,
+    end: `${y}-${mm}-${lastDay}`,
+  };
+}
+
 const useBookingsManager = () => {
   const { propertyId } = useCurrentProperty();
   const [bookings, setBookings] = useState([]);
-  const [loading, setLoading] = useState(false); // Initial loading
-  const [paginationLoading, setPaginationLoading] = useState(false); // Pagination loading
+  const [loading, setLoading] = useState(false);
+  const [paginationLoading, setPaginationLoading] = useState(false);
   const [error, setError] = useState(null);
   const [lastVisible, setLastVisible] = useState(null);
-  const [busy, setBusy] = useState(false); // State to track if an API call is in progress
+  const [busy, setBusy] = useState(false);
+
+  // This month and last month totals from loaded bookings (no extra query)
+  const monthlyCollectionTotal = useMemo(() => {
+    const { start, end } = getMonthRange(0);
+    return (bookings || []).reduce((sum, b) => {
+      const date = b?.bookingDate;
+      if (!date || date < start || date > end) return sum;
+      const t = b?.amountSumary?.total;
+      return sum + (typeof t === "number" ? t : Number(t) || 0);
+    }, 0);
+  }, [bookings]);
+
+  const lastMonthCollectionTotal = useMemo(() => {
+    const { start, end } = getMonthRange(-1);
+    return (bookings || []).reduce((sum, b) => {
+      const date = b?.bookingDate;
+      if (!date || date < start || date > end) return sum;
+      const t = b?.amountSumary?.total;
+      return sum + (typeof t === "number" ? t : Number(t) || 0);
+    }, 0);
+  }, [bookings]);
 
   // Next/upcoming booking first: date desc (today & recent first), then earliest slot in day first.
   const sortDataBySlots = (data) => {
@@ -42,7 +78,6 @@ const useBookingsManager = () => {
     });
   };
 
-  // Always fetch fresh when propertyId is set or changes (e.g. different login)
   useEffect(() => {
     if (!propertyId) {
       setBookings([]);
@@ -233,6 +268,8 @@ const useBookingsManager = () => {
     loading,
     paginationLoading,
     error,
+    monthlyCollectionTotal,
+    lastMonthCollectionTotal,
     addSlotBooking,
     deleteSlotBooking,
     updateBooking,

@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  Box,
-  Flex,
-  Text,
-  IconButton,
-  useDisclosure,
-  useToast,
-} from "@chakra-ui/react";
+import { Box, Flex, Text, IconButton } from "@chakra-ui/react";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import moment from "moment";
 import { map, property } from "lodash";
@@ -85,6 +78,10 @@ const BookingCard = ({ onComplete, booking, title, usersWithPoints }) => {
     ? getPoints(linkedUser?.points)
     : 0;
 
+  const totalAmount = booking?.amountSumary?.total ?? 0;
+  const formattedTotal = totalAmount.toLocaleString("en-IN");
+  const displayDate = moment(booking?.bookingDate).format("DD MMM YYYY");
+
   const getMessage = () => {
     switch (propertyId) {
       case "iNANAwfMb6EXNtp7MRwJ":
@@ -133,6 +130,7 @@ Mobile: ${num}
 Location: 1, New Vidhya Nagar
 Near Samudayik Bhawan, BSNL Road
 Hiran Magri, Sector 4, Udaipur
+Map: https://maps.app.goo.gl/x3UwszbasrKsUyFP6
 Date of Booking: ${moment(booking?.bookingDate).format("DD-MM-YYYY")}
 Time Slots: ${getSlotsInfo(booking)}
 *Total Amount: Rs. ${booking?.amountSumary?.total}*
@@ -155,41 +153,34 @@ ${advancedAmountString}
 
   return (
     <Box
-      boxShadow="md"
-      backgroundColor={"white"}
+      borderWidth="1px"
+      borderRadius="md"
+      backgroundColor="white"
       mt={2}
       mb={2}
-      pb={2}
-      pl={2}
-      pr={2}
-      pt={2}
-      borderRadius={8}
-      _hover={{
-        boxShadow: "lg",
-        transition: "all 0.2s ease",
-      }}>
-      <Flex
-        justifyContent={"space-between"}
-        align="center"
-        flexWrap="wrap"
-        gap={1}>
-        <Text fontSize="sm" fontWeight="bold" color="teal.700">
-          {name}
+      px={3}
+      py={3}
+      boxShadow="sm"
+      _hover={{ boxShadow: "md" }}>
+      <Flex justifyContent="space-between" align="center" mb={2}>
+        <Box>
+          <Text fontSize="sm" fontWeight="600" color="teal.700">
+            {name}
+          </Text>
+          <Text fontSize="xs" color="gray.500">
+            {num}
+          </Text>
+        </Box>
+        <Text fontSize="sm" fontWeight="700" color="teal.700">
+          ₹{formattedTotal}
         </Text>
-        <Flex flexWrap="wrap" gap={1} alignItems="center">
-          <Text fontWeight="500" fontSize="xs" px={1}>
-            {getSlotsInfo(booking)}
-          </Text>
-          <Text fontWeight="500" fontSize="xs" px={1}>
-            {moment(booking?.bookingDate).format("DD-MM-YYYY")}
-          </Text>
-        </Flex>
       </Flex>
-      <Text fontSize="xs" color="gray.600">
-        {num}
+
+      <Text fontSize="xs" color="gray.700">
+        {displayDate} · {getSlotsInfo(booking)}
       </Text>
 
-      <Flex justifyContent={"space-between"} align="center" mt={3}>
+      <Flex justifyContent="space-between" align="center" mt={3}>
         <DeleteBooking booking={booking} onComplete={onComplete} />
         <Box>
           <IconButton

@@ -1,5 +1,4 @@
-import { useEffect } from "react";
-import { Button, Flex, Box, useDisclosure, Spinner } from "@chakra-ui/react";
+import { Button, Flex, Box, Spinner, ButtonGroup } from "@chakra-ui/react";
 import { isEmpty, map } from "lodash";
 import useStore from "../../../zustand/useStore";
 import useBookingsManager, { LIMIT } from "../hooks/useBookingsManager";
@@ -7,6 +6,8 @@ import NoBookings from "./NoBookings";
 import useCurrentProperty from "../hooks/useCurrentProperty";
 import BookingCard from "./BookingCard";
 import { Link } from "react-router-dom";
+
+import { useMemo, useState } from "react";
 
 export default function AllBookingsList() {
   const { usersWithPoints } = useStore();
@@ -16,8 +17,19 @@ export default function AllBookingsList() {
   const noBookings = !loading && isEmpty(bookings);
   const title = property?.property?.title;
 
+  const [filter, setFilter] = useState("all");
+  const todayStr = new Date().toISOString().slice(0, 10);
+
+  const filteredBookings = useMemo(
+    () =>
+      filter === "today"
+        ? bookings.filter((b) => b?.bookingDate === todayStr)
+        : bookings,
+    [bookings, filter, todayStr]
+  );
+
   const onComplete = async () => {
-    await fetchBookings(false, true);
+    await fetchBookings();
   };
 
   return (
@@ -32,11 +44,26 @@ export default function AllBookingsList() {
           <Flex
             flexDirection={"row"}
             justifyContent={"space-between"}
+            alignItems="center"
             mt={1}
-            mb={2}>
-            <Box />
+            mb={3}
+            gap={3}>
+            <ButtonGroup size="sm" isAttached variant="outline">
+              <Button
+                variant={filter === "all" ? "solid" : "outline"}
+                colorScheme={filter === "all" ? "blue" : "gray"}
+                onClick={() => setFilter("all")}>
+                All
+              </Button>
+              <Button
+                variant={filter === "today" ? "solid" : "outline"}
+                colorScheme={filter === "today" ? "blue" : "gray"}
+                onClick={() => setFilter("today")}>
+                Today
+              </Button>
+            </ButtonGroup>
             <Link to={`/home/property/${propertyId}/add-booking`}>
-              <Button colorScheme="blue" alignSelf={"flex-end"}>
+              <Button colorScheme="blue" alignSelf={"flex-end"} size="sm">
                 Add Booking
               </Button>
             </Link>
@@ -62,7 +89,7 @@ export default function AllBookingsList() {
         ) : (
           <>
             <Box>
-              {map(bookings, (singleBooking) => {
+              {map(filteredBookings, (singleBooking) => {
                 return (
                   <BookingCard
                     key={singleBooking.id}
