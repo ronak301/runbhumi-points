@@ -23,6 +23,7 @@ const Login = ({ onLogin }) => {
       password: "1234",
       propertyId: "iNANAwfMb6EXNtp7MRwJ",
       title: "Runbhumi Mewar",
+      isAdmin: true,
       owner: {
         firstName: "Ronak",
         lastName: "Kothari",
@@ -32,6 +33,7 @@ const Login = ({ onLogin }) => {
       password: "1234",
       propertyId: "iNANAwfMb6EXNtp7MRwJ",
       title: "Runbhumi Mewar",
+      isAdmin: true,
       owner: {
         firstName: "Abhay",
         lastName: "Kothari",
@@ -78,6 +80,7 @@ const Login = ({ onLogin }) => {
           propertyId: user.propertyId,
           title: user.title,
           owner: user.owner,
+          isAdmin: !!user.isAdmin,
         })
       );
 

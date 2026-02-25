@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Text,
@@ -9,6 +9,7 @@ import {
   TabPanel,
   Icon,
   Image,
+  Select,
 } from "@chakra-ui/react"; // Full import from Chakra UI
 import { useNavigate, useParams } from "react-router-dom";
 import { FaCalendarAlt, FaStar, FaUser } from "react-icons/fa";
@@ -17,11 +18,20 @@ import Profile from "../Profile"; // Assuming Profile component exists
 import featureConfig from "../../../featureConfig"; // Import the feature config
 import Points from "../Points/Points";
 import useCurrentProperty from "../hooks/useCurrentProperty";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../../firebase";
 
 export default function HomeTab({ onLogout }) {
   const { propertyId, property } = useCurrentProperty();
 
   const navigate = useNavigate();
+
+  const storedUser = useMemo(
+    () => JSON.parse(localStorage.getItem("user") || "{}"),
+    []
+  );
+  const isAdmin = !!storedUser?.isAdmin;
+  const [allProperties, setAllProperties] = useState([]);
 
   // Redirect to login if no user is authenticated
   useEffect(() => {
@@ -34,6 +44,40 @@ export default function HomeTab({ onLogout }) {
     localStorage.removeItem("user");
     onLogout();
     navigate("/login", { replace: true });
+  };
+
+  // Load all properties for admin so they can switch between them
+  useEffect(() => {
+    const loadProperties = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, "properties"));
+        const list = snapshot.docs.map((d) => ({
+          id: d.id,
+          title: d.data()?.title || d.id,
+        }));
+        setAllProperties(list);
+      } catch (e) {
+        console.error("Failed to load properties list for admin:", e);
+      }
+    };
+    if (isAdmin) {
+      loadProperties();
+    }
+  }, [isAdmin]);
+
+  const handlePropertySwitch = (newId) => {
+    if (!newId || newId === propertyId) return;
+    const selected = allProperties.find((p) => p.id === newId);
+    const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
+    localStorage.setItem(
+      "user",
+      JSON.stringify({
+        ...currentUser,
+        propertyId: newId,
+        title: selected?.title || currentUser.title,
+      })
+    );
+    navigate(`/home/property/${newId}`, { replace: true });
   };
 
   // Get feature flags for the current property
@@ -74,8 +118,24 @@ export default function HomeTab({ onLogout }) {
           {property?.property?.title || "Loading..."}
         </Text>
 
-        {/* Placeholder for spacing on the right */}
-        <Box width="40px" />
+        {/* Admin property switcher on the right */}
+        {isAdmin ? (
+          <Select
+            size="sm"
+            width="160px"
+            bg="white"
+            color="black"
+            value={propertyId || ""}
+            onChange={(e) => handlePropertySwitch(e.target.value)}>
+            {allProperties.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.title}
+              </option>
+            ))}
+          </Select>
+        ) : (
+          <Box width="40px" />
+        )}
       </Box>
 
       {/* Main Content */}

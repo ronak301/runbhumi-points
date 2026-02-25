@@ -2,10 +2,8 @@ import React from "react";
 import { Box, Flex, Text, IconButton } from "@chakra-ui/react";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import moment from "moment";
-import { map, property } from "lodash";
 import { DeleteBooking } from "../../../components/DeleteBooking";
 import { getPoints, isValidPoints } from "../Points/Points";
-import useBookingsManager from "../hooks/useBookingsManager";
 import useCurrentProperty from "../hooks/useCurrentProperty";
 
 // This component represents each individual booking's card
@@ -22,14 +20,17 @@ const BookingCard = ({ onComplete, booking, title, usersWithPoints }) => {
     ? `Advance Received: Rs. ${booking?.amountSumary?.advanced}`
     : "";
 
-  const linkedUser = usersWithPoints.find(
-    (user) =>
-      user?.number?.replace(/\s/g, "").slice(-10) ===
-      num?.replace(/\s/g, "").slice(-10)
-  );
+  const linkedUser = usersWithPoints.find((user) => {
+    const uNum = String(user?.number || "").replace(/\s/g, "");
+    const bNum = num.replace(/\s/g, "");
+    return uNum.slice(-10) === bNum.slice(-10);
+  });
 
   const getFormattedTime = (time) => {
-    let [hours, minutes] = time.split(":").map(Number);
+    if (!time || typeof time !== "string" || !time.includes(":")) {
+      return time || "";
+    }
+    let [hours, minutes] = time.split(":").map((v) => Number(v || 0));
     const suffix = hours >= 12 ? "PM" : "AM";
     hours = hours % 12 || 12;
     return minutes === 0
@@ -38,25 +39,28 @@ const BookingCard = ({ onComplete, booking, title, usersWithPoints }) => {
   };
 
   const getSlotsInfo = (booking) => {
-    if (propertyId === "iNANAwfMb6EXNtp7MRwJ") {
-      const slots = booking?.slots;
-      const slotsInfo = slots.map((slot) => {
-        return slot.title;
-      });
-      const info = slotsInfo.join(", ");
+    const rawSlots = booking?.slots || [];
+    // Normalise possible legacy shapes: { title }, { slot: { title } }
+    const slots = rawSlots
+      .map((s) => {
+        if (s && typeof s.title === "string") return s;
+        if (s && s.slot && typeof s.slot.title === "string") return s.slot;
+        return null;
+      })
+      .filter(Boolean);
 
+    if (!slots.length) return "";
+
+    if (propertyId === "iNANAwfMb6EXNtp7MRwJ") {
+      const titles = slots.map((slot) => slot.title);
+      const info = titles.join(", ");
       const matches = [...info.matchAll(/-/g)];
       const indexes = matches.map((match) => match.index);
-      if (indexes.length === 1) {
-        return info;
-      } else {
-        const start = indexes[0];
-        const end = indexes[indexes.length - 1];
-        return info.slice(0, start) + info.slice(end);
-      }
+      if (indexes.length === 1) return info;
+      const start = indexes[0];
+      const end = indexes[indexes.length - 1];
+      return info.slice(0, start) + info.slice(end);
     }
-    const slots = booking?.slots;
-    if (!slots || slots.length === 0) return "";
 
     const courtId = slots[0]?.courtId;
     const courtLabel = courtId
@@ -68,6 +72,9 @@ const BookingCard = ({ onComplete, booking, title, usersWithPoints }) => {
     // Get first and last time from all slots
     const firstSlot = titles[0];
     const lastSlot = titles[titles.length - 1];
+    if (!firstSlot || !lastSlot || !firstSlot.includes(" - ") || !lastSlot.includes(" - ")) {
+      return courtLabel + (firstSlot || "");
+    }
     const startTime = firstSlot.split(" - ")[0];
     const endTime = lastSlot.split(" - ")[1];
 
