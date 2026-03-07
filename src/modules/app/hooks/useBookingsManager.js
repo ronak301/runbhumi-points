@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import {
   collection,
   addDoc,
@@ -42,27 +42,8 @@ const useBookingsManager = () => {
   const [lastVisible, setLastVisible] = useState(null);
   const [busy, setBusy] = useState(false);
 
-  // This month & last month totals from loaded bookings (no extra query)
-  const monthlyCollectionTotal = useMemo(() => {
-    const { start, end } = getMonthRange(0);
-    return (bookings || []).reduce((sum, b) => {
-      const date = b?.bookingDate;
-      if (!date || date < start || date > end) return sum;
-      const t = b?.amountSumary?.total;
-      return sum + (typeof t === "number" ? t : Number(t) || 0);
-    }, 0);
-  }, [bookings]);
-
-  const lastMonthCollectionTotal = useMemo(() => {
-    const { start, end } = getMonthRange(-1);
-    return (bookings || []).reduce((sum, b) => {
-      const date = b?.bookingDate;
-      if (!date || date < start || date > end) return sum;
-      const t = b?.amountSumary?.total;
-      return sum + (typeof t === "number" ? t : Number(t) || 0);
-    }, 0);
-  }, [bookings]);
-
+  const [monthlyCollectionTotal, setMonthlyCollectionTotal] = useState(0);
+  const [lastMonthCollectionTotal, setLastMonthCollectionTotal] = useState(0);
   const [financialYearCollectionTotal, setFinancialYearCollectionTotal] =
     useState(0);
 
@@ -81,49 +62,62 @@ const useBookingsManager = () => {
     });
   };
 
+  // Sum all bookings in date range for current property (query by range, filter by property.id)
+  const sumBookingsInRange = async (start, end, pid) => {
+    try {
+      const q = query(
+        collection(db, "bookings"),
+        where("bookingDate", ">=", start),
+        where("bookingDate", "<=", end)
+      );
+      const snapshot = await getDocs(q);
+      let total = 0;
+      snapshot.forEach((d) => {
+        const data = d.data();
+        if (data?.property?.id !== pid) return;
+        const t = data?.amountSumary?.total;
+        total += typeof t === "number" ? t : Number(t) || 0;
+      });
+      return total;
+    } catch (e) {
+      console.warn("Sum range failed:", e?.message);
+      return 0;
+    }
+  };
+
   useEffect(() => {
     if (!propertyId) {
       setBookings([]);
       setLastVisible(null);
+      setMonthlyCollectionTotal(0);
+      setLastMonthCollectionTotal(0);
       setFinancialYearCollectionTotal(0);
       return;
     }
     setLastVisible(null);
     fetchBookings();
 
-    // Also compute financial year total from all bookings for this property
-    const computeFy = async () => {
-      try {
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = now.getMonth(); // 0-based
-        const fyStartYear = month >= 3 ? year : year - 1;
-        const fyEndYear = fyStartYear + 1;
-        const fyStart = `${fyStartYear}-04-01`;
-        const fyEnd = `${fyEndYear}-03-31`;
+    const pid = propertyId;
+    const thisMonth = getMonthRange(0);
+    const prevMonth = getMonthRange(-1);
 
-        // Query all bookings in FY range, then filter by property in memory
-        const q = query(
-          collection(db, "bookings"),
-          where("bookingDate", ">=", fyStart),
-          where("bookingDate", "<=", fyEnd)
-        );
-        const snapshot = await getDocs(q);
-        let total = 0;
-        snapshot.forEach((d) => {
-          const data = d.data();
-          if (data?.property?.id !== propertyId) return;
-          const t = data?.amountSumary?.total;
-          total += typeof t === "number" ? t : Number(t) || 0;
-        });
-        setFinancialYearCollectionTotal(total);
-      } catch (e) {
-        console.warn("Failed to compute financial year total:", e?.message);
-        setFinancialYearCollectionTotal(0);
-      }
-    };
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    const fyStartYear = month >= 3 ? year : year - 1;
+    const fyEndYear = fyStartYear + 1;
+    const fyStart = `${fyStartYear}-04-01`;
+    const fyEnd = `${fyEndYear}-03-31`;
 
-    computeFy();
+    Promise.all([
+      sumBookingsInRange(thisMonth.start, thisMonth.end, pid),
+      sumBookingsInRange(prevMonth.start, prevMonth.end, pid),
+      sumBookingsInRange(fyStart, fyEnd, pid),
+    ]).then(([monthly, lastMonth, fy]) => {
+      setMonthlyCollectionTotal(monthly);
+      setLastMonthCollectionTotal(lastMonth);
+      setFinancialYearCollectionTotal(fy);
+    });
   }, [propertyId]);
 
   const fetchBookings = async (nextPage = false) => {
