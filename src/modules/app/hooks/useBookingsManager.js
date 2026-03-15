@@ -3,7 +3,6 @@ import {
   collection,
   addDoc,
   getDocs,
-  setDoc,
   doc,
   deleteDoc,
   query,
@@ -270,25 +269,6 @@ const useBookingsManager = () => {
     }
   };
 
-  // Update a booking
-  const updateBooking = async (booking) => {
-    if (busy) return;
-    setBusy(true);
-    setLoading(true);
-    try {
-      await setDoc(doc(db, "bookings", booking.id), booking);
-      console.log("Booking updated successfully!");
-      showAlert("Booking updated successfully!!", "success");
-      fetchBookings(); // Refetch bookings after update
-    } catch (e) {
-      console.error("Error updating booking:", e);
-      showAlert("Something went wrong while updating booking!!", "error");
-    } finally {
-      setLoading(false);
-      setBusy(false);
-    }
-  };
-
   // Load more bookings (pagination)
   const loadMore = () => {
     if (busy) return;
@@ -305,7 +285,6 @@ const useBookingsManager = () => {
     financialYearCollectionTotal,
     addSlotBooking,
     deleteSlotBooking,
-    updateBooking,
     loadMore,
     fetchBookings,
   };

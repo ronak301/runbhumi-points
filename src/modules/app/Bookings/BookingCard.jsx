@@ -19,6 +19,11 @@ const BookingCard = ({ onComplete, booking, title, usersWithPoints }) => {
   const advancedAmountString = booking?.amountSumary?.advanced
     ? `Advance Received: Rs. ${booking?.amountSumary?.advanced}`
     : "";
+  const discountAmount = Number(booking?.amountSumary?.discount) || 0;
+  const discountString =
+    discountAmount > 0
+      ? `Discount: Rs. ${booking?.amountSumary?.discount}`
+      : "";
 
   const linkedUser = usersWithPoints.find((user) => {
     const uNum = String(user?.number || "").replace(/\s/g, "");
@@ -72,7 +77,12 @@ const BookingCard = ({ onComplete, booking, title, usersWithPoints }) => {
     // Get first and last time from all slots
     const firstSlot = titles[0];
     const lastSlot = titles[titles.length - 1];
-    if (!firstSlot || !lastSlot || !firstSlot.includes(" - ") || !lastSlot.includes(" - ")) {
+    if (
+      !firstSlot ||
+      !lastSlot ||
+      !firstSlot.includes(" - ") ||
+      !lastSlot.includes(" - ")
+    ) {
       return courtLabel + (firstSlot || "");
     }
     const startTime = firstSlot.split(" - ")[0];
@@ -81,7 +91,7 @@ const BookingCard = ({ onComplete, booking, title, usersWithPoints }) => {
     const suffix = Number(startTime.split(":")[0]) >= 12 ? "PM" : "AM";
 
     return `${courtLabel}${getFormattedTime(startTime)} - ${getFormattedTime(
-      endTime
+      endTime,
     )} ${suffix}`;
   };
 
@@ -90,10 +100,13 @@ const BookingCard = ({ onComplete, booking, title, usersWithPoints }) => {
     : 0;
 
   const totalAmount = booking?.amountSumary?.total ?? 0;
+  const advancedAmount = Number(booking?.amountSumary?.advanced) || 0;
   const formattedTotal = totalAmount.toLocaleString("en-IN");
   const displayDate = moment(booking?.bookingDate).format("DD MMM YYYY");
 
   const getMessage = () => {
+    const totalLine = `*Total Amount: Rs. ${booking?.amountSumary?.total}*`;
+    const discountLine = discountString ? `${discountString}\n` : "";
     switch (propertyId) {
       case "iNANAwfMb6EXNtp7MRwJ":
         return `
@@ -104,7 +117,7 @@ Location: F-266, Road No. 12, Near Airtel Office, Madri Industrial Area
 Map: https://maps.app.goo.gl/QAs3A9APjdqRZfmS9
 Date of Booking: ${moment(booking?.bookingDate).format("DD-MM-YYYY")}
 Time Slots: ${getSlotsInfo(booking)}
-*Total Amount: Rs. ${booking?.amountSumary?.total}*
+${discountLine}${totalLine}
 ${advancedAmountString}
 Points Available: ${pointsAvailable}
               `;
@@ -117,7 +130,7 @@ Location: Behind Vatsalya academy, Tagore Nagar, Sector 4, Hiran Magri, Udaipur
 Map: https://maps.app.goo.gl/gCNNeNtW6yQEAmmKA
 Date of Booking: ${moment(booking?.bookingDate).format("DD-MM-YYYY")}
 Time Slots: ${getSlotsInfo(booking)}
-*Total Amount: Rs. ${booking?.amountSumary?.total}*
+${discountLine}${totalLine}
 ${advancedAmountString}
               `;
       case "D5FfylDnU6NXlmTtPtoj":
@@ -130,7 +143,7 @@ Location: Gopal mill, near railway underpass
 Map: https://maps.app.goo.gl/4sEQXASVY2TGrXxQ7
 Date of Booking: ${moment(booking?.bookingDate).format("DD-MM-YYYY")}
 Time Slots: ${getSlotsInfo(booking)}
-*Total Amount: Rs. ${booking?.amountSumary?.total}*
+${discountLine}${totalLine}
 ${advancedAmountString}
               `;
       case "2H3Ld4uq17AeCtfXpuo0":
@@ -144,7 +157,7 @@ Hiran Magri, Sector 4, Udaipur
 Map: https://maps.app.goo.gl/x3UwszbasrKsUyFP6
 Date of Booking: ${moment(booking?.bookingDate).format("DD-MM-YYYY")}
 Time Slots: ${getSlotsInfo(booking)}
-*Total Amount: Rs. ${booking?.amountSumary?.total}*
+${discountLine}${totalLine}
 ${advancedAmountString}
 
 *Note:* Maximum 4 persons per court. Extra charges apply for additional persons.
@@ -156,7 +169,7 @@ Name: ${name}
 Mobile: ${num}
 Date of Booking: ${moment(booking?.bookingDate).format("DD-MM-YYYY")}
 Time Slots: ${getSlotsInfo(booking)}
-*Total Amount: Rs. ${booking?.amountSumary?.total}*
+${discountLine}${totalLine}
 ${advancedAmountString}
               `;
     }
@@ -192,6 +205,16 @@ ${advancedAmountString}
       <Text fontSize="xs" color="gray.700">
         {displayDate} · {getSlotsInfo(booking)}
       </Text>
+      {discountAmount > 0 && (
+        <Text fontSize="xs" color="orange.600" mt={1}>
+          Discount: ₹{discountAmount.toLocaleString("en-IN")}
+        </Text>
+      )}
+      {advancedAmount > 0 && (
+        <Text fontSize="xs" color="gray.600" mt={1}>
+          Advanced: ₹{advancedAmount.toLocaleString("en-IN")}
+        </Text>
+      )}
 
       <Flex justifyContent="space-between" align="center" mt={3}>
         <DeleteBooking booking={booking} onComplete={onComplete} />
@@ -200,7 +223,7 @@ ${advancedAmountString}
             size="sm"
             onClick={() => {
               const url = `https://wa.me/${updatedNumber}?text=${encodeURIComponent(
-                message
+                message,
               )}`;
               window.open(url, "_blank");
             }}

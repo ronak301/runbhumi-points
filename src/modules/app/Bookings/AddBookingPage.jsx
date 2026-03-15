@@ -163,6 +163,12 @@ export default function AddBookingPage() {
     }
   }, [selectedSlots, input?.totalAmount, input?.date, propertyId]);
 
+  const subtotal = Number(totalAmount) || 0;
+  const discount = Number(input?.discount) || 0;
+  const totalAfterDiscount = Math.max(0, subtotal - discount);
+  const advanced = Number(input?.advanced) || 0;
+  const payable = Math.max(0, totalAfterDiscount - advanced);
+
   const onAddBooking = async () => {
     setAdditionOrUpdationInProgress(true);
     const slotsWithDatePrice = selectedSlots.map((slot) => ({
@@ -172,9 +178,11 @@ export default function AddBookingPage() {
     const booking = {
       bookingDate: input?.date,
       amountSumary: {
-        total: totalAmount,
-        advanced: Number(input?.advanced) || 0,
-        payable: totalAmount - (input?.advanced || 0),
+        subtotal,
+        discount,
+        total: totalAfterDiscount,
+        advanced,
+        payable,
       },
       customer: {
         name: input?.name,
@@ -270,6 +278,17 @@ export default function AddBookingPage() {
             placeholder="Total Amount"
           />
 
+          <FormLabel>Discount (₹)</FormLabel>
+          <Input
+            type="number"
+            min={0}
+            value={input?.discount ?? ""}
+            onChange={(e) =>
+              setInput({ ...input, discount: e.target.value ? e.target.value : undefined })
+            }
+            placeholder="0"
+          />
+
           <FormLabel>Advanced</FormLabel>
           <Input
             value={input?.advanced}
@@ -279,9 +298,10 @@ export default function AddBookingPage() {
 
           <FormLabel>Total Payable Amount</FormLabel>
           <Input
-            value={input?.payable || totalAmount - (input?.advanced || 0)}
-            onChange={(e) => setInput({ ...input, payable: e.target.value })}
+            value={payable}
+            readOnly
             placeholder="Total Payable Amount"
+            backgroundColor="gray.50"
           />
 
           <Button
