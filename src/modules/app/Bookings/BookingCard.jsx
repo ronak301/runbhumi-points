@@ -146,6 +146,8 @@ Date of Booking: ${moment(booking?.bookingDate).format("DD-MM-YYYY")}
 Time Slots: ${getSlotsInfo(booking)}
 *Total Amount: Rs. ${booking?.amountSumary?.total}*
 ${advancedAmountString}
+
+*Note:* Maximum 4 persons per court. Extra charges apply for additional persons.
               `;
       default:
         return `
