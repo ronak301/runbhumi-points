@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import {
   Button,
   Flex,
@@ -15,52 +15,32 @@ import { ArrowBackIcon, PhoneIcon } from "@chakra-ui/icons";
 import { useNavigate } from "react-router-dom";
 import SlotSelector from "./SlotSelector";
 import moment from "moment";
-import { isEmpty, map } from "lodash";
+import { isEmpty } from "lodash";
 import useBookingsManager from "../hooks/useBookingsManager";
 import useCurrentProperty from "../hooks/useCurrentProperty";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "../../../firebase";
-
-const getBookedSlotsForDateAndPlayground = async (date, propertyId) => {
-  let slots = [];
-  const slotsCollectionRef = collection(
-    db,
-    `properties/${propertyId}/bookings/${date}/bookedSlot`
-  );
-  const slotsQuerySnapshot = await getDocs(slotsCollectionRef);
-  slotsQuerySnapshot.forEach((slotDoc) => {
-    slots.push({ ...slotDoc.data(), id: slotDoc.id });
-  });
-  return slots;
-};
-
-// PickleX: Sat/Sun 7PM–12AM = ₹600 per half hour; else ₹300. Other properties use slot.price.
-const PICKLEX_PROPERTY_ID = "2H3Ld4uq17AeCtfXpuo0";
-const getSlotPriceForDate = (slot, dateStr, propertyId) => {
-  if (propertyId !== PICKLEX_PROPERTY_ID) {
-    return Number(slot?.price) || 300;
-  }
-  const day = new Date(dateStr).getDay();
-  const isWeekend = day === 0 || day === 6;
-  const match = (slot?.title || "").match(/^(\d{1,2}):/);
-  const hour = match ? parseInt(match[1], 10) : 0;
-  const isPeakTime = hour >= 19 && hour < 24;
-  return isWeekend && isPeakTime ? 600 : 300;
-};
+import {
+  fetchBookedSlotsForDate,
+  getBookingFormBlockingError,
+  getPhoneDigits,
+  getSlotPriceForDate,
+} from "./bookingHelpers";
 
 export default function AddBookingPage() {
   const navigate = useNavigate();
   const { propertyId, setInput, input, property } = useCurrentProperty();
-  const courts = property?.courts || ["court1"];
+  const courts = useMemo(
+    () => property?.courts || ["court1"],
+    [property?.courts]
+  );
   const isMultiCourt = courts.length > 1;
   const [selectedCourt, setSelectedCourt] = useState(courts[0]);
   const [bookedSlots, setBookedSlots] = useState([]);
   const [slotLoading, setSlotLoading] = React.useState(true);
   const [selectedSlots, setSelectedSlots] = useState([]);
-  const [isAddBookingDisabled, setIsAddBookingDisabled] = useState(true);
   const [additionOrUpdationInProgress, setAdditionOrUpdationInProgress] =
     useState(false);
   const [totalAmount, setTotalAmount] = useState(0);
+  const previousSelectedSlotCountRef = useRef(null);
   const { addSlotBooking } = useBookingsManager();
   const toast = useToast();
   const [pickingContact, setPickingContact] = useState(false);
@@ -90,7 +70,7 @@ export default function AddBookingPage() {
         const c = contacts[0];
         const name = c.name?.join?.(" ") || c.name || "";
         const tel = (c.tel && (Array.isArray(c.tel) ? c.tel[0] : c.tel)) || "";
-        const number = String(tel).replace(/\D/g, "").slice(-10);
+        const number = getPhoneDigits(String(tel).replace(/\D/g, "").slice(-10));
         setInput((prev) => ({
           ...prev,
           name: name || prev.name,
@@ -117,10 +97,7 @@ export default function AddBookingPage() {
       if (!propertyId || !input.date) return;
       try {
         setSlotLoading(true);
-        const slots = await getBookedSlotsForDateAndPlayground(
-          input.date,
-          propertyId
-        );
+        const slots = await fetchBookedSlotsForDate(propertyId, input.date);
         setBookedSlots(slots);
       } catch (err) {
         console.error("Error fetching booked slots:", err);
@@ -139,17 +116,25 @@ export default function AddBookingPage() {
     if (courts.length > 0 && !courts.includes(selectedCourt)) {
       setSelectedCourt(courts[0]);
     }
-  }, [courts]);
+  }, [courts, selectedCourt]);
 
   useEffect(() => {
-    const { name, number, date } = input;
-    setIsAddBookingDisabled(
-      !(name && number && date && selectedSlots.length > 0)
-    );
-  }, [input, selectedSlots]);
+    const n = selectedSlots.length;
+    const prev = previousSelectedSlotCountRef.current;
+    previousSelectedSlotCountRef.current = n;
+    if (prev !== null && prev > 0 && n === 0) {
+      setInput((prevInput) => ({
+        ...prevInput,
+        totalAmount: undefined,
+        discount: undefined,
+      }));
+    }
+  }, [selectedSlots.length, setInput]);
 
   useEffect(() => {
-    if (input?.totalAmount !== undefined) {
+    const hasManualTotal =
+      input?.totalAmount !== undefined && input?.totalAmount !== "";
+    if (hasManualTotal) {
       setTotalAmount(input?.totalAmount);
     } else {
       const total = isEmpty(selectedSlots)
@@ -163,6 +148,14 @@ export default function AddBookingPage() {
     }
   }, [selectedSlots, input?.totalAmount, input?.date, propertyId]);
 
+  const submitError = getBookingFormBlockingError({
+    name: input?.name,
+    date: input?.date,
+    phoneValue: input?.number,
+    selectedSlotCount: selectedSlots.length,
+  });
+  const canSubmit = !submitError;
+
   const subtotal = Number(totalAmount) || 0;
   const discount = Number(input?.discount) || 0;
   const totalAfterDiscount = Math.max(0, subtotal - discount);
@@ -170,7 +163,9 @@ export default function AddBookingPage() {
   const payable = Math.max(0, totalAfterDiscount - advanced);
 
   const onAddBooking = async () => {
+    if (!canSubmit) return;
     setAdditionOrUpdationInProgress(true);
+    const phone = getPhoneDigits(input?.number);
     const slotsWithDatePrice = selectedSlots.map((slot) => ({
       ...slot,
       price: getSlotPriceForDate(slot, input?.date || "", propertyId),
@@ -186,7 +181,7 @@ export default function AddBookingPage() {
       },
       customer: {
         name: input?.name,
-        number: input?.number,
+        number: phone,
       },
       propertyId,
       property: { id: propertyId, title: property?.property?.title },
@@ -246,9 +241,14 @@ export default function AddBookingPage() {
 
           <FormLabel>Phone Number</FormLabel>
           <Input
-            value={input?.number}
-            onChange={(e) => setInput({ ...input, number: e.target.value })}
-            placeholder="Phone Number"
+            inputMode="numeric"
+            autoComplete="tel"
+            maxLength={10}
+            value={getPhoneDigits(input?.number)}
+            onChange={(e) =>
+              setInput({ ...input, number: getPhoneDigits(e.target.value) })
+            }
+            placeholder="10-digit mobile number"
           />
 
           <FormLabel>Select Date</FormLabel>
@@ -304,10 +304,15 @@ export default function AddBookingPage() {
             backgroundColor="gray.50"
           />
 
+          {submitError ? (
+            <Text color="red.500" fontSize="sm" textAlign="center">
+              {submitError}
+            </Text>
+          ) : null}
           <Button
             colorScheme="blue"
             isLoading={additionOrUpdationInProgress}
-            isDisabled={isAddBookingDisabled}
+            isDisabled={!canSubmit}
             onClick={onAddBooking}>
             Add Booking
           </Button>

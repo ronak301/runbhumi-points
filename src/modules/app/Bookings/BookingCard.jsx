@@ -5,6 +5,7 @@ import moment from "moment";
 import { DeleteBooking } from "../../../components/DeleteBooking";
 import { getPoints, isValidPoints } from "../Points/Points";
 import useCurrentProperty from "../hooks/useCurrentProperty";
+import { EditBookingButton } from "./EditBookingModal";
 
 // This component represents each individual booking's card
 const BookingCard = ({ onComplete, booking, title, usersWithPoints }) => {
@@ -217,7 +218,10 @@ ${advancedAmountString}
       )}
 
       <Flex justifyContent="space-between" align="center" mt={3}>
-        <DeleteBooking booking={booking} onComplete={onComplete} />
+        <Flex align="center" gap={1}>
+          <DeleteBooking booking={booking} onComplete={onComplete} />
+          <EditBookingButton booking={booking} onComplete={onComplete} />
+        </Flex>
         <Box>
           <IconButton
             size="sm"

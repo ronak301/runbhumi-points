@@ -10,6 +10,8 @@ function SlotSelector({
   slotLoading,
   selectedCourt,
   onCourtChange,
+  /** When editing, booked rows for this booking are treated as free (not blocked). */
+  ignoreBookingId,
 }) {
   const { property } = useCurrentProperty();
   const allSlots = property?.slots || property?.property?.slots || [];
@@ -58,6 +60,9 @@ function SlotSelector({
 
   const slotIsBooked = (slot, bookedSlotsList) => {
     return filter(bookedSlotsList, (s) => {
+      if (ignoreBookingId && s.bookingId === ignoreBookingId) {
+        return false;
+      }
       const titleMatch = s.slot?.title === slot.title;
       const courtMatch =
         !s.courtId && !slot.courtId

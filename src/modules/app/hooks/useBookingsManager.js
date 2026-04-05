@@ -5,6 +5,7 @@ import {
   getDocs,
   doc,
   deleteDoc,
+  updateDoc,
   query,
   orderBy,
   limit,
@@ -119,8 +120,12 @@ const useBookingsManager = () => {
     });
   }, [propertyId]);
 
-  const fetchBookings = async (nextPage = false) => {
-    if (busy) return;
+  /**
+   * @param nextPage Pagination
+   * @param force If true, run even when `busy` (e.g. refresh after save/delete so the list never misses an update)
+   */
+  const fetchBookings = async (nextPage = false, force = false) => {
+    if (!force && busy) return;
     setBusy(true);
 
     if (!nextPage) {
@@ -235,6 +240,111 @@ const useBookingsManager = () => {
     }
   };
 
+  /** Remove all bookedSlot subdocs for a booking on a given calendar date. */
+  const deleteBookedSlotsForBookingOnDate = async (pid, date, bookingId) => {
+    if (!pid || !date || !bookingId) return;
+    const bookedSlotCollectionRef = collection(
+      db,
+      `properties/${pid}/bookings/${date}/bookedSlot`
+    );
+    const snapshot = await getDocs(bookedSlotCollectionRef);
+    const removals = [];
+    snapshot.forEach((d) => {
+      if (d.data()?.bookingId === bookingId) {
+        removals.push(deleteDoc(d.ref));
+      }
+    });
+    await Promise.all(removals);
+  };
+
+  /**
+   * Update booking document and property bookedSlot mirrors.
+   * Removes old slot rows for previousDate, then writes new rows for booking.bookingDate.
+   */
+  const updateSlotBooking = async (
+    bookingId,
+    previousDate,
+    booking,
+    slotsToBook,
+    onComplete
+  ) => {
+    if (busy) {
+      showAlert("Please wait for the current action to finish.", "warning");
+      return false;
+    }
+    if (!propertyId || !bookingId) {
+      showAlert("Missing property or booking.", "error");
+      return false;
+    }
+    if (booking?.property?.id && booking.property.id !== propertyId) {
+      showAlert("Booking does not belong to this property.", "error");
+      return false;
+    }
+    const newDate = booking?.bookingDate;
+    if (!newDate) {
+      showAlert("Booking date is required.", "error");
+      return false;
+    }
+    if (!previousDate) {
+      showAlert("Could not determine previous booking date.", "error");
+      return false;
+    }
+    setBusy(true);
+    setLoading(true);
+    try {
+      await updateDoc(doc(db, "bookings", bookingId), {
+        bookingDate: newDate,
+        amountSumary: booking.amountSumary,
+        customer: booking.customer,
+        property: booking.property,
+        propertyId: booking.propertyId ?? propertyId,
+        slots: booking.slots,
+        timestamp: booking.timestamp,
+      });
+
+      await deleteBookedSlotsForBookingOnDate(
+        propertyId,
+        previousDate,
+        bookingId
+      );
+      if (previousDate !== newDate) {
+        await deleteBookedSlotsForBookingOnDate(propertyId, newDate, bookingId);
+      }
+
+      await Promise.all(
+        slotsToBook.map(async (slot) => {
+          const slotInfo = {
+            slot,
+            bookingId,
+            bookingCancel: false,
+            customer: booking.customer,
+            ...(slot.courtId && { courtId: slot.courtId }),
+          };
+          const propertiesRef = collection(db, "properties");
+          const bookingsRef = doc(propertiesRef, propertyId);
+          const bookingsCollectionRef = collection(bookingsRef, "bookings");
+          const currentDateDocRef = doc(bookingsCollectionRef, newDate);
+          const bookedSlotCollectionRef = collection(
+            currentDateDocRef,
+            "bookedSlot"
+          );
+          await addDoc(bookedSlotCollectionRef, slotInfo);
+        })
+      );
+
+      await onComplete?.();
+      showAlert("Booking updated successfully!!", "success");
+      return true;
+    } catch (e) {
+      console.error("Error updating slot booking:", e);
+      showAlert("Something went wrong while updating booking!!", "error");
+      return false;
+    } finally {
+      setLoading(false);
+      setBusy(false);
+    }
+  };
+
   // Delete a slot booking
   const deleteSlotBooking = async (id, date, onComplete) => {
     if (busy) return;
@@ -284,6 +394,7 @@ const useBookingsManager = () => {
     lastMonthCollectionTotal,
     financialYearCollectionTotal,
     addSlotBooking,
+    updateSlotBooking,
     deleteSlotBooking,
     loadMore,
     fetchBookings,

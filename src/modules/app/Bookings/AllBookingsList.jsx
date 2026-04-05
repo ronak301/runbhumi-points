@@ -29,7 +29,7 @@ export default function AllBookingsList() {
   );
 
   const onComplete = async () => {
-    await fetchBookings();
+    await fetchBookings(false, true);
   };
 
   return (
