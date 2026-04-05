@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
   Box,
+  Button,
   Flex,
   Spinner,
   Tab,
@@ -20,6 +21,40 @@ import { compareBookingsBySlotTimeAsc } from "../Bookings/bookingSort";
 
 function sortBySlotTime(bookings) {
   return [...bookings].sort(compareBookingsBySlotTimeAsc);
+}
+
+/** @param {string | undefined} courtId e.g. court1 */
+function courtTabLabel(courtId) {
+  const n = String(courtId || "").replace(/^court/i, "").trim();
+  return n ? `Court ${n}` : String(courtId || "Court");
+}
+
+/** Booking counts if it has at least one slot on this court. */
+function bookingMatchesCourt(booking, courtId) {
+  const raw = booking?.slots || [];
+  if (!raw.length) return (courtId || "court1") === "court1";
+  for (const s of raw) {
+    const slot = s?.slot && typeof s.slot === "object" ? s.slot : s;
+    const cid = slot?.courtId || "court1";
+    if (cid === courtId) return true;
+  }
+  return false;
+}
+
+async function fetchCourtsList(propertyId) {
+  const propSnap = await getDoc(doc(db, "properties", propertyId));
+  const fromDoc = propSnap.data()?.courts;
+  if (Array.isArray(fromDoc) && fromDoc.length > 0) return fromDoc;
+  const slotsSnap = await getDocs(
+    collection(db, "properties", propertyId, "slots")
+  );
+  const ids = new Set();
+  slotsSnap.forEach((d) => {
+    const cid = d.data()?.courtId;
+    if (cid) ids.add(cid);
+  });
+  const arr = Array.from(ids).sort();
+  return arr.length > 0 ? arr : ["court1"];
 }
 
 function StaffBookingCard({ booking, propertyId }) {
@@ -95,6 +130,8 @@ export default function VenueStaffViewPage() {
   const [venueTitle, setVenueTitle] = useState("");
   const [propertyId, setPropertyId] = useState(null);
   const [bookings, setBookings] = useState([]);
+  const [courts, setCourts] = useState(null);
+  const [courtFilter, setCourtFilter] = useState("all");
 
   const todayStr = useMemo(() => new Date().toISOString().slice(0, 10), []);
   const tomorrowStr = useMemo(() => {
@@ -130,6 +167,13 @@ export default function VenueStaffViewPage() {
         if (cancelled) return;
         setPropertyId(pid);
         setVenueTitle(linkData?.venueTitle || "Venue");
+        setCourtFilter("all");
+        try {
+          const courtList = await fetchCourtsList(pid);
+          if (!cancelled) setCourts(courtList);
+        } catch {
+          if (!cancelled) setCourts(["court1"]);
+        }
 
         const mirrorCol = collection(
           doc(db, "staffViewLinks", token),
@@ -155,6 +199,8 @@ export default function VenueStaffViewPage() {
     };
   }, [token]);
 
+  const showCourtFilter = Array.isArray(courts) && courts.length > 1;
+
   const todayBookings = useMemo(
     () =>
       sortBySlotTime(bookings.filter((b) => b.bookingDate === todayStr)),
@@ -165,6 +211,16 @@ export default function VenueStaffViewPage() {
       sortBySlotTime(bookings.filter((b) => b.bookingDate === tomorrowStr)),
     [bookings, tomorrowStr]
   );
+
+  const filteredTodayBookings = useMemo(() => {
+    if (!showCourtFilter || courtFilter === "all") return todayBookings;
+    return todayBookings.filter((b) => bookingMatchesCourt(b, courtFilter));
+  }, [todayBookings, showCourtFilter, courtFilter]);
+
+  const filteredTomorrowBookings = useMemo(() => {
+    if (!showCourtFilter || courtFilter === "all") return tomorrowBookings;
+    return tomorrowBookings.filter((b) => bookingMatchesCourt(b, courtFilter));
+  }, [tomorrowBookings, showCourtFilter, courtFilter]);
 
   const shortToday = moment(todayStr).format("D MMM");
   const shortTomorrow = moment(tomorrowStr).format("D MMM");
@@ -198,6 +254,40 @@ export default function VenueStaffViewPage() {
         </Text>
       ) : (
         <Tabs colorScheme="blue" size="sm" px={2} pt={1} isLazy>
+          {showCourtFilter && (
+            <Flex
+              role="group"
+              aria-label="Filter by court"
+              px={1}
+              pt={2}
+              pb={1}
+              gap={1.5}
+              flexWrap="wrap"
+              align="center">
+              <Text fontSize="xs" color="gray.500" fontWeight="600" mr={1}>
+                Court
+              </Text>
+              <Button
+                size="xs"
+                variant={courtFilter === "all" ? "solid" : "outline"}
+                colorScheme="blue"
+                fontWeight="600"
+                onClick={() => setCourtFilter("all")}>
+                All
+              </Button>
+              {courts.map((cid) => (
+                <Button
+                  key={cid}
+                  size="xs"
+                  variant={courtFilter === cid ? "solid" : "outline"}
+                  colorScheme="blue"
+                  fontWeight="600"
+                  onClick={() => setCourtFilter(cid)}>
+                  {courtTabLabel(cid)}
+                </Button>
+              ))}
+            </Flex>
+          )}
           <TabList
             w="100%"
             flexWrap="nowrap"
@@ -214,7 +304,7 @@ export default function VenueStaffViewPage() {
               whiteSpace="nowrap"
               textAlign="center"
               lineHeight="1.2">
-              Today · {shortToday} · {todayBookings.length}
+              Today · {shortToday} · {filteredTodayBookings.length}
             </Tab>
             <Tab
               flex="1"
@@ -226,21 +316,21 @@ export default function VenueStaffViewPage() {
               whiteSpace="nowrap"
               textAlign="center"
               lineHeight="1.2">
-              Tomorrow · {shortTomorrow} · {tomorrowBookings.length}
+              Tomorrow · {shortTomorrow} · {filteredTomorrowBookings.length}
             </Tab>
           </TabList>
 
           <TabPanels>
             <TabPanel px={1}>
               <BookingList
-                list={todayBookings}
+                list={filteredTodayBookings}
                 propertyId={propertyId}
                 empty="No bookings for today."
               />
             </TabPanel>
             <TabPanel px={1}>
               <BookingList
-                list={tomorrowBookings}
+                list={filteredTomorrowBookings}
                 propertyId={propertyId}
                 empty="No bookings for tomorrow."
               />
