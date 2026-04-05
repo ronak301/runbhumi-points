@@ -10,6 +10,7 @@ import {
 import { AlertProvider } from "./context/AlertContext";
 import AdminPanel from "./modules/admin/AdminPanel";
 import AddBookingPage from "./modules/app/Bookings/AddBookingPage";
+import VenueStaffViewPage from "./modules/app/staffView/VenueStaffViewPage";
 import HomeTab from "./modules/app/HomeTab/HomeTab";
 import Login from "./modules/auth/Login";
 import Footer from "./modules/website/Footer";
@@ -78,7 +79,7 @@ const AppContent = ({ isAuthenticated, onLogout, onLogin }) => {
       "/news-blogs",
       "/news-blogs/:slug",
     ].some((path) => location.pathname.startsWith(path.replace(":id", ""))) &&
-    !["/login", "/admin", "/home"].some((path) =>
+    !["/login", "/admin", "/home", "/venue-view"].some((path) =>
       location.pathname.startsWith(path)
     );
 
@@ -99,6 +100,7 @@ const AppContent = ({ isAuthenticated, onLogout, onLogin }) => {
 
           <Route path="/news-blogs" element={<AllBlogs />} />
           <Route path="/news-blogs/:slug" element={<BlogDetail />} />
+          <Route path="/venue-view/:token" element={<VenueStaffViewPage />} />
           <Route
             path="/login"
             element={

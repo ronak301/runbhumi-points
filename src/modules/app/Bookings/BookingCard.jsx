@@ -6,6 +6,7 @@ import { DeleteBooking } from "../../../components/DeleteBooking";
 import { getPoints, isValidPoints } from "../Points/Points";
 import useCurrentProperty from "../hooks/useCurrentProperty";
 import { EditBookingButton } from "./EditBookingModal";
+import { getSlotsSummary } from "./bookingDisplay";
 
 // This component represents each individual booking's card
 const BookingCard = ({ onComplete, booking, title, usersWithPoints }) => {
@@ -32,70 +33,6 @@ const BookingCard = ({ onComplete, booking, title, usersWithPoints }) => {
     return uNum.slice(-10) === bNum.slice(-10);
   });
 
-  const getFormattedTime = (time) => {
-    if (!time || typeof time !== "string" || !time.includes(":")) {
-      return time || "";
-    }
-    let [hours, minutes] = time.split(":").map((v) => Number(v || 0));
-    const suffix = hours >= 12 ? "PM" : "AM";
-    hours = hours % 12 || 12;
-    return minutes === 0
-      ? `${hours}`
-      : `${hours}:${minutes.toString().padStart(2, "0")}`;
-  };
-
-  const getSlotsInfo = (booking) => {
-    const rawSlots = booking?.slots || [];
-    // Normalise possible legacy shapes: { title }, { slot: { title } }
-    const slots = rawSlots
-      .map((s) => {
-        if (s && typeof s.title === "string") return s;
-        if (s && s.slot && typeof s.slot.title === "string") return s.slot;
-        return null;
-      })
-      .filter(Boolean);
-
-    if (!slots.length) return "";
-
-    if (propertyId === "iNANAwfMb6EXNtp7MRwJ") {
-      const titles = slots.map((slot) => slot.title);
-      const info = titles.join(", ");
-      const matches = [...info.matchAll(/-/g)];
-      const indexes = matches.map((match) => match.index);
-      if (indexes.length === 1) return info;
-      const start = indexes[0];
-      const end = indexes[indexes.length - 1];
-      return info.slice(0, start) + info.slice(end);
-    }
-
-    const courtId = slots[0]?.courtId;
-    const courtLabel = courtId
-      ? `Court ${courtId.replace("court", "")} • `
-      : "";
-
-    const titles = slots.map((slot) => slot.title);
-
-    // Get first and last time from all slots
-    const firstSlot = titles[0];
-    const lastSlot = titles[titles.length - 1];
-    if (
-      !firstSlot ||
-      !lastSlot ||
-      !firstSlot.includes(" - ") ||
-      !lastSlot.includes(" - ")
-    ) {
-      return courtLabel + (firstSlot || "");
-    }
-    const startTime = firstSlot.split(" - ")[0];
-    const endTime = lastSlot.split(" - ")[1];
-
-    const suffix = Number(startTime.split(":")[0]) >= 12 ? "PM" : "AM";
-
-    return `${courtLabel}${getFormattedTime(startTime)} - ${getFormattedTime(
-      endTime,
-    )} ${suffix}`;
-  };
-
   const pointsAvailable = isValidPoints(linkedUser)
     ? getPoints(linkedUser?.points)
     : 0;
@@ -117,7 +54,7 @@ Mobile: ${num}
 Location: F-266, Road No. 12, Near Airtel Office, Madri Industrial Area
 Map: https://maps.app.goo.gl/QAs3A9APjdqRZfmS9
 Date of Booking: ${moment(booking?.bookingDate).format("DD-MM-YYYY")}
-Time Slots: ${getSlotsInfo(booking)}
+Time Slots: ${getSlotsSummary(booking, propertyId)}
 ${discountLine}${totalLine}
 ${advancedAmountString}
 Points Available: ${pointsAvailable}
@@ -130,7 +67,7 @@ Mobile: ${num}
 Location: Behind Vatsalya academy, Tagore Nagar, Sector 4, Hiran Magri, Udaipur
 Map: https://maps.app.goo.gl/gCNNeNtW6yQEAmmKA
 Date of Booking: ${moment(booking?.bookingDate).format("DD-MM-YYYY")}
-Time Slots: ${getSlotsInfo(booking)}
+Time Slots: ${getSlotsSummary(booking, propertyId)}
 ${discountLine}${totalLine}
 ${advancedAmountString}
               `;
@@ -143,7 +80,7 @@ Mobile: ${num}
 Location: Gopal mill, near railway underpass
 Map: https://maps.app.goo.gl/4sEQXASVY2TGrXxQ7
 Date of Booking: ${moment(booking?.bookingDate).format("DD-MM-YYYY")}
-Time Slots: ${getSlotsInfo(booking)}
+Time Slots: ${getSlotsSummary(booking, propertyId)}
 ${discountLine}${totalLine}
 ${advancedAmountString}
               `;
@@ -157,7 +94,7 @@ Near Samudayik Bhawan, BSNL Road
 Hiran Magri, Sector 4, Udaipur
 Map: https://maps.app.goo.gl/x3UwszbasrKsUyFP6
 Date of Booking: ${moment(booking?.bookingDate).format("DD-MM-YYYY")}
-Time Slots: ${getSlotsInfo(booking)}
+Time Slots: ${getSlotsSummary(booking, propertyId)}
 ${discountLine}${totalLine}
 ${advancedAmountString}
 
@@ -169,7 +106,7 @@ ${advancedAmountString}
 Name: ${name}
 Mobile: ${num}
 Date of Booking: ${moment(booking?.bookingDate).format("DD-MM-YYYY")}
-Time Slots: ${getSlotsInfo(booking)}
+Time Slots: ${getSlotsSummary(booking, propertyId)}
 ${discountLine}${totalLine}
 ${advancedAmountString}
               `;
@@ -204,7 +141,7 @@ ${advancedAmountString}
       </Flex>
 
       <Text fontSize="xs" color="gray.700">
-        {displayDate} · {getSlotsInfo(booking)}
+        {displayDate} · {getSlotsSummary(booking, propertyId)}
       </Text>
       {discountAmount > 0 && (
         <Text fontSize="xs" color="orange.600" mt={1}>

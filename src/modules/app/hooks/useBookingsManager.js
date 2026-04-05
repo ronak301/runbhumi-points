@@ -15,6 +15,11 @@ import {
 import { db } from "../../../firebase";
 import { showAlert } from "../../../context/AlertContext";
 import useCurrentProperty from "./useCurrentProperty";
+import {
+  deleteStaffViewMirror,
+  syncStaffViewMirror,
+} from "../staffView/staffViewMirror";
+import { compareBookingsByDateDescThenSlotAsc } from "../Bookings/bookingSort";
 
 export const LIMIT = 20;
 
@@ -46,20 +51,13 @@ const useBookingsManager = () => {
   const [lastMonthCollectionTotal, setLastMonthCollectionTotal] = useState(0);
   const [financialYearCollectionTotal, setFinancialYearCollectionTotal] =
     useState(0);
+  const [lastFinancialYearCollectionTotal, setLastFinancialYearCollectionTotal] =
+    useState(0);
 
-  // Next/upcoming booking first: date desc (today & recent first), then earliest slot in day first.
+  // Newer dates first; same day → earliest slot time first (see bookingSort.js).
   const sortDataBySlots = (data) => {
     const list = Array.isArray(data) ? [...data] : [];
-    return list.sort((a, b) => {
-      const dateA = new Date(a?.bookingDate);
-      const dateB = new Date(b?.bookingDate);
-      if (dateA.getTime() !== dateB.getTime()) {
-        return dateB - dateA; // newer date first (21 Feb before 7 Feb)
-      }
-      const slotA = a?.slots?.[0]?.sort ?? 0;
-      const slotB = b?.slots?.[0]?.sort ?? 0;
-      return slotA - slotB; // same day: earlier slot first
-    });
+    return list.sort(compareBookingsByDateDescThenSlotAsc);
   };
 
   // Sum all bookings in date range for current property (query by range, filter by property.id)
@@ -92,6 +90,7 @@ const useBookingsManager = () => {
       setMonthlyCollectionTotal(0);
       setLastMonthCollectionTotal(0);
       setFinancialYearCollectionTotal(0);
+      setLastFinancialYearCollectionTotal(0);
       return;
     }
     setLastVisible(null);
@@ -109,14 +108,21 @@ const useBookingsManager = () => {
     const fyStart = `${fyStartYear}-04-01`;
     const fyEnd = `${fyEndYear}-03-31`;
 
+    const prevFyStartYear = fyStartYear - 1;
+    const prevFyEndYear = fyStartYear;
+    const lastFyStart = `${prevFyStartYear}-04-01`;
+    const lastFyEnd = `${prevFyEndYear}-03-31`;
+
     Promise.all([
       sumBookingsInRange(thisMonth.start, thisMonth.end, pid),
       sumBookingsInRange(prevMonth.start, prevMonth.end, pid),
       sumBookingsInRange(fyStart, fyEnd, pid),
-    ]).then(([monthly, lastMonth, fy]) => {
+      sumBookingsInRange(lastFyStart, lastFyEnd, pid),
+    ]).then(([monthly, lastMonth, fy, lastFy]) => {
       setMonthlyCollectionTotal(monthly);
       setLastMonthCollectionTotal(lastMonth);
       setFinancialYearCollectionTotal(fy);
+      setLastFinancialYearCollectionTotal(lastFy);
     });
   }, [propertyId]);
 
@@ -225,6 +231,10 @@ const useBookingsManager = () => {
           await addDoc(bookedSlotCollectionRef, slotInfo);
         })
       );
+      await syncStaffViewMirror(propertyId, bookingId, {
+        ...booking,
+        id: bookingId,
+      });
       await fetchBookings();
 
       console.log("Booking added successfully!");
@@ -332,6 +342,10 @@ const useBookingsManager = () => {
         })
       );
 
+      await syncStaffViewMirror(propertyId, bookingId, {
+        ...booking,
+        id: bookingId,
+      });
       await onComplete?.();
       showAlert("Booking updated successfully!!", "success");
       return true;
@@ -352,6 +366,7 @@ const useBookingsManager = () => {
     setLoading(true);
     try {
       await deleteDoc(doc(db, "bookings", id));
+      await deleteStaffViewMirror(propertyId, id);
 
       const propertiesRef = collection(db, "properties");
       const bookingsRef = doc(propertiesRef, propertyId);
@@ -393,6 +408,7 @@ const useBookingsManager = () => {
     monthlyCollectionTotal,
     lastMonthCollectionTotal,
     financialYearCollectionTotal,
+    lastFinancialYearCollectionTotal,
     addSlotBooking,
     updateSlotBooking,
     deleteSlotBooking,

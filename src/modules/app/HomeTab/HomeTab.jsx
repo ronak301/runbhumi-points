@@ -138,8 +138,8 @@ export default function HomeTab({ onLogout }) {
         )}
       </Box>
 
-      {/* Main Content */}
-      <Box flex="1" overflowY="auto">
+      {/* Main Content — minH 0 + bottom padding clears fixed tab bar */}
+      <Box flex="1" minH={0} overflowY="auto" pb={24}>
         <Tabs
           index={activeTabIndex}
           onChange={handleTabChange}
