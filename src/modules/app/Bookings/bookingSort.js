@@ -3,24 +3,9 @@
  * Used for owner list (date desc) and staff view (same day, time asc).
  */
 
-/** @returns {number | null} minutes from midnight, or null if title not parsed */
-export function parseSlotTitleStartMinutes(title) {
-  if (!title || typeof title !== "string") return null;
-  const startPart = title.split(" - ")[0]?.trim() || "";
-  const m = startPart.match(/^(\d{1,2}):(\d{2})/);
-  if (m) {
-    const h = parseInt(m[1], 10);
-    const min = parseInt(m[2], 10);
-    return h * 60 + min;
-  }
-  const m2 = startPart.match(/^(\d{1,2})(?::(\d{2}))?$/);
-  if (m2) {
-    return (
-      parseInt(m2[1], 10) * 60 + (m2[2] ? parseInt(m2[2], 10) : 0)
-    );
-  }
-  return null;
-}
+import { parseSlotTitleStartMinutes } from "./bookingSlotTimeParse";
+
+export { parseSlotTitleStartMinutes } from "./bookingSlotTimeParse";
 
 function slotOrderingKey(slot) {
   if (!slot) return 1e9;

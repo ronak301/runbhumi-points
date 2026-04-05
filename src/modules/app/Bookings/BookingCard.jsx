@@ -126,16 +126,16 @@ ${advancedAmountString}
       py={3}
       boxShadow="sm"
       _hover={{ boxShadow: "md" }}>
-      <Flex justifyContent="space-between" align="center" mb={2}>
-        <Box>
-          <Text fontSize="sm" fontWeight="600" color="teal.700">
+      <Flex justifyContent="space-between" align="center" mb={2} gap={2}>
+        <Box flex="1" minW={0}>
+          <Text fontSize="sm" fontWeight="600" color="teal.700" mb={0.5}>
             {name}
           </Text>
           <Text fontSize="xs" color="gray.500">
             {num}
           </Text>
         </Box>
-        <Text fontSize="sm" fontWeight="700" color="teal.700">
+        <Text fontSize="sm" fontWeight="700" color="teal.700" flexShrink={0}>
           ₹{formattedTotal}
         </Text>
       </Flex>

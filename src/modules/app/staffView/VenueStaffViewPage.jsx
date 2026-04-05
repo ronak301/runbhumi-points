@@ -41,16 +41,16 @@ function StaffBookingCard({ booking, propertyId }) {
       px={3}
       py={3}
       boxShadow="sm">
-      <Flex justifyContent="space-between" align="flex-start" mb={2}>
-        <Box>
-          <Text fontSize="sm" fontWeight="600" color="teal.700">
+      <Flex justifyContent="space-between" align="center" mb={2} gap={2}>
+        <Box flex="1" minW={0}>
+          <Text fontSize="sm" fontWeight="600" color="teal.700" mb={0.5}>
             {name}
           </Text>
           <Text fontSize="xs" color="gray.500">
             {num}
           </Text>
         </Box>
-        <Text fontSize="sm" fontWeight="700" color="teal.700">
+        <Text fontSize="sm" fontWeight="700" color="teal.700" flexShrink={0}>
           ₹{formattedTotal}
         </Text>
       </Flex>
@@ -166,8 +166,8 @@ export default function VenueStaffViewPage() {
     [bookings, tomorrowStr]
   );
 
-  const labelToday = moment(todayStr).format("ddd D MMM");
-  const labelTomorrow = moment(tomorrowStr).format("ddd D MMM");
+  const shortToday = moment(todayStr).format("D MMM");
+  const shortTomorrow = moment(tomorrowStr).format("D MMM");
 
   return (
     <Box minH="100vh" bg="gray.50" pb={8}>
@@ -184,8 +184,8 @@ export default function VenueStaffViewPage() {
         </Text>
       </Box>
 
-      <Text fontSize="xs" color="gray.600" px={4} pt={3} pb={1}>
-        View only · Today &amp; tomorrow
+      <Text fontSize="xs" color="gray.600" px={4} pt={2} pb={0}>
+        View only
       </Text>
 
       {loading ? (
@@ -197,13 +197,36 @@ export default function VenueStaffViewPage() {
           {error}
         </Text>
       ) : (
-        <Tabs colorScheme="blue" px={2} pt={2} isLazy>
-          <TabList>
-            <Tab fontWeight="600" whiteSpace="normal" textAlign="left">
-              Today ({labelToday}) · {todayBookings.length}
+        <Tabs colorScheme="blue" size="sm" px={2} pt={1} isLazy>
+          <TabList
+            w="100%"
+            flexWrap="nowrap"
+            gap={0}
+            borderBottomWidth="1px"
+            borderColor="gray.200">
+            <Tab
+              flex="1"
+              minW={0}
+              fontSize="xs"
+              fontWeight="600"
+              py={2}
+              px={1}
+              whiteSpace="nowrap"
+              textAlign="center"
+              lineHeight="1.2">
+              Today · {shortToday} · {todayBookings.length}
             </Tab>
-            <Tab fontWeight="600" whiteSpace="normal" textAlign="left">
-              Tomorrow ({labelTomorrow}) · {tomorrowBookings.length}
+            <Tab
+              flex="1"
+              minW={0}
+              fontSize="xs"
+              fontWeight="600"
+              py={2}
+              px={1}
+              whiteSpace="nowrap"
+              textAlign="center"
+              lineHeight="1.2">
+              Tomorrow · {shortTomorrow} · {tomorrowBookings.length}
             </Tab>
           </TabList>
 
