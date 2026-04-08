@@ -27,22 +27,12 @@ import { useNavigate } from "react-router-dom";
 import {
   doc,
   getDoc,
-  setDoc,
-  updateDoc,
-  serverTimestamp,
 } from "firebase/firestore";
 import { db } from "../../firebase";
 import useBookingsManager from "./hooks/useBookingsManager";
 import {
-  backfillStaffViewMirrors,
   revokeStaffViewLink,
 } from "./staffView/staffViewMirror";
-
-function makeStaffViewToken() {
-  const a = new Uint8Array(24);
-  crypto.getRandomValues(a);
-  return Array.from(a, (b) => b.toString(16).padStart(2, "0")).join("");
-}
 
 const Profile = ({ onLogout }: any) => {
   const userData = JSON.parse(localStorage.getItem("user") || "{}");
@@ -50,12 +40,10 @@ const Profile = ({ onLogout }: any) => {
   const toast = useToast();
   const [staffToken, setStaffToken] = useState<string | null>(null);
   const [staffLinkLoading, setStaffLinkLoading] = useState(false);
-  const [generatingStaffLink, setGeneratingStaffLink] = useState(false);
   const [revokingStaffLink, setRevokingStaffLink] = useState(false);
   const revokeCancelRef = useRef<HTMLButtonElement>(null);
   const {
     isOpen: revokeOpen,
-    onOpen: onRevokeOpen,
     onClose: onRevokeClose,
   } = useDisclosure();
 
@@ -87,49 +75,9 @@ const Profile = ({ onLogout }: any) => {
   }, [loadStaffToken]);
 
   const staffViewUrl =
-    staffToken && typeof window !== "undefined"
-      ? `${window.location.origin}/venue-view/${staffToken}`
+    propertyId && typeof window !== "undefined"
+      ? `${window.location.origin}/venue-view/property/${propertyId}`
       : "";
-
-  const onGenerateStaffLink = async () => {
-    if (!propertyId) return;
-    try {
-      setGeneratingStaffLink(true);
-      const token = makeStaffViewToken();
-      await setDoc(doc(db, "staffViewLinks", token), {
-        propertyId,
-        venueTitle: title || "Venue",
-        createdAt: serverTimestamp(),
-      });
-      await updateDoc(doc(db, "properties", propertyId), {
-        staffViewToken: token,
-      });
-      setStaffToken(token);
-      const { count } = await backfillStaffViewMirrors(propertyId);
-      toast({
-        title: "Staff view link ready",
-        description:
-          count > 0
-            ? `${count} booking(s) for today & tomorrow synced for staff.`
-            : "Share the link with on-site staff. New edits sync automatically.",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-      });
-    } catch (e: any) {
-      console.error(e);
-      toast({
-        title: "Could not create link",
-        description:
-          e?.message || "Check Firestore permissions for staff view.",
-        status: "error",
-        duration: 6000,
-        isClosable: true,
-      });
-    } finally {
-      setGeneratingStaffLink(false);
-    }
-  };
 
   const onCopyStaffUrl = async () => {
     if (!staffViewUrl) return;
@@ -315,7 +263,7 @@ const Profile = ({ onLogout }: any) => {
                 <Text fontSize="sm" color="gray.500">
                   Loading…
                 </Text>
-              ) : staffToken ? (
+              ) : (
                 <VStack align="stretch" spacing={3}>
                   <Box>
                     <FormLabel mb={1} fontSize="xs">
@@ -335,33 +283,11 @@ const Profile = ({ onLogout }: any) => {
                       onClick={onCopyStaffUrl}>
                       Copy
                     </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={loadStaffToken}>
-                      Refresh
-                    </Button>
-                    <Button
-                      size="sm"
-                      colorScheme="red"
-                      variant="outline"
-                      onClick={onRevokeOpen}>
-                      Revoke
-                    </Button>
                   </HStack>
                   <Text fontSize="xs" color="gray.500">
-                    Revoke if the link was leaked—you can generate a new one
-                    later.
+                    This is a static URL (no token rotation).
                   </Text>
                 </VStack>
-              ) : (
-                <Button
-                  size="sm"
-                  colorScheme="teal"
-                  isLoading={generatingStaffLink}
-                  onClick={onGenerateStaffLink}>
-                  Generate staff link
-                </Button>
               )}
             </AccordionPanel>
           </AccordionItem>

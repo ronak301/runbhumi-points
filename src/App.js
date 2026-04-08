@@ -25,7 +25,6 @@ import BlogDetail from "./modules/website/Blogs/BlogDetail";
 import CricketTurf from "./modules/website/Products/CricketTurf";
 import FootballTurf from "./modules/website/Products/FootballTurf";
 import TagManager from "react-gtm-module";
-import CookieConsent from "./modules/website/CookieConsent";
 
 const tagManagerArgs = {
   gtmId: "GTM-5QZCQT5J",
@@ -100,7 +99,13 @@ const AppContent = ({ isAuthenticated, onLogout, onLogin }) => {
 
           <Route path="/news-blogs" element={<AllBlogs />} />
           <Route path="/news-blogs/:slug" element={<BlogDetail />} />
+          {/* Backwards-compatible staff view (token-based) */}
           <Route path="/venue-view/:token" element={<VenueStaffViewPage />} />
+          {/* Static staff view (propertyId-based) */}
+          <Route
+            path="/venue-view/property/:propertyId"
+            element={<VenueStaffViewPage />}
+          />
           <Route
             path="/login"
             element={

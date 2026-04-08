@@ -12,7 +12,7 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
-import { collection, doc, getDoc, getDocs } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
 import { useParams } from "react-router-dom";
 import moment from "moment";
 import { db } from "../../../firebase";
@@ -39,6 +39,18 @@ function bookingMatchesCourt(booking, courtId) {
     if (cid === courtId) return true;
   }
   return false;
+}
+
+async function fetchBookingsForPropertyOnDate(propertyId, dateStr) {
+  const q = query(
+    collection(db, "bookings"),
+    where("property.id", "==", propertyId),
+    where("bookingDate", "==", dateStr)
+  );
+  const snap = await getDocs(q);
+  const rows = [];
+  snap.forEach((d) => rows.push({ id: d.id, ...d.data() }));
+  return rows;
 }
 
 async function fetchCourtsList(propertyId) {
@@ -124,7 +136,7 @@ function BookingList({ list, propertyId, empty }) {
 }
 
 export default function VenueStaffViewPage() {
-  const { token } = useParams();
+  const { token, propertyId: propertyIdParam } = useParams();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [venueTitle, setVenueTitle] = useState("");
@@ -143,30 +155,52 @@ export default function VenueStaffViewPage() {
   useEffect(() => {
     let cancelled = false;
     const run = async () => {
-      if (!token) {
-        setError("Invalid link.");
-        setLoading(false);
-        return;
-      }
       try {
         setLoading(true);
         setError(null);
-        const linkSnap = await getDoc(doc(db, "staffViewLinks", token));
-        if (!linkSnap.exists()) {
-          setError("This link is not valid or was removed.");
-          setLoading(false);
-          return;
-        }
-        const linkData = linkSnap.data();
-        const pid = linkData?.propertyId;
+        let pid = propertyIdParam || null;
+        let title = "Venue";
+
+        // Backwards-compatible: if opened via token URL, resolve propertyId from staffViewLinks.
         if (!pid) {
-          setError("This link is not configured correctly.");
+          if (!token) {
+            setError("Invalid link.");
+            setLoading(false);
+            return;
+          }
+          const linkSnap = await getDoc(doc(db, "staffViewLinks", token));
+          if (!linkSnap.exists()) {
+            setError("This link is not valid or was removed.");
+            setLoading(false);
+            return;
+          }
+          const linkData = linkSnap.data();
+          pid = linkData?.propertyId || null;
+          title = linkData?.venueTitle || "Venue";
+        }
+
+        if (!pid) {
+          setError("Missing property.");
           setLoading(false);
           return;
         }
+
+        // Static mode: load venue title from property doc (source of truth).
+        if (propertyIdParam) {
+          try {
+            const propSnap = await getDoc(doc(db, "properties", pid));
+            title =
+              propSnap.data()?.property?.title ||
+              propSnap.data()?.title ||
+              "Venue";
+          } catch {
+            // ignore
+          }
+        }
+
         if (cancelled) return;
         setPropertyId(pid);
-        setVenueTitle(linkData?.venueTitle || "Venue");
+        setVenueTitle(title || "Venue");
         setCourtFilter("all");
         try {
           const courtList = await fetchCourtsList(pid);
@@ -175,15 +209,12 @@ export default function VenueStaffViewPage() {
           if (!cancelled) setCourts(["court1"]);
         }
 
-        const mirrorCol = collection(
-          doc(db, "staffViewLinks", token),
-          "mirrorBookings"
-        );
-        const snap = await getDocs(mirrorCol);
-        const rows = [];
-        snap.forEach((d) => {
-          rows.push({ id: d.id, ...d.data() });
-        });
+        // Source of truth: the same `bookings` collection used by the portal.
+        const [todayRows, tomorrowRows] = await Promise.all([
+          fetchBookingsForPropertyOnDate(pid, todayStr),
+          fetchBookingsForPropertyOnDate(pid, tomorrowStr),
+        ]);
+        const rows = [...todayRows, ...tomorrowRows];
         if (cancelled) return;
         setBookings(rows);
       } catch (e) {
@@ -197,7 +228,7 @@ export default function VenueStaffViewPage() {
     return () => {
       cancelled = true;
     };
-  }, [token]);
+  }, [token, propertyIdParam, todayStr, tomorrowStr]);
 
   const showCourtFilter = Array.isArray(courts) && courts.length > 1;
 
