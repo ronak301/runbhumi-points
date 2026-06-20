@@ -40,6 +40,7 @@ export default function MembershipsTab() {
       <MemberBookingsView
         membership={selectedMember}
         onBack={() => setSelectedMember(null)}
+        onMembershipChanged={fetchMemberships}
       />
     );
   }

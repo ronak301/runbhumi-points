@@ -20,18 +20,23 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import moment from "moment";
 import { db } from "../../../firebase";
 import useBookingsManager from "../hooks/useBookingsManager";
+import useMembershipsManager from "../hooks/useMembershipsManager";
 import { getSlotsSummary } from "../Bookings/bookingDisplay";
 import useCurrentProperty from "../hooks/useCurrentProperty";
+import useStore from "../../../zustand/useStore";
 
-function MemberBookingItem({ booking, onDeleted }) {
+function MemberBookingItem({ booking, membershipId, onDeleted, onAfterDelete }) {
   const { deleteSlotBooking, loading } = useBookingsManager();
+  const { decrementUsedBookings } = useMembershipsManager();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = React.useRef();
   const { propertyId } = useCurrentProperty();
 
   const handleDelete = async () => {
     await deleteSlotBooking(booking.id, booking.bookingDate, onDeleted);
+    await decrementUsedBookings(membershipId);
     onClose();
+    onAfterDelete?.();
   };
 
   return (
@@ -93,9 +98,11 @@ function MemberBookingItem({ booking, onDeleted }) {
   );
 }
 
-export default function MemberBookingsView({ membership, onBack }) {
+export default function MemberBookingsView({ membership, onBack, onMembershipChanged }) {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const triggerBookingsRefresh = useStore((s) => s.triggerBookingsRefresh);
+  const requestTabSwitch = useStore((s) => s.requestTabSwitch);
 
   const fetchBookings = async () => {
     setLoading(true);
@@ -118,6 +125,13 @@ export default function MemberBookingsView({ membership, onBack }) {
     fetchBookings();
   }, [membership.id]);
 
+  const handleAfterDelete = () => {
+    onMembershipChanged?.();
+    triggerBookingsRefresh();
+    requestTabSwitch(0);
+    onBack();
+  };
+
   return (
     <Box minH="100vh" bg="gray.50">
       <Box bg="rgb(20,20,20)" px={2} height="60px" display="flex" alignItems="center">
@@ -134,7 +148,7 @@ export default function MemberBookingsView({ membership, onBack }) {
             {membership.name}
           </Text>
           <Text fontSize="xs" color="gray.400">
-            {membership.usedBookings} of {membership.totalBookings} bookings
+            {bookings.length} of {membership.totalBookings} bookings
           </Text>
         </Box>
       </Box>
@@ -151,7 +165,7 @@ export default function MemberBookingsView({ membership, onBack }) {
           </Flex>
         ) : (
           bookings.map((b) => (
-            <MemberBookingItem key={b.id} booking={b} onDeleted={fetchBookings} />
+            <MemberBookingItem key={b.id} booking={b} membershipId={membership.id} onDeleted={fetchBookings} onAfterDelete={handleAfterDelete} />
           ))
         )}
       </Box>

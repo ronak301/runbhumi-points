@@ -19,6 +19,7 @@ import featureConfig from "../../../featureConfig"; // Import the feature config
 import Points from "../Points/Points";
 import MembershipsTab from "../Memberships/MembershipsTab";
 import useCurrentProperty from "../hooks/useCurrentProperty";
+import useStore from "../../../zustand/useStore";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../../firebase";
 
@@ -84,12 +85,22 @@ export default function HomeTab({ onLogout }) {
   // Get feature flags for the current property
   const features = featureConfig[propertyId] || {}; // Default to an empty object if the property ID is not found
 
+  const requestedTabIndex = useStore((s) => s.requestedTabIndex);
+  const clearTabSwitch = useStore((s) => s.clearTabSwitch);
+
   // State to manage the active tab
   const [activeTabIndex, setActiveTabIndex] = useState(0);
 
   const handleTabChange = (index) => {
-    setActiveTabIndex(index); // Update active tab index when a tab is clicked
+    setActiveTabIndex(index);
   };
+
+  useEffect(() => {
+    if (requestedTabIndex !== null) {
+      setActiveTabIndex(requestedTabIndex);
+      clearTabSwitch();
+    }
+  }, [requestedTabIndex]);
 
   const src = propertyId === "D5FfylDnU6NXlmTtPtoj" ? "/logo_3.png" : null;
 

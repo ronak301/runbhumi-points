@@ -46,12 +46,15 @@ export function getMembershipStatus(membership) {
 }
 
 export function getMembershipWhatsAppMessage(membership, propertyTitle) {
-  return `* Membership Confirmation*
+  const amountLine = membership.amount
+    ? `Amount Paid: Rs. ${Number(membership.amount).toLocaleString("en-IN")}\n`
+    : "";
+  return `*🏟️ Membership Confirmation*
 *${propertyTitle || ""}*
 Name: ${membership.name}
 Mobile: ${membership.number}
 Total Bookings: ${membership.totalBookings}
-Start Date: ${moment(membership.startDate).format("DD/MM/YYYY")}
+${amountLine}Start Date: ${moment(membership.startDate).format("DD/MM/YYYY")}
 Valid Till: ${moment(membership.endDate).format("DD/MM/YYYY")}
-Welcome to the family!`;
+Welcome to the family! 🎉`;
 }

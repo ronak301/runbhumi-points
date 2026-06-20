@@ -50,6 +50,7 @@ export default function AddMembershipForm({ onBack, onAdded }) {
     number.trim().length === 10 &&
     startDate &&
     endDate &&
+    endDate >= startDate &&
     amount !== "" &&
     !isNaN(amountNum) &&
     amountNum > 0;
@@ -184,7 +185,9 @@ export default function AddMembershipForm({ onBack, onAdded }) {
 
           {!canSubmit && (
             <Text fontSize="sm" color="red.500">
-              Fill in name, 10-digit number, dates, and a valid amount.
+              {endDate && startDate && endDate < startDate
+                ? "End date cannot be before start date."
+                : "Fill in name, 10-digit number, dates, and a valid amount."}
             </Text>
           )}
 

@@ -18,6 +18,8 @@ import useStore from "../../../zustand/useStore";
 const useMembershipsManager = () => {
   const { propertyId } = useCurrentProperty();
   const triggerBookingsRefresh = useStore((s) => s.triggerBookingsRefresh);
+  const membershipsRefreshKey = useStore((s) => s.membershipsRefreshKey);
+  const triggerMembershipsRefresh = useStore((s) => s.triggerMembershipsRefresh);
   const [memberships, setMemberships] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -27,7 +29,7 @@ const useMembershipsManager = () => {
       return;
     }
     fetchMemberships();
-  }, [propertyId]);
+  }, [propertyId, membershipsRefreshKey]);
 
   const fetchMemberships = async () => {
     if (!propertyId) return;
@@ -125,8 +127,20 @@ const useMembershipsManager = () => {
       await updateDoc(doc(db, "memberships", id), {
         usedBookings: increment(1),
       });
+      triggerMembershipsRefresh();
     } catch (e) {
       console.error("Error incrementing membership bookings:", e);
+    }
+  };
+
+  const decrementUsedBookings = async (id) => {
+    try {
+      await updateDoc(doc(db, "memberships", id), {
+        usedBookings: increment(-1),
+      });
+      triggerMembershipsRefresh();
+    } catch (e) {
+      console.error("Error decrementing membership bookings:", e);
     }
   };
 
@@ -138,6 +152,7 @@ const useMembershipsManager = () => {
     updateMembership,
     deleteMembership,
     incrementUsedBookings,
+    decrementUsedBookings,
   };
 };
 

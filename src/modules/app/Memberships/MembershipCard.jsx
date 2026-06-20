@@ -31,7 +31,7 @@ export default function MembershipCard({ membership, onComplete, onViewBookings 
   const { property, propertyId } = useCurrentProperty();
   const propertyTitle = property?.property?.title || "";
 
-  const { id, name, number, totalBookings, usedBookings, startDate, endDate } = membership;
+  const { id, name, number, totalBookings, usedBookings, startDate, endDate, amount } = membership;
   const progressPercent = Math.min(100, Math.round((usedBookings / totalBookings) * 100));
   const remaining = totalBookings - usedBookings;
   const isExhausted = remaining === 0;
@@ -135,6 +135,11 @@ export default function MembershipCard({ membership, onComplete, onViewBookings 
               <Text fontSize="xs" color="gray.500" mt={0.5}>
                 {number}
               </Text>
+              {amount > 0 && (
+                <Text fontSize="xs" color="teal.600" fontWeight="600" mt={0.5}>
+                  ₹{Number(amount).toLocaleString("en-IN")} paid
+                </Text>
+              )}
             </Box>
             <Badge
               colorScheme={isExhausted ? "red" : "teal"}
