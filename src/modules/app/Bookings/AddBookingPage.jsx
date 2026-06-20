@@ -12,11 +12,12 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { ArrowBackIcon, PhoneIcon } from "@chakra-ui/icons";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import SlotSelector from "./SlotSelector";
 import moment from "moment";
 import { isEmpty } from "lodash";
 import useBookingsManager from "../hooks/useBookingsManager";
+import useMembershipsManager from "../hooks/useMembershipsManager";
 import useCurrentProperty from "../hooks/useCurrentProperty";
 import {
   fetchBookedSlotsForDate,
@@ -27,7 +28,10 @@ import {
 
 export default function AddBookingPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const membershipContext = location.state?.membershipContext || null;
   const { propertyId, setInput, input, property } = useCurrentProperty();
+  const { incrementUsedBookings } = useMembershipsManager();
   const courts = useMemo(
     () => property?.courts || ["court1"],
     [property?.courts]
@@ -44,6 +48,16 @@ export default function AddBookingPage() {
   const { addSlotBooking } = useBookingsManager();
   const toast = useToast();
   const [pickingContact, setPickingContact] = useState(false);
+
+  useEffect(() => {
+    if (membershipContext?.name) {
+      setInput((prev) => ({
+        ...prev,
+        name: membershipContext.name,
+        number: membershipContext.number,
+      }));
+    }
+  }, []);
 
   const supportsContactPicker =
     typeof navigator !== "undefined" &&
@@ -187,8 +201,18 @@ export default function AddBookingPage() {
       property: { id: propertyId, title: property?.property?.title },
       slots: slotsWithDatePrice,
       timestamp: moment().format(),
+      ...(membershipContext && {
+        isMembershipBooking: true,
+        membershipId: membershipContext.membershipId,
+        membershipBookingIndex: membershipContext.membershipBookingIndex,
+        membershipTotalBookings: membershipContext.membershipTotalBookings,
+        membershipEndDate: membershipContext.membershipEndDate,
+      }),
     };
     await addSlotBooking(booking, slotsWithDatePrice);
+    if (membershipContext?.membershipId) {
+      await incrementUsedBookings(membershipContext.membershipId);
+    }
     setAdditionOrUpdationInProgress(false);
     navigate("/home");
   };
@@ -212,16 +236,24 @@ export default function AddBookingPage() {
           size="lg" // Increase button size
         />
         <Text ml={2} fontSize="lg" color="white" fontWeight="bold">
-          {"Add Booking"}
+          {membershipContext ? "Add Member Booking" : "Add Booking"}
         </Text>
       </Box>
 
       {/* Form Section */}
       <Box p={8}>
         <VStack spacing={4} align="stretch">
+          {membershipContext && (
+            <Box bg="teal.50" borderRadius="md" px={3} py={2} mb={1}>
+              <Text fontSize="xs" color="teal.700" fontWeight="600">
+                Member: {membershipContext.membershipBookingIndex} of {membershipContext.membershipTotalBookings} bookings
+              </Text>
+            </Box>
+          )}
+
           <Flex align="center" justify="space-between" wrap="wrap" gap={2}>
             <FormLabel mb={0}>Name</FormLabel>
-            {supportsContactPicker && (
+            {!membershipContext && supportsContactPicker && (
               <Button
                 size="sm"
                 leftIcon={<PhoneIcon />}
@@ -237,6 +269,8 @@ export default function AddBookingPage() {
             value={input?.name}
             onChange={(e) => setInput({ ...input, name: e.target.value })}
             placeholder="Name"
+            isReadOnly={!!membershipContext}
+            bg={membershipContext ? "gray.50" : undefined}
           />
 
           <FormLabel>Phone Number</FormLabel>
@@ -249,6 +283,8 @@ export default function AddBookingPage() {
               setInput({ ...input, number: getPhoneDigits(e.target.value) })
             }
             placeholder="10-digit mobile number"
+            isReadOnly={!!membershipContext}
+            bg={membershipContext ? "gray.50" : undefined}
           />
 
           <FormLabel>Select Date</FormLabel>
@@ -269,40 +305,44 @@ export default function AddBookingPage() {
             onCourtChange={setSelectedCourt}
           />
 
-          <FormLabel>Total Amount</FormLabel>
-          <Input
-            value={totalAmount}
-            onChange={(e) =>
-              setInput({ ...input, totalAmount: e.target.value })
-            }
-            placeholder="Total Amount"
-          />
+          {!membershipContext && (
+            <>
+              <FormLabel>Total Amount</FormLabel>
+              <Input
+                value={totalAmount}
+                onChange={(e) =>
+                  setInput({ ...input, totalAmount: e.target.value })
+                }
+                placeholder="Total Amount"
+              />
 
-          <FormLabel>Discount (₹)</FormLabel>
-          <Input
-            type="number"
-            min={0}
-            value={input?.discount ?? ""}
-            onChange={(e) =>
-              setInput({ ...input, discount: e.target.value ? e.target.value : undefined })
-            }
-            placeholder="0"
-          />
+              <FormLabel>Discount (₹)</FormLabel>
+              <Input
+                type="number"
+                min={0}
+                value={input?.discount ?? ""}
+                onChange={(e) =>
+                  setInput({ ...input, discount: e.target.value ? e.target.value : undefined })
+                }
+                placeholder="0"
+              />
 
-          <FormLabel>Advanced</FormLabel>
-          <Input
-            value={input?.advanced}
-            onChange={(e) => setInput({ ...input, advanced: e.target.value })}
-            placeholder="Advanced"
-          />
+              <FormLabel>Advanced</FormLabel>
+              <Input
+                value={input?.advanced}
+                onChange={(e) => setInput({ ...input, advanced: e.target.value })}
+                placeholder="Advanced"
+              />
 
-          <FormLabel>Total Payable Amount</FormLabel>
-          <Input
-            value={payable}
-            readOnly
-            placeholder="Total Payable Amount"
-            backgroundColor="gray.50"
-          />
+              <FormLabel>Total Payable Amount</FormLabel>
+              <Input
+                value={payable}
+                readOnly
+                placeholder="Total Payable Amount"
+                backgroundColor="gray.50"
+              />
+            </>
+          )}
 
           {submitError ? (
             <Text color="red.500" fontSize="sm" textAlign="center">

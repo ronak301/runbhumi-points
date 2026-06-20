@@ -29,7 +29,7 @@ import {
   mergeBookingSlotsWithProperty,
 } from "./bookingHelpers";
 
-export function EditBookingModal({ booking, isOpen, onClose, onComplete }) {
+export function EditBookingModal({ booking, isOpen, onClose, onComplete, slotOnly = false }) {
   const toast = useToast();
   const { propertyId, property } = useCurrentProperty();
   const courts = property?.courts || ["court1"];
@@ -205,21 +205,24 @@ export function EditBookingModal({ booking, isOpen, onClose, onComplete }) {
       }));
       const payload = {
         bookingDate: form.date,
-        amountSumary: {
-          subtotal,
-          discount,
-          total: totalAfterDiscount,
-          advanced,
-          payable,
-        },
+        amountSumary: slotOnly
+          ? booking.amountSumary
+          : { subtotal, discount, total: totalAfterDiscount, advanced, payable },
         customer: {
-          name: form.name,
-          number: phone,
+          name: slotOnly ? booking.customer?.name : form.name,
+          number: slotOnly ? booking.customer?.number : phone,
         },
         propertyId,
         property: { id: propertyId, title: property?.property?.title },
         slots: slotsWithDatePrice,
         timestamp: moment().format(),
+        ...(booking.isMembershipBooking && {
+          isMembershipBooking: true,
+          membershipId: booking.membershipId,
+          membershipBookingIndex: booking.membershipBookingIndex,
+          membershipTotalBookings: booking.membershipTotalBookings,
+          membershipEndDate: booking.membershipEndDate,
+        }),
       };
       const ok = await updateSlotBooking(
         booking.id,
@@ -269,36 +272,39 @@ export function EditBookingModal({ booking, isOpen, onClose, onComplete }) {
           </Box>
           <ModalBody px={8} pt={8} pb={24}>
             <VStack spacing={4} align="stretch">
-              <Flex align="center" justify="space-between" wrap="wrap" gap={2}>
-                <FormLabel mb={0}>Name</FormLabel>
-                {supportsContactPicker && (
-                  <Button
-                    size="sm"
-                    leftIcon={<PhoneIcon />}
-                    variant="outline"
-                    colorScheme="teal"
-                    onClick={pickFromContacts}>
-                    From contacts
-                  </Button>
-                )}
-              </Flex>
-              <Input
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder="Name"
-              />
-
-              <FormLabel>Phone Number</FormLabel>
-              <Input
-                inputMode="numeric"
-                autoComplete="tel"
-                maxLength={10}
-                value={getPhoneDigits(form.number)}
-                onChange={(e) =>
-                  setForm({ ...form, number: getPhoneDigits(e.target.value) })
-                }
-                placeholder="10-digit mobile number"
-              />
+              {!slotOnly && (
+                <>
+                  <Flex align="center" justify="space-between" wrap="wrap" gap={2}>
+                    <FormLabel mb={0}>Name</FormLabel>
+                    {supportsContactPicker && (
+                      <Button
+                        size="sm"
+                        leftIcon={<PhoneIcon />}
+                        variant="outline"
+                        colorScheme="teal"
+                        onClick={pickFromContacts}>
+                        From contacts
+                      </Button>
+                    )}
+                  </Flex>
+                  <Input
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    placeholder="Name"
+                  />
+                  <FormLabel>Phone Number</FormLabel>
+                  <Input
+                    inputMode="numeric"
+                    autoComplete="tel"
+                    maxLength={10}
+                    value={getPhoneDigits(form.number)}
+                    onChange={(e) =>
+                      setForm({ ...form, number: getPhoneDigits(e.target.value) })
+                    }
+                    placeholder="10-digit mobile number"
+                  />
+                </>
+              )}
 
               <FormLabel>Select Date</FormLabel>
               <Input
@@ -318,51 +324,55 @@ export function EditBookingModal({ booking, isOpen, onClose, onComplete }) {
                 ignoreBookingId={booking.id}
               />
 
-              <Text fontSize="xs" color="gray.600">
-                Amounts follow the same rules as new bookings: changing date or
-                slots updates the default total; you can still override total
-                below.
-              </Text>
+              {!slotOnly && (
+                <>
+                  <Text fontSize="xs" color="gray.600">
+                    Amounts follow the same rules as new bookings: changing date or
+                    slots updates the default total; you can still override total
+                    below.
+                  </Text>
 
-              <FormLabel>Total Amount</FormLabel>
-              <Input
-                value={totalAmount}
-                onChange={(e) =>
-                  setForm({ ...form, totalAmount: e.target.value })
-                }
-                placeholder="Total Amount"
-              />
+                  <FormLabel>Total Amount</FormLabel>
+                  <Input
+                    value={totalAmount}
+                    onChange={(e) =>
+                      setForm({ ...form, totalAmount: e.target.value })
+                    }
+                    placeholder="Total Amount"
+                  />
 
-              <FormLabel>Discount (₹)</FormLabel>
-              <Input
-                type="number"
-                min={0}
-                value={form.discount ?? ""}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    discount: e.target.value ? e.target.value : "",
-                  })
-                }
-                placeholder="0"
-              />
+                  <FormLabel>Discount (₹)</FormLabel>
+                  <Input
+                    type="number"
+                    min={0}
+                    value={form.discount ?? ""}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        discount: e.target.value ? e.target.value : "",
+                      })
+                    }
+                    placeholder="0"
+                  />
 
-              <FormLabel>Advanced</FormLabel>
-              <Input
-                value={form.advanced ?? ""}
-                onChange={(e) =>
-                  setForm({ ...form, advanced: e.target.value })
-                }
-                placeholder="Advanced"
-              />
+                  <FormLabel>Advanced</FormLabel>
+                  <Input
+                    value={form.advanced ?? ""}
+                    onChange={(e) =>
+                      setForm({ ...form, advanced: e.target.value })
+                    }
+                    placeholder="Advanced"
+                  />
 
-              <FormLabel>Total Payable Amount</FormLabel>
-              <Input
-                value={payable}
-                readOnly
-                placeholder="Total Payable Amount"
-                backgroundColor="gray.50"
-              />
+                  <FormLabel>Total Payable Amount</FormLabel>
+                  <Input
+                    value={payable}
+                    readOnly
+                    placeholder="Total Payable Amount"
+                    backgroundColor="gray.50"
+                  />
+                </>
+              )}
             </VStack>
           </ModalBody>
           <ModalFooter

@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Flex, Text, IconButton } from "@chakra-ui/react";
+import { Box, Flex, Text, IconButton, Badge } from "@chakra-ui/react";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import moment from "moment";
 import { DeleteBooking } from "../../../components/DeleteBooking";
@@ -42,7 +42,77 @@ const BookingCard = ({ onComplete, booking, title, usersWithPoints }) => {
   const formattedTotal = totalAmount.toLocaleString("en-IN");
   const displayDate = moment(booking?.bookingDate).format("DD MMM YYYY");
 
+  const getMembershipLine = () => {
+    const idx = booking?.membershipBookingIndex;
+    const total = booking?.membershipTotalBookings;
+    const end = booking?.membershipEndDate;
+    const validTill = end ? `Valid Till: ${moment(end).format("DD/MM/YYYY")}` : "";
+    return `Booking: ${idx} of ${total}\n${validTill}`;
+  };
+
   const getMessage = () => {
+    if (booking?.isMembershipBooking) {
+      const membershipLine = getMembershipLine();
+      switch (propertyId) {
+        case "iNANAwfMb6EXNtp7MRwJ":
+          return `
+*🏏${title} Booking Confirmation🏏*
+Name: ${name}
+Mobile: ${num}
+Location: F-266, Road No. 12, Near Airtel Office, Madri Industrial Area
+Map: https://maps.app.goo.gl/QAs3A9APjdqRZfmS9
+Date of Booking: ${moment(booking?.bookingDate).format("DD-MM-YYYY")}
+Time Slots: ${getSlotsSummary(booking, propertyId)}
+${membershipLine}
+              `;
+        case "4HJl3JYH5TzUeylFEHKj":
+          return `
+*🏏${title} Booking Confirmation🏏*
+Name: ${name}
+Mobile: ${num}
+Location: Behind Vatsalya academy, Tagore Nagar, Sector 4, Hiran Magri, Udaipur
+Map: https://maps.app.goo.gl/gCNNeNtW6yQEAmmKA
+Date of Booking: ${moment(booking?.bookingDate).format("DD-MM-YYYY")}
+Time Slots: ${getSlotsSummary(booking, propertyId)}
+${membershipLine}
+              `;
+        case "D5FfylDnU6NXlmTtPtoj":
+          return `
+*🏏Booking Confirmation🏏*
+*Satyam Sports Arena*
+Name: ${name}
+Mobile: ${num}
+Location: Gopal mill, near railway underpass
+Map: https://maps.app.goo.gl/4sEQXASVY2TGrXxQ7
+Date of Booking: ${moment(booking?.bookingDate).format("DD-MM-YYYY")}
+Time Slots: ${getSlotsSummary(booking, propertyId)}
+${membershipLine}
+              `;
+        case "2H3Ld4uq17AeCtfXpuo0":
+          return `
+*🏏${title} Booking Confirmation🏏*
+Name: ${name}
+Mobile: ${num}
+Location: 1, New Vidhya Nagar
+Near Samudayik Bhawan, BSNL Road
+Hiran Magri, Sector 4, Udaipur
+Map: https://maps.app.goo.gl/x3UwszbasrKsUyFP6
+Date of Booking: ${moment(booking?.bookingDate).format("DD-MM-YYYY")}
+Time Slots: ${getSlotsSummary(booking, propertyId)}
+${membershipLine}
+              `;
+        default:
+          return `
+*🏏${title} - Booking Confirmation🏏*
+Name: ${name}
+Mobile: ${num}
+Date of Booking: ${moment(booking?.bookingDate).format("DD-MM-YYYY")}
+Time Slots: ${getSlotsSummary(booking, propertyId)}
+${membershipLine}
+              `;
+      }
+    }
+
     const totalLine = `*Total Amount: Rs. ${booking?.amountSumary?.total}*`;
     const discountLine = discountString ? `${discountString}\n` : "";
     switch (propertyId) {
@@ -126,6 +196,11 @@ ${advancedAmountString}
       py={3}
       boxShadow="sm"
       _hover={{ boxShadow: "md" }}>
+      {booking?.isMembershipBooking && (
+        <Badge colorScheme="purple" borderRadius="full" px={2} fontSize="xs" mb={2}>
+          Member · {booking.membershipBookingIndex}/{booking.membershipTotalBookings}
+        </Badge>
+      )}
       <Flex justifyContent="space-between" align="center" mb={2} gap={2}>
         <Box flex="1" minW={0}>
           <Text fontSize="sm" fontWeight="600" color="teal.700" mb={0.5}>
@@ -135,9 +210,11 @@ ${advancedAmountString}
             {num}
           </Text>
         </Box>
-        <Text fontSize="sm" fontWeight="700" color="teal.700" flexShrink={0}>
-          ₹{formattedTotal}
-        </Text>
+        {!booking?.isMembershipBooking && (
+          <Text fontSize="sm" fontWeight="700" color="teal.700" flexShrink={0}>
+            ₹{formattedTotal}
+          </Text>
+        )}
       </Flex>
 
       <Text fontSize="xs" color="gray.700">
@@ -156,8 +233,12 @@ ${advancedAmountString}
 
       <Flex justifyContent="space-between" align="center" mt={3}>
         <Flex align="center" gap={1}>
-          <DeleteBooking booking={booking} onComplete={onComplete} />
-          <EditBookingButton booking={booking} onComplete={onComplete} />
+          {!booking?.isMembershipBooking && (
+            <>
+              <DeleteBooking booking={booking} onComplete={onComplete} />
+              <EditBookingButton booking={booking} onComplete={onComplete} />
+            </>
+          )}
         </Flex>
         <Box>
           <IconButton

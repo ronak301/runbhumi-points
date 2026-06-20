@@ -12,11 +12,12 @@ import {
   Select,
 } from "@chakra-ui/react"; // Full import from Chakra UI
 import { useNavigate, useParams } from "react-router-dom";
-import { FaCalendarAlt, FaStar, FaUser } from "react-icons/fa";
+import { FaCalendarAlt, FaIdCard, FaStar, FaUser } from "react-icons/fa";
 import Bookings from "../Bookings"; // Assuming Bookings component fetches bookings for the property
 import Profile from "../Profile"; // Assuming Profile component exists
 import featureConfig from "../../../featureConfig"; // Import the feature config
 import Points from "../Points/Points";
+import MembershipsTab from "../Memberships/MembershipsTab";
 import useCurrentProperty from "../hooks/useCurrentProperty";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../../firebase";
@@ -156,6 +157,12 @@ export default function HomeTab({ onLogout }) {
               </TabPanel>
             ) : null}
 
+            {features.membership ? (
+              <TabPanel p={0}>
+                <MembershipsTab />
+              </TabPanel>
+            ) : null}
+
             <TabPanel>
               <Profile onLogout={handleLogout} />{" "}
             </TabPanel>
@@ -206,6 +213,18 @@ export default function HomeTab({ onLogout }) {
               </Tab>
             ) : null}{" "}
             {/* Don't render Points tab if feature is disabled */}
+            {features.membership ? (
+              <Tab
+                _selected={{ color: "white" }}
+                color="grey"
+                flexDirection="column"
+                alignItems="center">
+                <Icon as={FaIdCard} boxSize={5} />
+                <Text fontSize="sm" mt={1}>
+                  Members
+                </Text>
+              </Tab>
+            ) : null}
             <Tab
               _selected={{ color: "white" }}
               color="grey"

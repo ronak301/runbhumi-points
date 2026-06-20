@@ -15,6 +15,8 @@ import {
 import { db } from "../../../firebase";
 import { showAlert } from "../../../context/AlertContext";
 import useCurrentProperty from "./useCurrentProperty";
+import useStore from "../../../zustand/useStore";
+import { sumMembershipsInRange } from "../Memberships/membershipHelpers";
 import {
   deleteStaffViewMirror,
   syncStaffViewMirror,
@@ -40,6 +42,7 @@ function getMonthRange(offset = 0) {
 
 const useBookingsManager = () => {
   const { propertyId } = useCurrentProperty();
+  const bookingsRefreshKey = useStore((s) => s.bookingsRefreshKey);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [paginationLoading, setPaginationLoading] = useState(false);
@@ -118,13 +121,17 @@ const useBookingsManager = () => {
       sumBookingsInRange(prevMonth.start, prevMonth.end, pid),
       sumBookingsInRange(fyStart, fyEnd, pid),
       sumBookingsInRange(lastFyStart, lastFyEnd, pid),
-    ]).then(([monthly, lastMonth, fy, lastFy]) => {
-      setMonthlyCollectionTotal(monthly);
-      setLastMonthCollectionTotal(lastMonth);
-      setFinancialYearCollectionTotal(fy);
-      setLastFinancialYearCollectionTotal(lastFy);
+      sumMembershipsInRange(thisMonth.start, thisMonth.end, pid),
+      sumMembershipsInRange(prevMonth.start, prevMonth.end, pid),
+      sumMembershipsInRange(fyStart, fyEnd, pid),
+      sumMembershipsInRange(lastFyStart, lastFyEnd, pid),
+    ]).then(([monthly, lastMonth, fy, lastFy, mMonthly, mLastMonth, mFy, mLastFy]) => {
+      setMonthlyCollectionTotal(monthly + mMonthly);
+      setLastMonthCollectionTotal(lastMonth + mLastMonth);
+      setFinancialYearCollectionTotal(fy + mFy);
+      setLastFinancialYearCollectionTotal(lastFy + mLastFy);
     });
-  }, [propertyId]);
+  }, [propertyId, bookingsRefreshKey]);
 
   /**
    * @param nextPage Pagination
