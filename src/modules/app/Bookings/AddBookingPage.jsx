@@ -184,9 +184,10 @@ export default function AddBookingPage() {
       ...slot,
       price: getSlotPriceForDate(slot, input?.date || "", propertyId),
     }));
+    const zeroAmount = { subtotal: 0, discount: 0, total: 0, advanced: 0, payable: 0 };
     const booking = {
       bookingDate: input?.date,
-      amountSumary: {
+      amountSumary: membershipContext ? zeroAmount : {
         subtotal,
         discount,
         total: totalAfterDiscount,

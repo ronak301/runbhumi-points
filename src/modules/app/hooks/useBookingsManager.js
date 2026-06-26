@@ -76,6 +76,7 @@ const useBookingsManager = () => {
       snapshot.forEach((d) => {
         const data = d.data();
         if (data?.property?.id !== pid) return;
+        if (data?.isMembershipBooking) return;
         const t = data?.amountSumary?.total;
         total += typeof t === "number" ? t : Number(t) || 0;
       });
